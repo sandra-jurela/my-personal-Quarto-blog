@@ -1,0 +1,323 @@
+---
+title: "Customer Analysis – Advanced Plots With {ggplot2}"
+description: |
+  Querying database in R code chunk and making some useful plots with ggplot2.
+date: 2022-05-20
+categories:
+  - data cleaning
+  - data manipulation
+  - data visualization
+  - SQL
+  - PostgreSQL
+  - R
+image: images/preview.png
+---
+
+
+## Part I - Getting & wrangling data from the database
+
+The **Bike Sales** Database represents a **bicycle manufacturer**, including tables for products (bikes), customers (bike shops), and transactions (orders).
+
+It consists of 3 tables: 
+
+- **`bikes`** table, which includes bicycle models, descriptions, and unit prices that are produced by the manufacturer.
+
+- **`bikeshops`** table, which includes customers that the bicycle manufacturer has sold to.
+
+- **`orderlines`** table, which includes transactional data such as order ID, order line, date, customer, product, and quantity sold.
+
+**`bike_sales`** database is the local Postgres database stored on my machine.
+
+### Entity Relationship Diagram
+
+```{r}
+#| echo: false
+#| fig-align: center
+knitr::include_graphics("images/bike_sales_erd.png")
+```
+
+### Setting up the programming environment
+
+```{r}
+# loading packages
+library(DBI)
+library(RPostgres)  
+library(tidyverse)
+library(lubridate)
+```
+
+
+
+The `sql` engine uses the `DBI` package to execute SQL queries, print their results, and optionally assign the results to a data frame. To use the `sql` engine, we first need to establish a DBI connection to a database. 
+
+
+### Creating a connection to the `bike_sales` database
+
+
+```{r}
+#| eval = TRUE
+mycon <- DBI::dbConnect(RPostgres::Postgres(), 
+                        dbname = "bike_sales", 
+                        host = "localhost",  
+                        port = "5432",  
+                        user = getOption("database_userid"),
+                        password = getOption("database_password"))
+```
+
+
+Check [here](https://db.rstudio.com/best-practices/managing-credentials/#using-options) how to hide credentials using `options()`.
+
+
+```{r}
+mycon
+```
+
+
+```{r}
+# list the database table names
+dbListTables(mycon)
+```
+
+```{r}
+# read the bikeshops table
+dbReadTable(mycon, "bikeshops") %>% head()
+```
+
+```{r}
+# read the bikes table
+dbReadTable(mycon, "bikes") %>% head()
+```
+
+```{r}
+# read the orderlines table
+dbReadTable(mycon, "orderlines") %>% head()
+```
+
+
+```{r}
+# a simple query example
+dbGetQuery(mycon, 
+          "SELECT model, price 
+           FROM bikes WHERE price > 10000 
+           ORDER BY price DESC")
+```
+
+### Joining the tables
+
+In all three tables there are dots in column names. This is not a good practice and I first had to figure out how to join the tables without an error! Here is the solution:
+
+
+```{r}
+bike_orderlines_joined <- dbGetQuery(mycon, 
+
+'SELECT * 
+FROM orderlines 
+LEFT JOIN bikes
+ON orderlines."product.id" = bikes."bike.id"
+LEFT JOIN bikeshops
+ON orderlines."customer.id" = bikeshops."bikeshop.id"')
+
+head(bike_orderlines_joined)
+```
+
+```{r}
+glimpse(bike_orderlines_joined)
+```
+
+Here I wanted to show how to query a database in an R code chunk. Alternatively, I could have run SQL code in an R Markdown code chunk and send the query output to an R dataframe with `output.var` = "bike_orderlines_joined" in the code chunk options. I have already shown this method in the first three posts. 
+
+The alternative solution would look like this:
+
+
+````{verbatim}
+```{sql connection = mycon, output.var = "bike_orderlines_joined"}
+
+SELECT * 
+FROM orderlines 
+LEFT JOIN bikes
+ON orderlines."product.id" = bikes."bike.id"
+LEFT JOIN bikeshops
+ON orderlines."customer.id" = bikeshops."bikeshop.id"
+```
+
+Now that I have joined the tables I am going to disconnect from the database.
+
+```{r}
+dbDisconnect(mycon)
+```
+
+
+### Data wrangling
+
+```{r}
+bike_orderlines <- bike_orderlines_joined %>% 
+  # rename columns - replacing "." with "_"
+  set_names(names(.) %>% str_replace_all("\\.", "_")) %>% 
+  # remove the unnecessary columns 
+  select(-c(customer_id, product_id, bike_id, bikeshop_id)) %>% 
+  # separate description into category_1, category_2, and frame_material
+  separate(description, 
+           c("category_1", "category_2", "frame_material"),
+           sep = " - ") %>% 
+  # separate location into city and state
+  separate(location,
+           c("city", "state"),
+           sep = ", ") %>%
+  # create a new column total_price
+  mutate(total_price = price * quantity) %>% 
+  # reorder columns
+  select(contains(c("date", "id", "order")),
+         quantity, price, total_price,
+         everything()) 
+
+bike_orderlines %>% head()
+```
+
+```{r}
+bike_orderlines %>% glimpse()
+```
+
+
+
+# Part II - Advanced plots with `ggplot2`
+
+I will continue to work with the `bike_orderlines` dataframe and create two useful plots.
+
+
+## Lollipop Chart: Top N Customers
+
+Question: How much purchasing power is in top 10 customers?
+
+Goal is to visualize top N customers in terms of Revenue, including cumulative percentage.
+
+### Data manipulation
+
+```{r}
+n <- 10
+
+top_customers <- bike_orderlines %>% 
+  select(bikeshop_name, total_price) %>% 
+  mutate(bikeshop_name = as_factor(bikeshop_name) %>% fct_lump_n(n = n, w = total_price)) %>% 
+  group_by(bikeshop_name) %>% 
+  summarise(revenue = sum(total_price)) %>% 
+  ungroup() %>% 
+  mutate(bikeshop_name = bikeshop_name %>% fct_reorder(revenue)) %>% 
+  mutate(bikeshop_name = bikeshop_name %>% fct_relevel("Other", after = 0)) %>% 
+  arrange(desc(bikeshop_name)) %>% 
+  # revenue text
+  mutate(revenue_text = scales::dollar(revenue, scale = 1e-06, suffix = "M")) %>% 
+  # cumulative percent
+  mutate(cum_pct = cumsum(revenue) / sum(revenue)) %>% 
+  mutate(cum_pct_text = scales::percent(cum_pct)) %>% 
+  # rank
+  mutate(rank = row_number()) %>% 
+  mutate(rank = ifelse(rank == max(rank), NA_integer_, rank)) %>% 
+  # label text
+  mutate(label_text = str_glue("Rank: {rank}\nRev: {revenue_text}\nCumPct: {cum_pct_text}")) 
+
+top_customers
+```
+
+               
+### Data visualization
+
+```{r}
+#| fig.width=9,
+#| fig.height=8
+top_customers %>% 
+  ggplot(aes(revenue, bikeshop_name)) +
+  # geometries
+  geom_segment(aes(xend = 0, yend = bikeshop_name), 
+               color = RColorBrewer::brewer.pal(n = 9, name = "Set1")[1],
+               size = 1) +
+  geom_point(color = RColorBrewer::brewer.pal(n = 9, name = "Set1")[1], 
+             size = 3) +
+  geom_label(aes(label = label_text), 
+             hjust = "left", 
+             size = 3,
+             nudge_x = 0.8e+06) +
+  # formatting
+  scale_x_continuous(labels = scales::dollar_format(scale = 1e-06, suffix = "M")) +
+  labs(title = str_glue("Top {n} customers in terms of revenue, with cumulative percentage"),
+       subtitle = str_glue("Top {n} customers contribute {top_customers$cum_pct_text[n]} of purchasing power."),
+       x = "Revenue ($M)",
+       y = "Customer",
+       caption = str_glue("Year: {year(min(bike_orderlines$order_date))} - {year(max(bike_orderlines$order_date))}")) +
+  expand_limits(x = max(top_customers$revenue) + 6e+06) +
+  # theme
+  theme_bw() 
+```
+
+
+
+## Heatmap: Customers' Purchasing Habits
+
+Question: Do specific customers have a purchasing preference?
+
+Goal is to visualize heatmap of proportion of sales by Secondary Product Category.
+
+### Data manipulation
+
+```{r}
+pct_sales_by_customer <- bike_orderlines %>% 
+  select(bikeshop_name, category_1, category_2, quantity) %>% 
+  group_by(bikeshop_name, category_1, category_2) %>% 
+  summarise(total_qty = sum(quantity)) %>% 
+  ungroup() %>% 
+  group_by(bikeshop_name) %>% 
+  mutate(pct = total_qty / sum(total_qty)) %>% 
+  ungroup() %>% 
+  mutate(bikeshop_name = as.factor(bikeshop_name) %>% fct_rev()) %>%  
+  mutate(bikeshop_name_num = as.numeric(bikeshop_name))
+    
+pct_sales_by_customer   
+```
+
+### Data visualization
+
+```{r}
+#| fig.width=9,
+#| fig.height=10
+pct_sales_by_customer %>% 
+  ggplot(aes(category_2, bikeshop_name)) + 
+  # geometries
+  geom_tile(aes(fill = pct)) +
+  geom_text(aes(label = scales::percent(pct, accuracy = 0.1)),
+            size = 3,
+            color = ifelse(pct_sales_by_customer$pct >= 0.15, "white", "black")) +
+  facet_wrap(~ category_1, scales = "free_x") + 
+  # formatting
+  scale_fill_gradient(low = "white", high = tidyquant::palette_light()[1]) + 
+  labs(title = "Heatmap of Purchasing Habits", 
+       subtitle = str_glue("Year: {year(min(bike_orderlines$order_date))} - {year(max(bike_orderlines$order_date))}"),
+       x = "Bike Type",
+       y = "Customer") + 
+  # theme
+  theme(legend.position = "none",
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(face = "bold"),
+        strip.background = element_rect(fill = tidyquant::palette_light()[1], 
+                                        color = "white"), 
+        strip.text = element_text(color = "white", size = 11), 
+        panel.background = element_rect(fill = "white"))
+
+
+```
+
+Top 3 customers that prefer mountain bikes:
+
+- Ithaca Mountain Climbers
+- Pittsburgh Mountain Machines
+- Tampa 29ers
+
+Top 3 customers that prefer road bikes:
+
+- Ann Arbor Speed
+- Austin Cruisers
+- Indianapolis Velocipedes
+
+
+<br/>
+
+That's it! I hope you like it. For those wondering where I learned to make these plots... in a fantastic course [Data Science for Business Part 1](https://university.business-science.io/p/ds4b-101-r-business-analysis-r) by [Matt Dancho](https://www.linkedin.com/in/mattdancho/).
+

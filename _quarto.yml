@@ -2,17 +2,35 @@ project:
   type: website
 
 website:
-  title: "my-personal-Quarto-blog"
+  title: "Sandra Jurela"
+  site-url: "https://sandrajurela.com"
+  description: "This is an extraordinary blog built by Sandra Jurela"
+  favicon: img/logo.png
+  twitter-card: true
+  open-graph: true
   navbar:
+    logo: img/logo.png
+    href: index.html
     right:
-      - about.qmd
+      - text: Home
+        href: index.qmd 
+      - text: About
+        href: about.qmd
       - icon: github
-        href: https://github.com/
-      - icon: twitter
-        href: https://twitter.com
+        href: https://github.com/sandra-jurela
+      - icon: linkedin
+        href: https://www.linkedin.com/in/sandra-jurela-a95985211/
+      - icon: rss
+        href: index.xml
+  google-analytics: "G-MJRRNS5NVY"
+  cookie-consent: false 
+  page-footer: 
+    center: |
+      Copyright © 2023 Sandra Jurela. All Rights Reserved     
+      Built with 🧠 and [Quarto](https://uarto.org/) in RStudio.
 format:
   html:
-    theme: litera
+    theme: theme-light.scss
     css: styles.css
 
 editor: visual

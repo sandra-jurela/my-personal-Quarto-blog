@@ -1,12 +1,15 @@
 ---
-title: "my-personal-Quarto-blog"
+# title: "Latest"
+image: img/profile.jpg
 listing:
   contents: posts
   sort: "date desc"
   type: default
   categories: true
+  feed: true
   sort-ui: false
   filter-ui: false
 page-layout: full
-title-block-banner: true
+title-block-banner: true  
+comments: false
 ---

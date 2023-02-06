@@ -5,4 +5,29 @@
 freeze: true
 
 # Enable banner style title blocks
-title-block-banner: true
+title-block-banner: true   # true adds more space
+
+# Author name of all blog posts
+author: 'Sandra Jurela'
+
+# table of contents
+toc: true
+toc-title: Table of Contents
+toc-location: right
+toc-depth: 3
+
+# fig
+fig-cap-location: bottom
+
+# knitr options
+execute:
+  echo: true
+  message: false
+  warning: false
+  # out.width: "80%"   # doesn't work
+  
+# knitr:
+#   opts_chunk: 
+#     collapse: true
+    
+page-layout: article

@@ -10,5 +10,11 @@
   },
   "posts/welcome/index.qmd": {
     "index.html": "2b4823a6"
+  },
+  "posts/titanic-survival-exercises/titanic-survival-exercises.qmd": {
+    "titanic-survival-exercises.html": "e41aff49"
+  },
+  "posts/ustomer-analysis-advanced-plots-with-ggplot2/customer-analysis-advanced-plots-with-ggplot2.qmd": {
+    "customer-analysis-advanced-plots-with-ggplot2.html": "fe4e6625"
   }
 }
