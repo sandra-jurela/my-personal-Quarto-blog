@@ -4,8 +4,7 @@ description: |
   Querying database in R code chunk and making some useful plots with ggplot2.
 date: 2022-05-20
 categories:
-  - data cleaning
-  - data manipulation
+  - data wrangling
   - data visualization
   - SQL
   - PostgreSQL
@@ -47,12 +46,10 @@ library(lubridate)
 ```
 
 
-
 The `sql` engine uses the `DBI` package to execute SQL queries, print their results, and optionally assign the results to a data frame. To use the `sql` engine, we first need to establish a DBI connection to a database. 
 
 
 ### Creating a connection to the `bike_sales` database
-
 
 ```{r}
 #| eval = TRUE
@@ -245,7 +242,9 @@ top_customers %>%
        caption = str_glue("Year: {year(min(bike_orderlines$order_date))} - {year(max(bike_orderlines$order_date))}")) +
   expand_limits(x = max(top_customers$revenue) + 6e+06) +
   # theme
-  theme_bw() 
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
 ```
 
 
@@ -319,5 +318,5 @@ Top 3 customers that prefer road bikes:
 
 <br/>
 
-That's it! I hope you like it. For those wondering where I learned to make these plots... in a fantastic course [Data Science for Business Part 1](https://university.business-science.io/p/ds4b-101-r-business-analysis-r) by [Matt Dancho](https://www.linkedin.com/in/mattdancho/).
+That's it! I hope you like it. For those wondering where I learned to make plots like this... in a fabulous course [Data Science for Business Part 1](https://university.business-science.io/p/ds4b-101-r-business-analysis-r) by [Matt Dancho](https://www.linkedin.com/in/mattdancho/). This is probably the best course on R and I highly recommend it.
 

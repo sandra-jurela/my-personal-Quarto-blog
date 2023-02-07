@@ -22,16 +22,18 @@ website:
         href: https://www.linkedin.com/in/sandra-jurela-a95985211/
       - icon: rss
         href: index.xml
-  google-analytics: "G-MJRRNS5NVY"
+  google-analytics: "G-JH321LBKZY"
   cookie-consent: false 
   page-footer: 
     center: |
-      Copyright © 2023 Sandra Jurela. All Rights Reserved     
+      © 2023 Sandra Jurela. All Rights Reserved     
       Built with 🧠 and [Quarto](https://uarto.org/) in RStudio.
 format:
   html:
     theme: theme-light.scss
     css: styles.css
+    smooth-scroll: true
+    link-external-newwindow: true
 
 editor: visual
 
