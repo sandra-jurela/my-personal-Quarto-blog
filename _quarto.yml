@@ -27,7 +27,7 @@ website:
   page-footer: 
     center: |
       © 2023 Sandra Jurela. All Rights Reserved     
-      Built with 🧠 and [Quarto](https://uarto.org/) in RStudio.
+      Built with 🧠 and [Quarto](https://quarto.org) in RStudio.
 format:
   html:
     theme: theme-light.scss

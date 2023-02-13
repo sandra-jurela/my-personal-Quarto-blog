@@ -118,21 +118,6 @@ head(bike_orderlines_joined)
 glimpse(bike_orderlines_joined)
 ```
 
-Here I wanted to show how to query a database in an R code chunk. Alternatively, I could have run SQL code in an R Markdown code chunk and send the query output to an R dataframe with `output.var` = "bike_orderlines_joined" in the code chunk options. I have already shown this method in the first three posts. 
-
-The alternative solution would look like this:
-
-
-````{verbatim}
-```{sql connection = mycon, output.var = "bike_orderlines_joined"}
-
-SELECT * 
-FROM orderlines 
-LEFT JOIN bikes
-ON orderlines."product.id" = bikes."bike.id"
-LEFT JOIN bikeshops
-ON orderlines."customer.id" = bikeshops."bikeshop.id"
-```
 
 Disconnecting from the database.
 

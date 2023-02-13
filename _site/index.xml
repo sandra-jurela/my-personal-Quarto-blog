@@ -449,7 +449,7 @@
 <item>
   <title>Customer Analysis – Advanced Plots With {ggplot2}</title>
   <dc:creator>Sandra Jurela</dc:creator>
-  <link>https://sandrajurela.com/posts/ustomer-analysis-advanced-plots-with-ggplot2/customer-analysis-advanced-plots-with-ggplot2.html</link>
+  <link>https://sandrajurela.com/posts/customer-analysis-advanced-plots-with-ggplot2/customer-analysis-advanced-plots-with-ggplot2.html</link>
   <description><![CDATA[ 
 
 
@@ -471,7 +471,7 @@
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="https://sandrajurela.com/posts/ustomer-analysis-advanced-plots-with-ggplot2/images/bike_sales_erd.png" class="img-fluid figure-img" width="718"></p>
+<p><img src="https://sandrajurela.com/posts/customer-analysis-advanced-plots-with-ggplot2/images/bike_sales_erd.png" class="img-fluid figure-img" width="718"></p>
 </figure>
 </div>
 </div>
@@ -625,45 +625,35 @@ $ bikeshop.name &lt;chr&gt; "Ithaca Mountain Climbers", "Ithaca Mountain Climber
 $ location      &lt;chr&gt; "Ithaca, NY", "Ithaca, NY", "Kansas City, KS", "Kansas C…</code></pre>
 </div>
 </div>
-<p>Here I wanted to show how to query a database in an R code chunk. Alternatively, I could have run SQL code in an R Markdown code chunk and send the query output to an R dataframe with <code>output.var</code> = “bike_orderlines_joined” in the code chunk options. I have already shown this method in the first three posts.</p>
-<p>The alternative solution would look like this:</p>
-<div class="sourceCode" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb19-1">```{sql connection = mycon, output.var = "bike_orderlines_joined"}</span>
-<span id="cb19-2"></span>
-<span id="cb19-3">SELECT * </span>
-<span id="cb19-4">FROM orderlines </span>
-<span id="cb19-5">LEFT JOIN bikes</span>
-<span id="cb19-6">ON orderlines."product.id" = bikes."bike.id"</span>
-<span id="cb19-7">LEFT JOIN bikeshops</span>
-<span id="cb19-8">ON orderlines."customer.id" = bikeshops."bikeshop.id"</span></code></pre></div>
 <p>Disconnecting from the database.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><span class="fu" style="color: #4758AB;">dbDisconnect</span>(mycon)</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><span class="fu" style="color: #4758AB;">dbDisconnect</span>(mycon)</span></code></pre></div>
 </div>
 </section>
 <section id="data-wrangling" class="level3">
 <h3 class="anchored" data-anchor-id="data-wrangling">Data wrangling</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1">bike_orderlines <span class="ot" style="color: #003B4F;">&lt;-</span> bike_orderlines_joined <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb21-2">  <span class="co" style="color: #5E5E5E;"># rename columns - replacing "." with "_"</span></span>
-<span id="cb21-3">  <span class="fu" style="color: #4758AB;">set_names</span>(<span class="fu" style="color: #4758AB;">names</span>(.) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> <span class="fu" style="color: #4758AB;">str_replace_all</span>(<span class="st" style="color: #20794D;">"</span><span class="sc" style="color: #5E5E5E;">\\</span><span class="st" style="color: #20794D;">."</span>, <span class="st" style="color: #20794D;">"_"</span>)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb21-4">  <span class="co" style="color: #5E5E5E;"># remove the unnecessary columns </span></span>
-<span id="cb21-5">  <span class="fu" style="color: #4758AB;">select</span>(<span class="sc" style="color: #5E5E5E;">-</span><span class="fu" style="color: #4758AB;">c</span>(customer_id, product_id, bike_id, bikeshop_id)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb21-6">  <span class="co" style="color: #5E5E5E;"># separate description into category_1, category_2, and frame_material</span></span>
-<span id="cb21-7">  <span class="fu" style="color: #4758AB;">separate</span>(description, </span>
-<span id="cb21-8">           <span class="fu" style="color: #4758AB;">c</span>(<span class="st" style="color: #20794D;">"category_1"</span>, <span class="st" style="color: #20794D;">"category_2"</span>, <span class="st" style="color: #20794D;">"frame_material"</span>),</span>
-<span id="cb21-9">           <span class="at" style="color: #657422;">sep =</span> <span class="st" style="color: #20794D;">" - "</span>) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb21-10">  <span class="co" style="color: #5E5E5E;"># separate location into city and state</span></span>
-<span id="cb21-11">  <span class="fu" style="color: #4758AB;">separate</span>(location,</span>
-<span id="cb21-12">           <span class="fu" style="color: #4758AB;">c</span>(<span class="st" style="color: #20794D;">"city"</span>, <span class="st" style="color: #20794D;">"state"</span>),</span>
-<span id="cb21-13">           <span class="at" style="color: #657422;">sep =</span> <span class="st" style="color: #20794D;">", "</span>) <span class="sc" style="color: #5E5E5E;">%&gt;%</span></span>
-<span id="cb21-14">  <span class="co" style="color: #5E5E5E;"># create a new column total_price</span></span>
-<span id="cb21-15">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">total_price =</span> price <span class="sc" style="color: #5E5E5E;">*</span> quantity) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb21-16">  <span class="co" style="color: #5E5E5E;"># reorder columns</span></span>
-<span id="cb21-17">  <span class="fu" style="color: #4758AB;">select</span>(<span class="fu" style="color: #4758AB;">contains</span>(<span class="fu" style="color: #4758AB;">c</span>(<span class="st" style="color: #20794D;">"date"</span>, <span class="st" style="color: #20794D;">"id"</span>, <span class="st" style="color: #20794D;">"order"</span>)),</span>
-<span id="cb21-18">         quantity, price, total_price,</span>
-<span id="cb21-19">         <span class="fu" style="color: #4758AB;">everything</span>()) </span>
-<span id="cb21-20"></span>
-<span id="cb21-21">bike_orderlines <span class="sc" style="color: #5E5E5E;">%&gt;%</span> <span class="fu" style="color: #4758AB;">head</span>()</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb20" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1">bike_orderlines <span class="ot" style="color: #003B4F;">&lt;-</span> bike_orderlines_joined <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb20-2">  <span class="co" style="color: #5E5E5E;"># rename columns - replacing "." with "_"</span></span>
+<span id="cb20-3">  <span class="fu" style="color: #4758AB;">set_names</span>(<span class="fu" style="color: #4758AB;">names</span>(.) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> <span class="fu" style="color: #4758AB;">str_replace_all</span>(<span class="st" style="color: #20794D;">"</span><span class="sc" style="color: #5E5E5E;">\\</span><span class="st" style="color: #20794D;">."</span>, <span class="st" style="color: #20794D;">"_"</span>)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb20-4">  <span class="co" style="color: #5E5E5E;"># remove the unnecessary columns </span></span>
+<span id="cb20-5">  <span class="fu" style="color: #4758AB;">select</span>(<span class="sc" style="color: #5E5E5E;">-</span><span class="fu" style="color: #4758AB;">c</span>(customer_id, product_id, bike_id, bikeshop_id)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb20-6">  <span class="co" style="color: #5E5E5E;"># separate description into category_1, category_2, and frame_material</span></span>
+<span id="cb20-7">  <span class="fu" style="color: #4758AB;">separate</span>(description, </span>
+<span id="cb20-8">           <span class="fu" style="color: #4758AB;">c</span>(<span class="st" style="color: #20794D;">"category_1"</span>, <span class="st" style="color: #20794D;">"category_2"</span>, <span class="st" style="color: #20794D;">"frame_material"</span>),</span>
+<span id="cb20-9">           <span class="at" style="color: #657422;">sep =</span> <span class="st" style="color: #20794D;">" - "</span>) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb20-10">  <span class="co" style="color: #5E5E5E;"># separate location into city and state</span></span>
+<span id="cb20-11">  <span class="fu" style="color: #4758AB;">separate</span>(location,</span>
+<span id="cb20-12">           <span class="fu" style="color: #4758AB;">c</span>(<span class="st" style="color: #20794D;">"city"</span>, <span class="st" style="color: #20794D;">"state"</span>),</span>
+<span id="cb20-13">           <span class="at" style="color: #657422;">sep =</span> <span class="st" style="color: #20794D;">", "</span>) <span class="sc" style="color: #5E5E5E;">%&gt;%</span></span>
+<span id="cb20-14">  <span class="co" style="color: #5E5E5E;"># create a new column total_price</span></span>
+<span id="cb20-15">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">total_price =</span> price <span class="sc" style="color: #5E5E5E;">*</span> quantity) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb20-16">  <span class="co" style="color: #5E5E5E;"># reorder columns</span></span>
+<span id="cb20-17">  <span class="fu" style="color: #4758AB;">select</span>(<span class="fu" style="color: #4758AB;">contains</span>(<span class="fu" style="color: #4758AB;">c</span>(<span class="st" style="color: #20794D;">"date"</span>, <span class="st" style="color: #20794D;">"id"</span>, <span class="st" style="color: #20794D;">"order"</span>)),</span>
+<span id="cb20-18">         quantity, price, total_price,</span>
+<span id="cb20-19">         <span class="fu" style="color: #4758AB;">everything</span>()) </span>
+<span id="cb20-20"></span>
+<span id="cb20-21">bike_orderlines <span class="sc" style="color: #5E5E5E;">%&gt;%</span> <span class="fu" style="color: #4758AB;">head</span>()</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  order_date order_id order_line quantity price total_price
 1 2011-01-07        1          1        1  6070        6070
@@ -689,7 +679,7 @@ $ location      &lt;chr&gt; "Ithaca, NY", "Ithaca, NY", "Kansas City, KS", "Kans
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1">bike_orderlines <span class="sc" style="color: #5E5E5E;">%&gt;%</span> <span class="fu" style="color: #4758AB;">glimpse</span>()</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb22" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1">bike_orderlines <span class="sc" style="color: #5E5E5E;">%&gt;%</span> <span class="fu" style="color: #4758AB;">glimpse</span>()</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 15,644
 Columns: 13
@@ -720,29 +710,29 @@ $ state          &lt;chr&gt; "NY", "NY", "KS", "KS", "KY", "KY", "KY", "KY", "KY
 <section id="data-manipulation" class="level3">
 <h3 class="anchored" data-anchor-id="data-manipulation">Data manipulation</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1">n <span class="ot" style="color: #003B4F;">&lt;-</span> <span class="dv" style="color: #AD0000;">10</span></span>
-<span id="cb25-2"></span>
-<span id="cb25-3">top_customers <span class="ot" style="color: #003B4F;">&lt;-</span> bike_orderlines <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb25-4">  <span class="fu" style="color: #4758AB;">select</span>(bikeshop_name, total_price) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb25-5">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">bikeshop_name =</span> <span class="fu" style="color: #4758AB;">as_factor</span>(bikeshop_name) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> <span class="fu" style="color: #4758AB;">fct_lump_n</span>(<span class="at" style="color: #657422;">n =</span> n, <span class="at" style="color: #657422;">w =</span> total_price)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb25-6">  <span class="fu" style="color: #4758AB;">group_by</span>(bikeshop_name) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb25-7">  <span class="fu" style="color: #4758AB;">summarise</span>(<span class="at" style="color: #657422;">revenue =</span> <span class="fu" style="color: #4758AB;">sum</span>(total_price)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb25-8">  <span class="fu" style="color: #4758AB;">ungroup</span>() <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb25-9">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">bikeshop_name =</span> bikeshop_name <span class="sc" style="color: #5E5E5E;">%&gt;%</span> <span class="fu" style="color: #4758AB;">fct_reorder</span>(revenue)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb25-10">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">bikeshop_name =</span> bikeshop_name <span class="sc" style="color: #5E5E5E;">%&gt;%</span> <span class="fu" style="color: #4758AB;">fct_relevel</span>(<span class="st" style="color: #20794D;">"Other"</span>, <span class="at" style="color: #657422;">after =</span> <span class="dv" style="color: #AD0000;">0</span>)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb25-11">  <span class="fu" style="color: #4758AB;">arrange</span>(<span class="fu" style="color: #4758AB;">desc</span>(bikeshop_name)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb25-12">  <span class="co" style="color: #5E5E5E;"># revenue text</span></span>
-<span id="cb25-13">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">revenue_text =</span> scales<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">dollar</span>(revenue, <span class="at" style="color: #657422;">scale =</span> <span class="fl" style="color: #AD0000;">1e-06</span>, <span class="at" style="color: #657422;">suffix =</span> <span class="st" style="color: #20794D;">"M"</span>)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb25-14">  <span class="co" style="color: #5E5E5E;"># cumulative percent</span></span>
-<span id="cb25-15">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">cum_pct =</span> <span class="fu" style="color: #4758AB;">cumsum</span>(revenue) <span class="sc" style="color: #5E5E5E;">/</span> <span class="fu" style="color: #4758AB;">sum</span>(revenue)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb25-16">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">cum_pct_text =</span> scales<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">percent</span>(cum_pct)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb25-17">  <span class="co" style="color: #5E5E5E;"># rank</span></span>
-<span id="cb25-18">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">rank =</span> <span class="fu" style="color: #4758AB;">row_number</span>()) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb25-19">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">rank =</span> <span class="fu" style="color: #4758AB;">ifelse</span>(rank <span class="sc" style="color: #5E5E5E;">==</span> <span class="fu" style="color: #4758AB;">max</span>(rank), <span class="cn" style="color: #8f5902;">NA_integer_</span>, rank)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb25-20">  <span class="co" style="color: #5E5E5E;"># label text</span></span>
-<span id="cb25-21">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">label_text =</span> <span class="fu" style="color: #4758AB;">str_glue</span>(<span class="st" style="color: #20794D;">"Rank: {rank}</span><span class="sc" style="color: #5E5E5E;">\n</span><span class="st" style="color: #20794D;">Rev: {revenue_text}</span><span class="sc" style="color: #5E5E5E;">\n</span><span class="st" style="color: #20794D;">CumPct: {cum_pct_text}"</span>)) </span>
-<span id="cb25-22"></span>
-<span id="cb25-23">top_customers</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb24" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1">n <span class="ot" style="color: #003B4F;">&lt;-</span> <span class="dv" style="color: #AD0000;">10</span></span>
+<span id="cb24-2"></span>
+<span id="cb24-3">top_customers <span class="ot" style="color: #003B4F;">&lt;-</span> bike_orderlines <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb24-4">  <span class="fu" style="color: #4758AB;">select</span>(bikeshop_name, total_price) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb24-5">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">bikeshop_name =</span> <span class="fu" style="color: #4758AB;">as_factor</span>(bikeshop_name) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> <span class="fu" style="color: #4758AB;">fct_lump_n</span>(<span class="at" style="color: #657422;">n =</span> n, <span class="at" style="color: #657422;">w =</span> total_price)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb24-6">  <span class="fu" style="color: #4758AB;">group_by</span>(bikeshop_name) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb24-7">  <span class="fu" style="color: #4758AB;">summarise</span>(<span class="at" style="color: #657422;">revenue =</span> <span class="fu" style="color: #4758AB;">sum</span>(total_price)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb24-8">  <span class="fu" style="color: #4758AB;">ungroup</span>() <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb24-9">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">bikeshop_name =</span> bikeshop_name <span class="sc" style="color: #5E5E5E;">%&gt;%</span> <span class="fu" style="color: #4758AB;">fct_reorder</span>(revenue)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb24-10">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">bikeshop_name =</span> bikeshop_name <span class="sc" style="color: #5E5E5E;">%&gt;%</span> <span class="fu" style="color: #4758AB;">fct_relevel</span>(<span class="st" style="color: #20794D;">"Other"</span>, <span class="at" style="color: #657422;">after =</span> <span class="dv" style="color: #AD0000;">0</span>)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb24-11">  <span class="fu" style="color: #4758AB;">arrange</span>(<span class="fu" style="color: #4758AB;">desc</span>(bikeshop_name)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb24-12">  <span class="co" style="color: #5E5E5E;"># revenue text</span></span>
+<span id="cb24-13">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">revenue_text =</span> scales<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">dollar</span>(revenue, <span class="at" style="color: #657422;">scale =</span> <span class="fl" style="color: #AD0000;">1e-06</span>, <span class="at" style="color: #657422;">suffix =</span> <span class="st" style="color: #20794D;">"M"</span>)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb24-14">  <span class="co" style="color: #5E5E5E;"># cumulative percent</span></span>
+<span id="cb24-15">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">cum_pct =</span> <span class="fu" style="color: #4758AB;">cumsum</span>(revenue) <span class="sc" style="color: #5E5E5E;">/</span> <span class="fu" style="color: #4758AB;">sum</span>(revenue)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb24-16">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">cum_pct_text =</span> scales<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">percent</span>(cum_pct)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb24-17">  <span class="co" style="color: #5E5E5E;"># rank</span></span>
+<span id="cb24-18">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">rank =</span> <span class="fu" style="color: #4758AB;">row_number</span>()) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb24-19">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">rank =</span> <span class="fu" style="color: #4758AB;">ifelse</span>(rank <span class="sc" style="color: #5E5E5E;">==</span> <span class="fu" style="color: #4758AB;">max</span>(rank), <span class="cn" style="color: #8f5902;">NA_integer_</span>, rank)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb24-20">  <span class="co" style="color: #5E5E5E;"># label text</span></span>
+<span id="cb24-21">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">label_text =</span> <span class="fu" style="color: #4758AB;">str_glue</span>(<span class="st" style="color: #20794D;">"Rank: {rank}</span><span class="sc" style="color: #5E5E5E;">\n</span><span class="st" style="color: #20794D;">Rev: {revenue_text}</span><span class="sc" style="color: #5E5E5E;">\n</span><span class="st" style="color: #20794D;">CumPct: {cum_pct_text}"</span>)) </span>
+<span id="cb24-22"></span>
+<span id="cb24-23">top_customers</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 11 × 7
    bikeshop_name                 revenue revenue…¹ cum_pct cum_p…²  rank label…³
@@ -765,32 +755,32 @@ $ state          &lt;chr&gt; "NY", "NY", "KS", "KS", "KY", "KY", "KY", "KY", "KY
 <section id="data-visualization" class="level3">
 <h3 class="anchored" data-anchor-id="data-visualization">Data visualization</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1">top_customers <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb27-2">  <span class="fu" style="color: #4758AB;">ggplot</span>(<span class="fu" style="color: #4758AB;">aes</span>(revenue, bikeshop_name)) <span class="sc" style="color: #5E5E5E;">+</span></span>
-<span id="cb27-3">  <span class="co" style="color: #5E5E5E;"># geometries</span></span>
-<span id="cb27-4">  <span class="fu" style="color: #4758AB;">geom_segment</span>(<span class="fu" style="color: #4758AB;">aes</span>(<span class="at" style="color: #657422;">xend =</span> <span class="dv" style="color: #AD0000;">0</span>, <span class="at" style="color: #657422;">yend =</span> bikeshop_name), </span>
-<span id="cb27-5">               <span class="at" style="color: #657422;">color =</span> RColorBrewer<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">brewer.pal</span>(<span class="at" style="color: #657422;">n =</span> <span class="dv" style="color: #AD0000;">9</span>, <span class="at" style="color: #657422;">name =</span> <span class="st" style="color: #20794D;">"Set1"</span>)[<span class="dv" style="color: #AD0000;">1</span>],</span>
-<span id="cb27-6">               <span class="at" style="color: #657422;">size =</span> <span class="dv" style="color: #AD0000;">1</span>) <span class="sc" style="color: #5E5E5E;">+</span></span>
-<span id="cb27-7">  <span class="fu" style="color: #4758AB;">geom_point</span>(<span class="at" style="color: #657422;">color =</span> RColorBrewer<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">brewer.pal</span>(<span class="at" style="color: #657422;">n =</span> <span class="dv" style="color: #AD0000;">9</span>, <span class="at" style="color: #657422;">name =</span> <span class="st" style="color: #20794D;">"Set1"</span>)[<span class="dv" style="color: #AD0000;">1</span>], </span>
-<span id="cb27-8">             <span class="at" style="color: #657422;">size =</span> <span class="dv" style="color: #AD0000;">3</span>) <span class="sc" style="color: #5E5E5E;">+</span></span>
-<span id="cb27-9">  <span class="fu" style="color: #4758AB;">geom_label</span>(<span class="fu" style="color: #4758AB;">aes</span>(<span class="at" style="color: #657422;">label =</span> label_text), </span>
-<span id="cb27-10">             <span class="at" style="color: #657422;">hjust =</span> <span class="st" style="color: #20794D;">"left"</span>, </span>
-<span id="cb27-11">             <span class="at" style="color: #657422;">size =</span> <span class="dv" style="color: #AD0000;">3</span>,</span>
-<span id="cb27-12">             <span class="at" style="color: #657422;">nudge_x =</span> <span class="fl" style="color: #AD0000;">0.8e+06</span>) <span class="sc" style="color: #5E5E5E;">+</span></span>
-<span id="cb27-13">  <span class="co" style="color: #5E5E5E;"># formatting</span></span>
-<span id="cb27-14">  <span class="fu" style="color: #4758AB;">scale_x_continuous</span>(<span class="at" style="color: #657422;">labels =</span> scales<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">dollar_format</span>(<span class="at" style="color: #657422;">scale =</span> <span class="fl" style="color: #AD0000;">1e-06</span>, <span class="at" style="color: #657422;">suffix =</span> <span class="st" style="color: #20794D;">"M"</span>)) <span class="sc" style="color: #5E5E5E;">+</span></span>
-<span id="cb27-15">  <span class="fu" style="color: #4758AB;">labs</span>(<span class="at" style="color: #657422;">title =</span> <span class="fu" style="color: #4758AB;">str_glue</span>(<span class="st" style="color: #20794D;">"Top {n} customers in terms of revenue, with cumulative percentage"</span>),</span>
-<span id="cb27-16">       <span class="at" style="color: #657422;">subtitle =</span> <span class="fu" style="color: #4758AB;">str_glue</span>(<span class="st" style="color: #20794D;">"Top {n} customers contribute {top_customers$cum_pct_text[n]} of purchasing power."</span>),</span>
-<span id="cb27-17">       <span class="at" style="color: #657422;">x =</span> <span class="st" style="color: #20794D;">"Revenue ($M)"</span>,</span>
-<span id="cb27-18">       <span class="at" style="color: #657422;">y =</span> <span class="st" style="color: #20794D;">"Customer"</span>,</span>
-<span id="cb27-19">       <span class="at" style="color: #657422;">caption =</span> <span class="fu" style="color: #4758AB;">str_glue</span>(<span class="st" style="color: #20794D;">"Year: {year(min(bike_orderlines$order_date))} - {year(max(bike_orderlines$order_date))}"</span>)) <span class="sc" style="color: #5E5E5E;">+</span></span>
-<span id="cb27-20">  <span class="fu" style="color: #4758AB;">expand_limits</span>(<span class="at" style="color: #657422;">x =</span> <span class="fu" style="color: #4758AB;">max</span>(top_customers<span class="sc" style="color: #5E5E5E;">$</span>revenue) <span class="sc" style="color: #5E5E5E;">+</span> <span class="fl" style="color: #AD0000;">6e+06</span>) <span class="sc" style="color: #5E5E5E;">+</span></span>
-<span id="cb27-21">  <span class="co" style="color: #5E5E5E;"># theme</span></span>
-<span id="cb27-22">  <span class="fu" style="color: #4758AB;">theme_bw</span>() <span class="sc" style="color: #5E5E5E;">+</span></span>
-<span id="cb27-23">  <span class="fu" style="color: #4758AB;">theme</span>(<span class="at" style="color: #657422;">panel.grid.major =</span> <span class="fu" style="color: #4758AB;">element_blank</span>(),</span>
-<span id="cb27-24">        <span class="at" style="color: #657422;">panel.grid.minor =</span> <span class="fu" style="color: #4758AB;">element_blank</span>())</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb26" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1">top_customers <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb26-2">  <span class="fu" style="color: #4758AB;">ggplot</span>(<span class="fu" style="color: #4758AB;">aes</span>(revenue, bikeshop_name)) <span class="sc" style="color: #5E5E5E;">+</span></span>
+<span id="cb26-3">  <span class="co" style="color: #5E5E5E;"># geometries</span></span>
+<span id="cb26-4">  <span class="fu" style="color: #4758AB;">geom_segment</span>(<span class="fu" style="color: #4758AB;">aes</span>(<span class="at" style="color: #657422;">xend =</span> <span class="dv" style="color: #AD0000;">0</span>, <span class="at" style="color: #657422;">yend =</span> bikeshop_name), </span>
+<span id="cb26-5">               <span class="at" style="color: #657422;">color =</span> RColorBrewer<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">brewer.pal</span>(<span class="at" style="color: #657422;">n =</span> <span class="dv" style="color: #AD0000;">9</span>, <span class="at" style="color: #657422;">name =</span> <span class="st" style="color: #20794D;">"Set1"</span>)[<span class="dv" style="color: #AD0000;">1</span>],</span>
+<span id="cb26-6">               <span class="at" style="color: #657422;">size =</span> <span class="dv" style="color: #AD0000;">1</span>) <span class="sc" style="color: #5E5E5E;">+</span></span>
+<span id="cb26-7">  <span class="fu" style="color: #4758AB;">geom_point</span>(<span class="at" style="color: #657422;">color =</span> RColorBrewer<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">brewer.pal</span>(<span class="at" style="color: #657422;">n =</span> <span class="dv" style="color: #AD0000;">9</span>, <span class="at" style="color: #657422;">name =</span> <span class="st" style="color: #20794D;">"Set1"</span>)[<span class="dv" style="color: #AD0000;">1</span>], </span>
+<span id="cb26-8">             <span class="at" style="color: #657422;">size =</span> <span class="dv" style="color: #AD0000;">3</span>) <span class="sc" style="color: #5E5E5E;">+</span></span>
+<span id="cb26-9">  <span class="fu" style="color: #4758AB;">geom_label</span>(<span class="fu" style="color: #4758AB;">aes</span>(<span class="at" style="color: #657422;">label =</span> label_text), </span>
+<span id="cb26-10">             <span class="at" style="color: #657422;">hjust =</span> <span class="st" style="color: #20794D;">"left"</span>, </span>
+<span id="cb26-11">             <span class="at" style="color: #657422;">size =</span> <span class="dv" style="color: #AD0000;">3</span>,</span>
+<span id="cb26-12">             <span class="at" style="color: #657422;">nudge_x =</span> <span class="fl" style="color: #AD0000;">0.8e+06</span>) <span class="sc" style="color: #5E5E5E;">+</span></span>
+<span id="cb26-13">  <span class="co" style="color: #5E5E5E;"># formatting</span></span>
+<span id="cb26-14">  <span class="fu" style="color: #4758AB;">scale_x_continuous</span>(<span class="at" style="color: #657422;">labels =</span> scales<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">dollar_format</span>(<span class="at" style="color: #657422;">scale =</span> <span class="fl" style="color: #AD0000;">1e-06</span>, <span class="at" style="color: #657422;">suffix =</span> <span class="st" style="color: #20794D;">"M"</span>)) <span class="sc" style="color: #5E5E5E;">+</span></span>
+<span id="cb26-15">  <span class="fu" style="color: #4758AB;">labs</span>(<span class="at" style="color: #657422;">title =</span> <span class="fu" style="color: #4758AB;">str_glue</span>(<span class="st" style="color: #20794D;">"Top {n} customers in terms of revenue, with cumulative percentage"</span>),</span>
+<span id="cb26-16">       <span class="at" style="color: #657422;">subtitle =</span> <span class="fu" style="color: #4758AB;">str_glue</span>(<span class="st" style="color: #20794D;">"Top {n} customers contribute {top_customers$cum_pct_text[n]} of purchasing power."</span>),</span>
+<span id="cb26-17">       <span class="at" style="color: #657422;">x =</span> <span class="st" style="color: #20794D;">"Revenue ($M)"</span>,</span>
+<span id="cb26-18">       <span class="at" style="color: #657422;">y =</span> <span class="st" style="color: #20794D;">"Customer"</span>,</span>
+<span id="cb26-19">       <span class="at" style="color: #657422;">caption =</span> <span class="fu" style="color: #4758AB;">str_glue</span>(<span class="st" style="color: #20794D;">"Year: {year(min(bike_orderlines$order_date))} - {year(max(bike_orderlines$order_date))}"</span>)) <span class="sc" style="color: #5E5E5E;">+</span></span>
+<span id="cb26-20">  <span class="fu" style="color: #4758AB;">expand_limits</span>(<span class="at" style="color: #657422;">x =</span> <span class="fu" style="color: #4758AB;">max</span>(top_customers<span class="sc" style="color: #5E5E5E;">$</span>revenue) <span class="sc" style="color: #5E5E5E;">+</span> <span class="fl" style="color: #AD0000;">6e+06</span>) <span class="sc" style="color: #5E5E5E;">+</span></span>
+<span id="cb26-21">  <span class="co" style="color: #5E5E5E;"># theme</span></span>
+<span id="cb26-22">  <span class="fu" style="color: #4758AB;">theme_bw</span>() <span class="sc" style="color: #5E5E5E;">+</span></span>
+<span id="cb26-23">  <span class="fu" style="color: #4758AB;">theme</span>(<span class="at" style="color: #657422;">panel.grid.major =</span> <span class="fu" style="color: #4758AB;">element_blank</span>(),</span>
+<span id="cb26-24">        <span class="at" style="color: #657422;">panel.grid.minor =</span> <span class="fu" style="color: #4758AB;">element_blank</span>())</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://sandrajurela.com/posts/ustomer-analysis-advanced-plots-with-ggplot2/customer-analysis-advanced-plots-with-ggplot2_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="864"></p>
+<p><img src="https://sandrajurela.com/posts/customer-analysis-advanced-plots-with-ggplot2/customer-analysis-advanced-plots-with-ggplot2_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="864"></p>
 </div>
 </div>
 </section>
@@ -802,18 +792,18 @@ $ state          &lt;chr&gt; "NY", "NY", "KS", "KS", "KY", "KY", "KY", "KY", "KY
 <section id="data-manipulation-1" class="level3">
 <h3 class="anchored" data-anchor-id="data-manipulation-1">Data manipulation</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1">pct_sales_by_customer <span class="ot" style="color: #003B4F;">&lt;-</span> bike_orderlines <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb28-2">  <span class="fu" style="color: #4758AB;">select</span>(bikeshop_name, category_1, category_2, quantity) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb28-3">  <span class="fu" style="color: #4758AB;">group_by</span>(bikeshop_name, category_1, category_2) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb28-4">  <span class="fu" style="color: #4758AB;">summarise</span>(<span class="at" style="color: #657422;">total_qty =</span> <span class="fu" style="color: #4758AB;">sum</span>(quantity)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb28-5">  <span class="fu" style="color: #4758AB;">ungroup</span>() <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb28-6">  <span class="fu" style="color: #4758AB;">group_by</span>(bikeshop_name) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb28-7">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">pct =</span> total_qty <span class="sc" style="color: #5E5E5E;">/</span> <span class="fu" style="color: #4758AB;">sum</span>(total_qty)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb28-8">  <span class="fu" style="color: #4758AB;">ungroup</span>() <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb28-9">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">bikeshop_name =</span> <span class="fu" style="color: #4758AB;">as.factor</span>(bikeshop_name) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> <span class="fu" style="color: #4758AB;">fct_rev</span>()) <span class="sc" style="color: #5E5E5E;">%&gt;%</span>  </span>
-<span id="cb28-10">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">bikeshop_name_num =</span> <span class="fu" style="color: #4758AB;">as.numeric</span>(bikeshop_name))</span>
-<span id="cb28-11">    </span>
-<span id="cb28-12">pct_sales_by_customer   </span></code></pre></div>
+<div class="sourceCode cell-code" id="cb27" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1">pct_sales_by_customer <span class="ot" style="color: #003B4F;">&lt;-</span> bike_orderlines <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb27-2">  <span class="fu" style="color: #4758AB;">select</span>(bikeshop_name, category_1, category_2, quantity) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb27-3">  <span class="fu" style="color: #4758AB;">group_by</span>(bikeshop_name, category_1, category_2) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb27-4">  <span class="fu" style="color: #4758AB;">summarise</span>(<span class="at" style="color: #657422;">total_qty =</span> <span class="fu" style="color: #4758AB;">sum</span>(quantity)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb27-5">  <span class="fu" style="color: #4758AB;">ungroup</span>() <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb27-6">  <span class="fu" style="color: #4758AB;">group_by</span>(bikeshop_name) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb27-7">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">pct =</span> total_qty <span class="sc" style="color: #5E5E5E;">/</span> <span class="fu" style="color: #4758AB;">sum</span>(total_qty)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb27-8">  <span class="fu" style="color: #4758AB;">ungroup</span>() <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb27-9">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">bikeshop_name =</span> <span class="fu" style="color: #4758AB;">as.factor</span>(bikeshop_name) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> <span class="fu" style="color: #4758AB;">fct_rev</span>()) <span class="sc" style="color: #5E5E5E;">%&gt;%</span>  </span>
+<span id="cb27-10">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">bikeshop_name_num =</span> <span class="fu" style="color: #4758AB;">as.numeric</span>(bikeshop_name))</span>
+<span id="cb27-11">    </span>
+<span id="cb27-12">pct_sales_by_customer   </span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 270 × 6
    bikeshop_name      category_1 category_2         total_qty    pct bikeshop_…¹
@@ -835,30 +825,30 @@ $ state          &lt;chr&gt; "NY", "NY", "KS", "KS", "KY", "KY", "KY", "KY", "KY
 <section id="data-visualization-1" class="level3">
 <h3 class="anchored" data-anchor-id="data-visualization-1">Data visualization</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1">pct_sales_by_customer <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb30-2">  <span class="fu" style="color: #4758AB;">ggplot</span>(<span class="fu" style="color: #4758AB;">aes</span>(category_2, bikeshop_name)) <span class="sc" style="color: #5E5E5E;">+</span> </span>
-<span id="cb30-3">  <span class="co" style="color: #5E5E5E;"># geometries</span></span>
-<span id="cb30-4">  <span class="fu" style="color: #4758AB;">geom_tile</span>(<span class="fu" style="color: #4758AB;">aes</span>(<span class="at" style="color: #657422;">fill =</span> pct)) <span class="sc" style="color: #5E5E5E;">+</span></span>
-<span id="cb30-5">  <span class="fu" style="color: #4758AB;">geom_text</span>(<span class="fu" style="color: #4758AB;">aes</span>(<span class="at" style="color: #657422;">label =</span> scales<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">percent</span>(pct, <span class="at" style="color: #657422;">accuracy =</span> <span class="fl" style="color: #AD0000;">0.1</span>)),</span>
-<span id="cb30-6">            <span class="at" style="color: #657422;">size =</span> <span class="dv" style="color: #AD0000;">3</span>,</span>
-<span id="cb30-7">            <span class="at" style="color: #657422;">color =</span> <span class="fu" style="color: #4758AB;">ifelse</span>(pct_sales_by_customer<span class="sc" style="color: #5E5E5E;">$</span>pct <span class="sc" style="color: #5E5E5E;">&gt;=</span> <span class="fl" style="color: #AD0000;">0.15</span>, <span class="st" style="color: #20794D;">"white"</span>, <span class="st" style="color: #20794D;">"black"</span>)) <span class="sc" style="color: #5E5E5E;">+</span></span>
-<span id="cb30-8">  <span class="fu" style="color: #4758AB;">facet_wrap</span>(<span class="sc" style="color: #5E5E5E;">~</span> category_1, <span class="at" style="color: #657422;">scales =</span> <span class="st" style="color: #20794D;">"free_x"</span>) <span class="sc" style="color: #5E5E5E;">+</span> </span>
-<span id="cb30-9">  <span class="co" style="color: #5E5E5E;"># formatting</span></span>
-<span id="cb30-10">  <span class="fu" style="color: #4758AB;">scale_fill_gradient</span>(<span class="at" style="color: #657422;">low =</span> <span class="st" style="color: #20794D;">"white"</span>, <span class="at" style="color: #657422;">high =</span> tidyquant<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">palette_light</span>()[<span class="dv" style="color: #AD0000;">1</span>]) <span class="sc" style="color: #5E5E5E;">+</span> </span>
-<span id="cb30-11">  <span class="fu" style="color: #4758AB;">labs</span>(<span class="at" style="color: #657422;">title =</span> <span class="st" style="color: #20794D;">"Heatmap of Purchasing Habits"</span>, </span>
-<span id="cb30-12">       <span class="at" style="color: #657422;">subtitle =</span> <span class="fu" style="color: #4758AB;">str_glue</span>(<span class="st" style="color: #20794D;">"Year: {year(min(bike_orderlines$order_date))} - {year(max(bike_orderlines$order_date))}"</span>),</span>
-<span id="cb30-13">       <span class="at" style="color: #657422;">x =</span> <span class="st" style="color: #20794D;">"Bike Type"</span>,</span>
-<span id="cb30-14">       <span class="at" style="color: #657422;">y =</span> <span class="st" style="color: #20794D;">"Customer"</span>) <span class="sc" style="color: #5E5E5E;">+</span> </span>
-<span id="cb30-15">  <span class="co" style="color: #5E5E5E;"># theme</span></span>
-<span id="cb30-16">  <span class="fu" style="color: #4758AB;">theme</span>(<span class="at" style="color: #657422;">legend.position =</span> <span class="st" style="color: #20794D;">"none"</span>,</span>
-<span id="cb30-17">        <span class="at" style="color: #657422;">axis.text.x =</span> <span class="fu" style="color: #4758AB;">element_text</span>(<span class="at" style="color: #657422;">angle =</span> <span class="dv" style="color: #AD0000;">45</span>, <span class="at" style="color: #657422;">hjust =</span> <span class="dv" style="color: #AD0000;">1</span>),</span>
-<span id="cb30-18">        <span class="at" style="color: #657422;">plot.title =</span> <span class="fu" style="color: #4758AB;">element_text</span>(<span class="at" style="color: #657422;">face =</span> <span class="st" style="color: #20794D;">"bold"</span>),</span>
-<span id="cb30-19">        <span class="at" style="color: #657422;">strip.background =</span> <span class="fu" style="color: #4758AB;">element_rect</span>(<span class="at" style="color: #657422;">fill =</span> tidyquant<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">palette_light</span>()[<span class="dv" style="color: #AD0000;">1</span>], </span>
-<span id="cb30-20">                                        <span class="at" style="color: #657422;">color =</span> <span class="st" style="color: #20794D;">"white"</span>), </span>
-<span id="cb30-21">        <span class="at" style="color: #657422;">strip.text =</span> <span class="fu" style="color: #4758AB;">element_text</span>(<span class="at" style="color: #657422;">color =</span> <span class="st" style="color: #20794D;">"white"</span>, <span class="at" style="color: #657422;">size =</span> <span class="dv" style="color: #AD0000;">11</span>), </span>
-<span id="cb30-22">        <span class="at" style="color: #657422;">panel.background =</span> <span class="fu" style="color: #4758AB;">element_rect</span>(<span class="at" style="color: #657422;">fill =</span> <span class="st" style="color: #20794D;">"white"</span>))</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb29" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1">pct_sales_by_customer <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb29-2">  <span class="fu" style="color: #4758AB;">ggplot</span>(<span class="fu" style="color: #4758AB;">aes</span>(category_2, bikeshop_name)) <span class="sc" style="color: #5E5E5E;">+</span> </span>
+<span id="cb29-3">  <span class="co" style="color: #5E5E5E;"># geometries</span></span>
+<span id="cb29-4">  <span class="fu" style="color: #4758AB;">geom_tile</span>(<span class="fu" style="color: #4758AB;">aes</span>(<span class="at" style="color: #657422;">fill =</span> pct)) <span class="sc" style="color: #5E5E5E;">+</span></span>
+<span id="cb29-5">  <span class="fu" style="color: #4758AB;">geom_text</span>(<span class="fu" style="color: #4758AB;">aes</span>(<span class="at" style="color: #657422;">label =</span> scales<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">percent</span>(pct, <span class="at" style="color: #657422;">accuracy =</span> <span class="fl" style="color: #AD0000;">0.1</span>)),</span>
+<span id="cb29-6">            <span class="at" style="color: #657422;">size =</span> <span class="dv" style="color: #AD0000;">3</span>,</span>
+<span id="cb29-7">            <span class="at" style="color: #657422;">color =</span> <span class="fu" style="color: #4758AB;">ifelse</span>(pct_sales_by_customer<span class="sc" style="color: #5E5E5E;">$</span>pct <span class="sc" style="color: #5E5E5E;">&gt;=</span> <span class="fl" style="color: #AD0000;">0.15</span>, <span class="st" style="color: #20794D;">"white"</span>, <span class="st" style="color: #20794D;">"black"</span>)) <span class="sc" style="color: #5E5E5E;">+</span></span>
+<span id="cb29-8">  <span class="fu" style="color: #4758AB;">facet_wrap</span>(<span class="sc" style="color: #5E5E5E;">~</span> category_1, <span class="at" style="color: #657422;">scales =</span> <span class="st" style="color: #20794D;">"free_x"</span>) <span class="sc" style="color: #5E5E5E;">+</span> </span>
+<span id="cb29-9">  <span class="co" style="color: #5E5E5E;"># formatting</span></span>
+<span id="cb29-10">  <span class="fu" style="color: #4758AB;">scale_fill_gradient</span>(<span class="at" style="color: #657422;">low =</span> <span class="st" style="color: #20794D;">"white"</span>, <span class="at" style="color: #657422;">high =</span> tidyquant<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">palette_light</span>()[<span class="dv" style="color: #AD0000;">1</span>]) <span class="sc" style="color: #5E5E5E;">+</span> </span>
+<span id="cb29-11">  <span class="fu" style="color: #4758AB;">labs</span>(<span class="at" style="color: #657422;">title =</span> <span class="st" style="color: #20794D;">"Heatmap of Purchasing Habits"</span>, </span>
+<span id="cb29-12">       <span class="at" style="color: #657422;">subtitle =</span> <span class="fu" style="color: #4758AB;">str_glue</span>(<span class="st" style="color: #20794D;">"Year: {year(min(bike_orderlines$order_date))} - {year(max(bike_orderlines$order_date))}"</span>),</span>
+<span id="cb29-13">       <span class="at" style="color: #657422;">x =</span> <span class="st" style="color: #20794D;">"Bike Type"</span>,</span>
+<span id="cb29-14">       <span class="at" style="color: #657422;">y =</span> <span class="st" style="color: #20794D;">"Customer"</span>) <span class="sc" style="color: #5E5E5E;">+</span> </span>
+<span id="cb29-15">  <span class="co" style="color: #5E5E5E;"># theme</span></span>
+<span id="cb29-16">  <span class="fu" style="color: #4758AB;">theme</span>(<span class="at" style="color: #657422;">legend.position =</span> <span class="st" style="color: #20794D;">"none"</span>,</span>
+<span id="cb29-17">        <span class="at" style="color: #657422;">axis.text.x =</span> <span class="fu" style="color: #4758AB;">element_text</span>(<span class="at" style="color: #657422;">angle =</span> <span class="dv" style="color: #AD0000;">45</span>, <span class="at" style="color: #657422;">hjust =</span> <span class="dv" style="color: #AD0000;">1</span>),</span>
+<span id="cb29-18">        <span class="at" style="color: #657422;">plot.title =</span> <span class="fu" style="color: #4758AB;">element_text</span>(<span class="at" style="color: #657422;">face =</span> <span class="st" style="color: #20794D;">"bold"</span>),</span>
+<span id="cb29-19">        <span class="at" style="color: #657422;">strip.background =</span> <span class="fu" style="color: #4758AB;">element_rect</span>(<span class="at" style="color: #657422;">fill =</span> tidyquant<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">palette_light</span>()[<span class="dv" style="color: #AD0000;">1</span>], </span>
+<span id="cb29-20">                                        <span class="at" style="color: #657422;">color =</span> <span class="st" style="color: #20794D;">"white"</span>), </span>
+<span id="cb29-21">        <span class="at" style="color: #657422;">strip.text =</span> <span class="fu" style="color: #4758AB;">element_text</span>(<span class="at" style="color: #657422;">color =</span> <span class="st" style="color: #20794D;">"white"</span>, <span class="at" style="color: #657422;">size =</span> <span class="dv" style="color: #AD0000;">11</span>), </span>
+<span id="cb29-22">        <span class="at" style="color: #657422;">panel.background =</span> <span class="fu" style="color: #4758AB;">element_rect</span>(<span class="at" style="color: #657422;">fill =</span> <span class="st" style="color: #20794D;">"white"</span>))</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://sandrajurela.com/posts/ustomer-analysis-advanced-plots-with-ggplot2/customer-analysis-advanced-plots-with-ggplot2_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="864"></p>
+<p><img src="https://sandrajurela.com/posts/customer-analysis-advanced-plots-with-ggplot2/customer-analysis-advanced-plots-with-ggplot2_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="864"></p>
 </div>
 </div>
 <p>Top 3 customers that prefer mountain bikes:</p>
@@ -887,9 +877,9 @@ $ state          &lt;chr&gt; "NY", "NY", "KS", "KS", "KY", "KY", "KY", "KY", "KY
   <category>SQL</category>
   <category>PostgreSQL</category>
   <category>R</category>
-  <guid>https://sandrajurela.com/posts/ustomer-analysis-advanced-plots-with-ggplot2/customer-analysis-advanced-plots-with-ggplot2.html</guid>
+  <guid>https://sandrajurela.com/posts/customer-analysis-advanced-plots-with-ggplot2/customer-analysis-advanced-plots-with-ggplot2.html</guid>
   <pubDate>Thu, 19 May 2022 22:00:00 GMT</pubDate>
-  <media:content url="https://sandrajurela.com/posts/ustomer-analysis-advanced-plots-with-ggplot2/images/preview.png" medium="image" type="image/png" height="144" width="144"/>
+  <media:content url="https://sandrajurela.com/posts/customer-analysis-advanced-plots-with-ggplot2/images/preview.png" medium="image" type="image/png" height="144" width="144"/>
 </item>
 <item>
   <title>Answering Business Questions Using SQL</title>
