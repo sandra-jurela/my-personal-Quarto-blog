@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.313">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Sandra Jurela">
+<meta name="dcterms.date" content="2022-02-15">
+<meta name="description" content="My SQL project for the “Intermediate SQL for Data Analysis” course at Dataquest.">
+
+<title>Sandra Jurela - Answering Business Questions Using SQL</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../img/logo.png" rel="icon" type="image/png">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JH321LBKZY"></script>
+
+<script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-JH321LBKZY', { 'anonymize_ip': true});
+</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+<link href="../../site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+<script src="../../site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="Sandra Jurela - Answering Business Questions Using SQL">
+<meta property="og:description" content="My SQL project for the &quot;Intermediate SQL for Data Analysis&quot; course at Dataquest.">
+<meta property="og:image" content="https://sandrajurela.com/posts\answering-business-questions-using-sql\images\media_type.png">
+<meta property="og:site-name" content="Sandra Jurela">
+<meta property="og:image:height" content="973">
+<meta property="og:image:width" content="1616">
+<meta name="twitter:title" content="Sandra Jurela - Answering Business Questions Using SQL">
+<meta name="twitter:description" content="My SQL project for the &quot;Intermediate SQL for Data Analysis&quot; course at Dataquest.">
+<meta name="twitter:image" content="https://sandrajurela.com/posts\answering-business-questions-using-sql\images\media_type.png">
+<meta name="twitter:image-height" content="973">
+<meta name="twitter:image-width" content="1616">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../img/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Sandra Jurela</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html">
+ <span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/sandra-jurela"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/sandra-jurela-a95985211/"><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../index.xml"><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Answering Business Questions Using SQL</h1>
+                  <div>
+        <div class="description">
+          <p>My SQL project for the “Intermediate SQL for Data Analysis” course at Dataquest.</p>
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">SQL</div>
+                <div class="quarto-category">SQLite</div>
+                <div class="quarto-category">Dataquest</div>
+                <div class="quarto-category">data visualization</div>
+                <div class="quarto-category">R</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Sandra Jurela </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">February 15, 2022</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of Contents</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#connecting-to-the-database-and-data-overview" id="toc-connecting-to-the-database-and-data-overview" class="nav-link" data-scroll-target="#connecting-to-the-database-and-data-overview">Connecting to the Database and Data Overview</a></li>
+  <li><a href="#selecting-albums-to-purchase" id="toc-selecting-albums-to-purchase" class="nav-link" data-scroll-target="#selecting-albums-to-purchase">1. Selecting Albums to Purchase</a></li>
+  <li><a href="#analyzing-employee-sales-performance" id="toc-analyzing-employee-sales-performance" class="nav-link" data-scroll-target="#analyzing-employee-sales-performance">2. Analyzing Employee Sales Performance</a></li>
+  <li><a href="#analyzing-sales-by-country" id="toc-analyzing-sales-by-country" class="nav-link" data-scroll-target="#analyzing-sales-by-country">3. Analyzing Sales by Country</a></li>
+  <li><a href="#albums-vs-individual-tracks" id="toc-albums-vs-individual-tracks" class="nav-link" data-scroll-target="#albums-vs-individual-tracks">4. Albums vs Individual Tracks</a></li>
+  <li><a href="#which-artist-is-used-in-the-most-playlists" id="toc-which-artist-is-used-in-the-most-playlists" class="nav-link" data-scroll-target="#which-artist-is-used-in-the-most-playlists">5. Which artist is used in the most playlists?</a></li>
+  <li><a href="#how-many-tracks-have-been-purchased-vs-not-purchased" id="toc-how-many-tracks-have-been-purchased-vs-not-purchased" class="nav-link" data-scroll-target="#how-many-tracks-have-been-purchased-vs-not-purchased">6. How many tracks have been purchased vs not purchased?</a></li>
+  <li><a href="#do-protected-vs-non-protected-media-types-have-an-effect-on-popularity" id="toc-do-protected-vs-non-protected-media-types-have-an-effect-on-popularity" class="nav-link" data-scroll-target="#do-protected-vs-non-protected-media-types-have-an-effect-on-popularity">7. Do protected vs non-protected media types have an effect on popularity?</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>The aim of this project is to explore a modified version of the <a href="https://github.com/lerocha/chinook-database">Chinook database</a> using SQL and answer some business questions. The Chinook database represents a fictional digital media shop, based on real data from an iTunes Library and manually generated data. The database is provided as a <strong>SQLite database</strong> file called <strong>chinook.db</strong>.</p>
+<p>Here’s a schema diagram for the Chinook database:</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="images/chinook-schema.svg" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="connecting-to-the-database-and-data-overview" class="level2">
+<h2 class="anchored" data-anchor-id="connecting-to-the-database-and-data-overview">Connecting to the Database and Data Overview</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DBI)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>db <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(RSQLite<span class="sc">::</span><span class="fu">SQLite</span>(), <span class="at">dbname =</span> <span class="st">"data/chinook.db"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Listing all tables in the Chinook database.</p>
+<div class="cell" data-max.print="null">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  name,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">type</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> sqlite_master</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> <span class="kw">type</span> <span class="kw">IN</span> (<span class="ot">"table"</span>, <span class="ot">"view"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>11 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">name</th>
+<th style="text-align: left;">type</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">album</td>
+<td style="text-align: left;">table</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">artist</td>
+<td style="text-align: left;">table</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">customer</td>
+<td style="text-align: left;">table</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">employee</td>
+<td style="text-align: left;">table</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">genre</td>
+<td style="text-align: left;">table</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">invoice</td>
+<td style="text-align: left;">table</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">invoice_line</td>
+<td style="text-align: left;">table</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">media_type</td>
+<td style="text-align: left;">table</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">playlist</td>
+<td style="text-align: left;">table</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">playlist_track</td>
+<td style="text-align: left;">table</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">track</td>
+<td style="text-align: left;">table</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The database consists of 11 tables containing information about artists, albums, media tracks, playlists, invoices, customers, and shop employees. Let’s start by getting familiar with our data from the main tables:</p>
+<p><code>employee</code> table</p>
+<div class="cell" data-output.var="employee">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> employee</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["employee_id"],"name":[1],"type":["int"],"align":["right"]},{"label":["last_name"],"name":[2],"type":["chr"],"align":["left"]},{"label":["first_name"],"name":[3],"type":["chr"],"align":["left"]},{"label":["title"],"name":[4],"type":["chr"],"align":["left"]},{"label":["reports_to"],"name":[5],"type":["int"],"align":["right"]},{"label":["birthdate"],"name":[6],"type":["chr"],"align":["left"]},{"label":["hire_date"],"name":[7],"type":["chr"],"align":["left"]},{"label":["address"],"name":[8],"type":["chr"],"align":["left"]},{"label":["city"],"name":[9],"type":["chr"],"align":["left"]},{"label":["state"],"name":[10],"type":["chr"],"align":["left"]},{"label":["country"],"name":[11],"type":["chr"],"align":["left"]},{"label":["postal_code"],"name":[12],"type":["chr"],"align":["left"]},{"label":["phone"],"name":[13],"type":["chr"],"align":["left"]},{"label":["fax"],"name":[14],"type":["chr"],"align":["left"]},{"label":["email"],"name":[15],"type":["chr"],"align":["left"]}],"data":[{"1":"1","2":"Adams","3":"Andrew","4":"General Manager","5":"NA","6":"1962-02-18 00:00:00","7":"2016-08-14 00:00:00","8":"11120 Jasper Ave NW","9":"Edmonton","10":"AB","11":"Canada","12":"T5K 2N1","13":"+1 (780) 428-9482","14":"+1 (780) 428-3457","15":"andrew@chinookcorp.com"},{"1":"2","2":"Edwards","3":"Nancy","4":"Sales Manager","5":"1","6":"1958-12-08 00:00:00","7":"2016-05-01 00:00:00","8":"825 8 Ave SW","9":"Calgary","10":"AB","11":"Canada","12":"T2P 2T3","13":"+1 (403) 262-3443","14":"+1 (403) 262-3322","15":"nancy@chinookcorp.com"},{"1":"3","2":"Peacock","3":"Jane","4":"Sales Support Agent","5":"2","6":"1973-08-29 00:00:00","7":"2017-04-01 00:00:00","8":"1111 6 Ave SW","9":"Calgary","10":"AB","11":"Canada","12":"T2P 5M5","13":"+1 (403) 262-3443","14":"+1 (403) 262-6712","15":"jane@chinookcorp.com"},{"1":"4","2":"Park","3":"Margaret","4":"Sales Support Agent","5":"2","6":"1947-09-19 00:00:00","7":"2017-05-03 00:00:00","8":"683 10 Street SW","9":"Calgary","10":"AB","11":"Canada","12":"T2P 5G3","13":"+1 (403) 263-4423","14":"+1 (403) 263-4289","15":"margaret@chinookcorp.com"},{"1":"5","2":"Johnson","3":"Steve","4":"Sales Support Agent","5":"2","6":"1965-03-03 00:00:00","7":"2017-10-17 00:00:00","8":"7727B 41 Ave","9":"Calgary","10":"AB","11":"Canada","12":"T3B 1Y7","13":"1 (780) 836-9987","14":"1 (780) 836-9543","15":"steve@chinookcorp.com"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p><code>customer</code> table</p>
+<div class="cell" data-output.var="customer">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> customer</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["customer_id"],"name":[1],"type":["int"],"align":["right"]},{"label":["first_name"],"name":[2],"type":["chr"],"align":["left"]},{"label":["last_name"],"name":[3],"type":["chr"],"align":["left"]},{"label":["company"],"name":[4],"type":["chr"],"align":["left"]},{"label":["address"],"name":[5],"type":["chr"],"align":["left"]},{"label":["city"],"name":[6],"type":["chr"],"align":["left"]},{"label":["state"],"name":[7],"type":["chr"],"align":["left"]},{"label":["country"],"name":[8],"type":["chr"],"align":["left"]},{"label":["postal_code"],"name":[9],"type":["chr"],"align":["left"]},{"label":["phone"],"name":[10],"type":["chr"],"align":["left"]},{"label":["fax"],"name":[11],"type":["chr"],"align":["left"]},{"label":["email"],"name":[12],"type":["chr"],"align":["left"]},{"label":["support_rep_id"],"name":[13],"type":["int"],"align":["right"]}],"data":[{"1":"1","2":"Luís","3":"Gonçalves","4":"Embraer - Empresa Brasileira de Aeronáutica S.A.","5":"Av. Brigadeiro Faria Lima, 2170","6":"São José dos Campos","7":"SP","8":"Brazil","9":"12227-000","10":"+55 (12) 3923-5555","11":"+55 (12) 3923-5566","12":"luisg@embraer.com.br","13":"3"},{"1":"2","2":"Leonie","3":"Köhler","4":"NA","5":"Theodor-Heuss-Straße 34","6":"Stuttgart","7":"NA","8":"Germany","9":"70174","10":"+49 0711 2842222","11":"NA","12":"leonekohler@surfeu.de","13":"5"},{"1":"3","2":"François","3":"Tremblay","4":"NA","5":"1498 rue Bélanger","6":"Montréal","7":"QC","8":"Canada","9":"H2G 1A7","10":"+1 (514) 721-4711","11":"NA","12":"ftremblay@gmail.com","13":"3"},{"1":"4","2":"Bjørn","3":"Hansen","4":"NA","5":"Ullevålsveien 14","6":"Oslo","7":"NA","8":"Norway","9":"0171","10":"+47 22 44 22 22","11":"NA","12":"bjorn.hansen@yahoo.no","13":"4"},{"1":"5","2":"František","3":"Wichterlová","4":"JetBrains s.r.o.","5":"Klanova 9/506","6":"Prague","7":"NA","8":"Czech Republic","9":"14700","10":"+420 2 4172 5555","11":"+420 2 4172 5555","12":"frantisekw@jetbrains.com","13":"4"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p><code>invoice</code> table</p>
+<div class="cell" data-output.var="invoice">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> invoice</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["invoice_id"],"name":[1],"type":["int"],"align":["right"]},{"label":["customer_id"],"name":[2],"type":["int"],"align":["right"]},{"label":["invoice_date"],"name":[3],"type":["chr"],"align":["left"]},{"label":["billing_address"],"name":[4],"type":["chr"],"align":["left"]},{"label":["billing_city"],"name":[5],"type":["chr"],"align":["left"]},{"label":["billing_state"],"name":[6],"type":["chr"],"align":["left"]},{"label":["billing_country"],"name":[7],"type":["chr"],"align":["left"]},{"label":["billing_postal_code"],"name":[8],"type":["chr"],"align":["left"]},{"label":["total"],"name":[9],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"18","3":"2017-01-03 00:00:00","4":"627 Broadway","5":"New York","6":"NY","7":"USA","8":"10012-2612","9":"15.84"},{"1":"2","2":"30","3":"2017-01-03 00:00:00","4":"230 Elgin Street","5":"Ottawa","6":"ON","7":"Canada","8":"K2P 1L7","9":"9.90"},{"1":"3","2":"40","3":"2017-01-05 00:00:00","4":"8, Rue Hanovre","5":"Paris","6":"None","7":"France","8":"75002","9":"1.98"},{"1":"4","2":"18","3":"2017-01-06 00:00:00","4":"627 Broadway","5":"New York","6":"NY","7":"USA","8":"10012-2612","9":"7.92"},{"1":"5","2":"27","3":"2017-01-07 00:00:00","4":"1033 N Park Ave","5":"Tucson","6":"AZ","7":"USA","8":"85719","9":"16.83"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p><code>invoice_line</code> table</p>
+<div class="cell" data-output.var="invoice_line">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> invoice_line</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">30</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["invoice_line_id"],"name":[1],"type":["int"],"align":["right"]},{"label":["invoice_id"],"name":[2],"type":["int"],"align":["right"]},{"label":["track_id"],"name":[3],"type":["int"],"align":["right"]},{"label":["unit_price"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["quantity"],"name":[5],"type":["int"],"align":["right"]}],"data":[{"1":"1","2":"1","3":"1158","4":"0.99","5":"1"},{"1":"2","2":"1","3":"1159","4":"0.99","5":"1"},{"1":"3","2":"1","3":"1160","4":"0.99","5":"1"},{"1":"4","2":"1","3":"1161","4":"0.99","5":"1"},{"1":"5","2":"1","3":"1162","4":"0.99","5":"1"},{"1":"6","2":"1","3":"1163","4":"0.99","5":"1"},{"1":"7","2":"1","3":"1164","4":"0.99","5":"1"},{"1":"8","2":"1","3":"1165","4":"0.99","5":"1"},{"1":"9","2":"1","3":"1166","4":"0.99","5":"1"},{"1":"10","2":"1","3":"1167","4":"0.99","5":"1"},{"1":"11","2":"1","3":"1168","4":"0.99","5":"1"},{"1":"12","2":"1","3":"1169","4":"0.99","5":"1"},{"1":"13","2":"1","3":"1170","4":"0.99","5":"1"},{"1":"14","2":"1","3":"1171","4":"0.99","5":"1"},{"1":"15","2":"1","3":"1172","4":"0.99","5":"1"},{"1":"16","2":"1","3":"1173","4":"0.99","5":"1"},{"1":"17","2":"2","3":"3476","4":"0.99","5":"1"},{"1":"18","2":"2","3":"482","4":"0.99","5":"1"},{"1":"19","2":"2","3":"2701","4":"0.99","5":"1"},{"1":"20","2":"2","3":"1641","4":"0.99","5":"1"},{"1":"21","2":"2","3":"1119","4":"0.99","5":"1"},{"1":"22","2":"2","3":"2324","4":"0.99","5":"1"},{"1":"23","2":"2","3":"201","4":"0.99","5":"1"},{"1":"24","2":"2","3":"819","4":"0.99","5":"1"},{"1":"25","2":"2","3":"392","4":"0.99","5":"1"},{"1":"26","2":"2","3":"2651","4":"0.99","5":"1"},{"1":"27","2":"3","3":"2516","4":"0.99","5":"1"},{"1":"28","2":"3","3":"2646","4":"0.99","5":"1"},{"1":"29","2":"4","3":"3448","4":"0.99","5":"1"},{"1":"30","2":"4","3":"2560","4":"0.99","5":"1"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p><code>track</code> table</p>
+<div class="cell" data-output.var="track">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> track</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">20</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["track_id"],"name":[1],"type":["int"],"align":["right"]},{"label":["name"],"name":[2],"type":["chr"],"align":["left"]},{"label":["album_id"],"name":[3],"type":["int"],"align":["right"]},{"label":["media_type_id"],"name":[4],"type":["int"],"align":["right"]},{"label":["genre_id"],"name":[5],"type":["int"],"align":["right"]},{"label":["composer"],"name":[6],"type":["chr"],"align":["left"]},{"label":["milliseconds"],"name":[7],"type":["int"],"align":["right"]},{"label":["bytes"],"name":[8],"type":["int"],"align":["right"]},{"label":["unit_price"],"name":[9],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"For Those About To Rock (We Salute You)","3":"1","4":"1","5":"1","6":"Angus Young, Malcolm Young, Brian Johnson","7":"343719","8":"11170334","9":"0.99"},{"1":"2","2":"Balls to the Wall","3":"2","4":"2","5":"1","6":"NA","7":"342562","8":"5510424","9":"0.99"},{"1":"3","2":"Fast As a Shark","3":"3","4":"2","5":"1","6":"F. Baltes, S. Kaufman, U. Dirkscneider & W. Hoffman","7":"230619","8":"3990994","9":"0.99"},{"1":"4","2":"Restless and Wild","3":"3","4":"2","5":"1","6":"F. Baltes, R.A. Smith-Diesel, S. Kaufman, U. Dirkscneider & W. Hoffman","7":"252051","8":"4331779","9":"0.99"},{"1":"5","2":"Princess of the Dawn","3":"3","4":"2","5":"1","6":"Deaffy & R.A. Smith-Diesel","7":"375418","8":"6290521","9":"0.99"},{"1":"6","2":"Put The Finger On You","3":"1","4":"1","5":"1","6":"Angus Young, Malcolm Young, Brian Johnson","7":"205662","8":"6713451","9":"0.99"},{"1":"7","2":"Let's Get It Up","3":"1","4":"1","5":"1","6":"Angus Young, Malcolm Young, Brian Johnson","7":"233926","8":"7636561","9":"0.99"},{"1":"8","2":"Inject The Venom","3":"1","4":"1","5":"1","6":"Angus Young, Malcolm Young, Brian Johnson","7":"210834","8":"6852860","9":"0.99"},{"1":"9","2":"Snowballed","3":"1","4":"1","5":"1","6":"Angus Young, Malcolm Young, Brian Johnson","7":"203102","8":"6599424","9":"0.99"},{"1":"10","2":"Evil Walks","3":"1","4":"1","5":"1","6":"Angus Young, Malcolm Young, Brian Johnson","7":"263497","8":"8611245","9":"0.99"},{"1":"11","2":"C.O.D.","3":"1","4":"1","5":"1","6":"Angus Young, Malcolm Young, Brian Johnson","7":"199836","8":"6566314","9":"0.99"},{"1":"12","2":"Breaking The Rules","3":"1","4":"1","5":"1","6":"Angus Young, Malcolm Young, Brian Johnson","7":"263288","8":"8596840","9":"0.99"},{"1":"13","2":"Night Of The Long Knives","3":"1","4":"1","5":"1","6":"Angus Young, Malcolm Young, Brian Johnson","7":"205688","8":"6706347","9":"0.99"},{"1":"14","2":"Spellbound","3":"1","4":"1","5":"1","6":"Angus Young, Malcolm Young, Brian Johnson","7":"270863","8":"8817038","9":"0.99"},{"1":"15","2":"Go Down","3":"4","4":"1","5":"1","6":"AC/DC","7":"331180","8":"10847611","9":"0.99"},{"1":"16","2":"Dog Eat Dog","3":"4","4":"1","5":"1","6":"AC/DC","7":"215196","8":"7032162","9":"0.99"},{"1":"17","2":"Let There Be Rock","3":"4","4":"1","5":"1","6":"AC/DC","7":"366654","8":"12021261","9":"0.99"},{"1":"18","2":"Bad Boy Boogie","3":"4","4":"1","5":"1","6":"AC/DC","7":"267728","8":"8776140","9":"0.99"},{"1":"19","2":"Problem Child","3":"4","4":"1","5":"1","6":"AC/DC","7":"325041","8":"10617116","9":"0.99"},{"1":"20","2":"Overdose","3":"4","4":"1","5":"1","6":"AC/DC","7":"369319","8":"12066294","9":"0.99"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</section>
+<section id="selecting-albums-to-purchase" class="level2">
+<h2 class="anchored" data-anchor-id="selecting-albums-to-purchase">1. Selecting Albums to Purchase</h2>
+<p>The Chinook record store has just signed a deal with a new record label, and you’ve been tasked with selecting the first three albums that will be added to the store, from a list of four. All four albums are by artists that don’t have any tracks in the store right now - we have the artist names, and the genre of music they produce:</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Artist Name</th>
+<th>Genre</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Regal</td>
+<td>Hip-Hop</td>
+</tr>
+<tr class="even">
+<td>Red Tone</td>
+<td>Punk</td>
+</tr>
+<tr class="odd">
+<td>Meteor and the Girls</td>
+<td>Pop</td>
+</tr>
+<tr class="even">
+<td>Slim Jim Bites</td>
+<td>Blues</td>
+</tr>
+</tbody>
+</table>
+<p>The record label specializes in artists from the USA, and they have given Chinook some money to advertise the new albums in the USA, so we’re interested in finding out which genres sell the best in the USA.</p>
+<p>You’ll need to write a query to find out which genres sell the most tracks in the USA, write up a summary of your findings, and make a recommendation for the three artists whose albums we should purchase for the store.</p>
+<p><strong>Instructions</strong></p>
+<ol type="1">
+<li><p>Write a query that returns each genre, with the number of tracks sold in the USA:</p>
+<ul>
+<li>in absolute numbers</li>
+<li>in percentages.</li>
+</ul></li>
+<li><p>Write a paragraph that interprets the data and makes a recommendation for the three artists whose albums we should purchase for the store, based on sales of tracks from their genres.</p></li>
+</ol>
+<div class="cell" data-max.print="null" data-output.var="genre_perc">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  g.name <span class="kw">AS</span> genre,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">SUM</span>(il.quantity) <span class="kw">AS</span> tracks_sold,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ROUND</span>(<span class="fu">CAST</span>(<span class="fu">SUM</span>(il.quantity) <span class="kw">AS</span> <span class="dt">FLOAT</span>)<span class="op">/</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  (</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">SELECT</span> <span class="fu">SUM</span>(il.quantity) </span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> invoice i</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">INNER</span> <span class="kw">JOIN</span> invoice_line il</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ON</span> i.invoice_id <span class="op">=</span> il.invoice_id</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">WHERE</span> i.billing_country <span class="op">=</span> <span class="st">'USA'</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  ) </span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  , <span class="dv">4</span>) <span class="kw">AS</span> percentage_sold</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> invoice i</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="kw">INNER</span> <span class="kw">JOIN</span> invoice_line il</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="kw">ON</span> i.invoice_id <span class="op">=</span> il.invoice_id</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="kw">INNER</span> <span class="kw">JOIN</span> track t </span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="kw">ON</span> il.track_id <span class="op">=</span> t.track_id</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="kw">INNER</span> <span class="kw">JOIN</span> genre g</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="kw">ON</span> t.genre_id <span class="op">=</span> g.genre_id</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> i.billing_country <span class="op">=</span> <span class="st">'USA'</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> genre</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> tracks_sold <span class="kw">DESC</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<thead>
+<tr class="header">
+<th style="text-align: left;">genre</th>
+<th style="text-align: right;">tracks_sold</th>
+<th style="text-align: right;">percentage_sold</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Rock</td>
+<td style="text-align: right;">561</td>
+<td style="text-align: right;">0.5338</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Alternative &amp; Punk</td>
+<td style="text-align: right;">130</td>
+<td style="text-align: right;">0.1237</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Metal</td>
+<td style="text-align: right;">124</td>
+<td style="text-align: right;">0.1180</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">R&amp;B/Soul</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">0.0504</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Blues</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">0.0343</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Alternative</td>
+<td style="text-align: right;">35</td>
+<td style="text-align: right;">0.0333</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Pop</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">0.0209</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Latin</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">0.0209</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Hip Hop/Rap</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">0.0190</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Jazz</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">0.0133</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Easy Listening</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">0.0124</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Reggae</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">0.0057</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Electronica/Dance</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">0.0048</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Classical</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.0038</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Heavy Metal</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.0029</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Soundtrack</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0.0019</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">TV Shows</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.0010</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_classic</span>())</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>genre_of_interest <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Alternative &amp; Punk"</span>, <span class="st">"Hip Hop/Rap"</span>, <span class="st">"Pop"</span>, <span class="st">"Blues"</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>genre_perc <span class="sc">%&gt;%</span> </span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">of_interest =</span> <span class="fu">ifelse</span>(genre <span class="sc">%in%</span> genre_of_interest, <span class="st">"yes"</span>, <span class="st">"no"</span>),</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">perc_text =</span> scales<span class="sc">::</span><span class="fu">percent</span>(percentage_sold, <span class="at">accuracy =</span> <span class="fl">0.1</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>tracks_sold, <span class="at">y=</span><span class="fu">reorder</span>(genre, tracks_sold, sum), <span class="at">fill=</span>of_interest)) <span class="sc">+</span> </span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">'identity'</span>, <span class="at">width =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> perc_text), <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Sold Tracks by Genre, USA"</span>, <span class="at">x =</span> <span class="st">"Tracks Sold"</span>, <span class="at">y =</span> <span class="st">"Genre"</span>, </span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Genre of Interest"</span>) <span class="sc">+</span> </span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"gray74"</span>, <span class="st">"orange"</span>)) <span class="sc">+</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">600</span>)) <span class="sc">+</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="chinook_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The most popular genres in the USA are <strong>Rock</strong>, <strong>Alternative &amp; Punk</strong>, and <strong>Metal</strong>, followed with a big gap by all the others. Since our choice is limited by Hip-Hop, Punk, Pop, and Blues genres, and since we have to choose 3 out of 4 albums, we should purchase the new albums by the following artists:</p>
+<ul>
+<li>Red Tone (Punk)</li>
+<li>Slim Jim Bites (Blues)</li>
+<li>Meteor and the Girls (Pop)</li>
+</ul>
+</section>
+<section id="analyzing-employee-sales-performance" class="level2">
+<h2 class="anchored" data-anchor-id="analyzing-employee-sales-performance">2. Analyzing Employee Sales Performance</h2>
+<p>Each customer for the Chinook store gets assigned to a sales support agent within the company when they first make a purchase. You have been asked to analyze the purchases of customers belonging to each employee to see if any sales support agent is performing either better or worse than the others.</p>
+<p>You might like to consider whether any extra columns from the employee table explain any variance you see, or whether the variance might instead be indicative of employee performance.</p>
+<p><strong>Instructions</strong></p>
+<ol type="1">
+<li><p>Write a query that finds the total dollar amount of sales assigned to each sales support agent within the company. Add any extra attributes for that employee that you find are relevant to the analysis.</p></li>
+<li><p>Write a short statement describing your results, and providing a possible interpretation.</p></li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  e.first_name <span class="op">||</span> <span class="st">' '</span> <span class="op">||</span> e.last_name <span class="kw">AS</span> sales_support_agent,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  e.hire_date,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> c.customer_id) <span class="kw">AS</span> customers,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">SUM</span>(i.total) <span class="kw">AS</span> total_sales</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> employee e</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="kw">INNER</span> <span class="kw">JOIN</span> customer c</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="kw">ON</span> e.employee_id <span class="op">=</span> c.support_rep_id</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="kw">INNER</span> <span class="kw">JOIN</span> invoice i</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="kw">ON</span> c.customer_id <span class="op">=</span> i.customer_id</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> sales_support_agent</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>3 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">sales_support_agent</th>
+<th style="text-align: left;">hire_date</th>
+<th style="text-align: right;">customers</th>
+<th style="text-align: right;">total_sales</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Jane Peacock</td>
+<td style="text-align: left;">2017-04-01 00:00:00</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">1731.51</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Margaret Park</td>
+<td style="text-align: left;">2017-05-03 00:00:00</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">1584.00</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Steve Johnson</td>
+<td style="text-align: left;">2017-10-17 00:00:00</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">1393.92</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>While there is a <strong>20% difference in sales</strong> between Jane (the top employee) and Steve (the bottom employee), the difference roughly corresponds with the differences in their hiring dates.</p>
+</section>
+<section id="analyzing-sales-by-country" class="level2">
+<h2 class="anchored" data-anchor-id="analyzing-sales-by-country">3. Analyzing Sales by Country</h2>
+<p>Your next task is to analyze the sales data for customers from each different country. You have been given guidance to use the country value from the customers table, and ignore the country from the billing address in the invoice table.</p>
+<p><strong>Instructions</strong></p>
+<ol type="1">
+<li><p>Write a query that collates data on purchases from different countries.</p></li>
+<li><p>Where a country has only one customer, collect them into an “Other” group.</p></li>
+<li><p>The results should be sorted by the total sales from highest to lowest, with the “Other” group at the very bottom.</p></li>
+<li><p>For each country, include:</p>
+<ul>
+<li>total number of customers</li>
+<li>total value of sales</li>
+<li>average value of sales per customer</li>
+<li>average order value</li>
+</ul></li>
+</ol>
+<div class="cell" data-max.print="null" data-output.var="sales_by_country">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> t1 <span class="kw">AS</span> (</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">CASE</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>      <span class="cf">WHEN</span> <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> c.customer_id) <span class="op">=</span> <span class="dv">1</span> <span class="cf">THEN</span> <span class="st">'Other'</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>      <span class="cf">ELSE</span> c.country</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>      <span class="cf">END</span> <span class="kw">AS</span> country,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> c.customer_id) <span class="kw">AS</span> customers,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">SUM</span>(i.total) <span class="kw">AS</span> total_sales,</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">SUM</span>(i.total)<span class="op">/</span><span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> c.customer_id) <span class="kw">AS</span> avg_sales_per_cust,</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">AVG</span>(i.total) <span class="kw">AS</span> avg_order</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> customer c</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">INNER</span> <span class="kw">JOIN</span> invoice i</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="kw">ON</span> c.customer_id <span class="op">=</span> i.customer_id</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  <span class="kw">GROUP</span> <span class="kw">BY</span> country</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>  country,</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">SUM</span>(customers) <span class="kw">AS</span> customers,</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">SUM</span>(total_sales) <span class="kw">AS</span> total_sales,</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">AVG</span>(avg_sales_per_cust) <span class="kw">AS</span> avg_sales_per_cust,</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">AVG</span>(avg_order) <span class="kw">AS</span> avg_order</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> </span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>  (</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>    <span class="kw">SELECT</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>      t1.<span class="op">*</span>,</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>      <span class="cf">CASE</span> </span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">WHEN</span> country <span class="op">=</span> <span class="st">'Other'</span> <span class="cf">THEN</span> <span class="dv">1</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">ELSE</span> <span class="dv">0</span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>        <span class="cf">END</span> <span class="kw">AS</span> sorted</span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> t1</span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> country</span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> sorted, total_sales <span class="kw">DESC</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<thead>
+<tr class="header">
+<th style="text-align: left;">country</th>
+<th style="text-align: right;">customers</th>
+<th style="text-align: right;">total_sales</th>
+<th style="text-align: right;">avg_sales_per_cust</th>
+<th style="text-align: right;">avg_order</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">USA</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">1040.49</td>
+<td style="text-align: right;">80.03769</td>
+<td style="text-align: right;">7.942672</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Canada</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">535.59</td>
+<td style="text-align: right;">66.94875</td>
+<td style="text-align: right;">7.047237</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Brazil</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">427.68</td>
+<td style="text-align: right;">85.53600</td>
+<td style="text-align: right;">7.011147</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">France</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">389.07</td>
+<td style="text-align: right;">77.81400</td>
+<td style="text-align: right;">7.781400</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Germany</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">334.62</td>
+<td style="text-align: right;">83.65500</td>
+<td style="text-align: right;">8.161463</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Czech Republic</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">273.24</td>
+<td style="text-align: right;">136.62000</td>
+<td style="text-align: right;">9.108000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">United Kingdom</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">245.52</td>
+<td style="text-align: right;">81.84000</td>
+<td style="text-align: right;">8.768571</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Portugal</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">185.13</td>
+<td style="text-align: right;">92.56500</td>
+<td style="text-align: right;">6.383793</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">India</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">183.15</td>
+<td style="text-align: right;">91.57500</td>
+<td style="text-align: right;">8.721429</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Other</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">1094.94</td>
+<td style="text-align: right;">72.99600</td>
+<td style="text-align: right;">7.445071</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>sales_by_country <span class="sc">%&gt;%</span> </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(country, customers, total_sales) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">country =</span> <span class="fu">factor</span>(country, <span class="at">levels =</span> <span class="fu">c</span>(country)) <span class="sc">%&gt;%</span> <span class="fu">fct_rev</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">customers =</span> customers<span class="sc">/</span><span class="fu">sum</span>(customers),</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">total_sales =</span> total_sales<span class="sc">/</span><span class="fu">sum</span>(total_sales)) <span class="sc">%&gt;%</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>country, <span class="at">names_to =</span> <span class="st">"variable"</span>, <span class="at">values_to =</span> <span class="st">"value"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>value, <span class="at">y=</span>country, <span class="at">fill=</span>variable)) <span class="sc">+</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">width =</span> <span class="fl">0.65</span>, <span class="at">position =</span> <span class="fu">position_dodge</span>(<span class="fl">0.8</span>)) <span class="sc">+</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">"Share of Customers and Sales by Country"</span>, <span class="at">x=</span><span class="st">"share"</span>, <span class="at">fill=</span><span class="st">""</span>) <span class="sc">+</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span>percent) <span class="sc">+</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"gray77"</span>, <span class="st">"seagreen3"</span>)) <span class="sc">+</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="chinook_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>sales_by_country <span class="sc">%&gt;%</span> </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(country, avg_order, avg_sales_per_cust) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">country =</span> <span class="fu">factor</span>(country, <span class="at">levels =</span> <span class="fu">c</span>(country)) <span class="sc">%&gt;%</span> <span class="fu">fct_rev</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">avg_order =</span> (avg_order <span class="sc">-</span> <span class="fu">mean</span>(avg_order)) <span class="sc">/</span> <span class="fu">mean</span>(avg_order),</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">avg_sales_per_cust =</span> (avg_sales_per_cust <span class="sc">-</span> <span class="fu">mean</span>(avg_sales_per_cust)) <span class="sc">/</span> </span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>                                 <span class="fu">mean</span>(avg_sales_per_cust)) <span class="sc">%&gt;%</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">`</span><span class="at">Average Order</span><span class="st">`</span> <span class="ot">=</span> avg_order,</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Average Sales per Customer</span><span class="st">`</span> <span class="ot">=</span> avg_sales_per_cust) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>country, <span class="at">names_to =</span> <span class="st">"variable"</span>, <span class="at">values_to =</span> <span class="st">"pct_diff_from_mean"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>pct_diff_from_mean, <span class="at">y=</span>country, <span class="at">fill=</span>variable)) <span class="sc">+</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">width =</span> <span class="fl">0.65</span>, <span class="at">position =</span> <span class="fu">position_dodge</span>(<span class="fl">0.8</span>)) <span class="sc">+</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> variable, <span class="at">scales =</span> <span class="st">"free_x"</span>) <span class="sc">+</span> </span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">"Average Order &amp; Average Sales per Customer"</span>, </span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"(Percent Difference from Mean)"</span>, <span class="at">x=</span><span class="st">"pct diff from mean"</span>, <span class="at">fill=</span><span class="st">""</span>) <span class="sc">+</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"steelblue"</span>, <span class="st">"lightskyblue2"</span>)) <span class="sc">+</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span>percent) <span class="sc">+</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="chinook_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The USA has the largest customer base and, consequently, the highest total sales.</p>
+<p>Based on the data, there may be opportunity in the following countries:</p>
+<ul>
+<li>Czech Republic</li>
+<li>United Kingdom</li>
+<li>India</li>
+</ul>
+<p>It’s worth keeping in mind that the amount of data from each of these countries is relatively low. Because of this, we should be cautious spending too much money on new marketing campaigns, as the sample size is not large enough to give us high confidence. A better approach would be to run small campaigns in these countries, collecting and analyzing the new customers to make sure that these trends hold with new customers.</p>
+</section>
+<section id="albums-vs-individual-tracks" class="level2">
+<h2 class="anchored" data-anchor-id="albums-vs-individual-tracks">4. Albums vs Individual Tracks</h2>
+<p>The Chinook store is setup in a way that allows customer to make purchases in one of the two ways:</p>
+<ul>
+<li>purchase a whole album</li>
+<li>purchase a collection of one or more individual tracks.</li>
+</ul>
+<p>The store does not let customers purchase a whole album, and then add individual tracks to that same purchase (unless they do that by choosing each track manually). When customers purchase albums they are charged the same price as if they had purchased each of those tracks separately.</p>
+<p>Management are currently considering changing their purchasing strategy to save money. The strategy they are considering is to purchase only the most popular tracks from each album from record companies, instead of purchasing every track from an album.</p>
+<p>We have been asked to find out what percentage of purchases are individual tracks vs whole albums, so that management can use this data to understand the effect this decision might have on overall revenue.</p>
+<p><strong>Instructions</strong></p>
+<ol type="1">
+<li><p>Write a query that categorizes each invoice as either an album purchase or not, and calculates the following summary statistics:</p>
+<ul>
+<li>Number of invoices</li>
+<li>Percentage of invoices</li>
+</ul></li>
+<li><p>Write one to two sentences explaining your findings, and making a prospective recommendation on whether the Chinook store should continue to buy full albums from record companies</p></li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> cat_purchase <span class="kw">AS</span> (</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    il.invoice_id,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">CASE</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>      <span class="cf">WHEN</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> t.album_id) <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>      <span class="kw">AND</span> </span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> t.track_id) <span class="op">=</span> c.count_album_tracks</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>      <span class="cf">THEN</span> <span class="st">'album'</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>      <span class="cf">ELSE</span> <span class="st">'individual track(s)'</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>      <span class="cf">END</span> <span class="kw">AS</span> purchase_type,</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>      c.count_album_tracks</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> track t</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">JOIN</span> invoice_line il</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ON</span> il.track_id <span class="op">=</span> t.track_id</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">JOIN</span> (<span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> count_album_tracks, album_id</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>          <span class="kw">FROM</span> track</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>          <span class="kw">GROUP</span> <span class="kw">BY</span> album_id) c</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ON</span> c.album_id <span class="op">=</span> t.album_id</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>    <span class="kw">GROUP</span> <span class="kw">BY</span> invoice_id</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>  purchase_type,</span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> number_of_invoices,</span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ROUND</span>(<span class="fu">CAST</span>(<span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> <span class="dt">float</span>) <span class="op">/</span> <span class="fu">CAST</span>(</span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>    (<span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>)</span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> invoice) <span class="kw">AS</span> <span class="dt">FLOAT</span>), <span class="dv">2</span>) <span class="kw">AS</span> percentage_of_invoices</span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> cat_purchase</span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> purchase_type</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>2 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">purchase_type</th>
+<th style="text-align: right;">number_of_invoices</th>
+<th style="text-align: right;">percentage_of_invoices</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">album</td>
+<td style="text-align: right;">114</td>
+<td style="text-align: right;">0.19</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">individual track(s)</td>
+<td style="text-align: right;">500</td>
+<td style="text-align: right;">0.81</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Album purchases account for 19% of all purchases. Based on this data, I would recommend against purchasing only the most popular tracks from each album from record companies, since there is a potential of losing a significant portion of revenue.</p>
+</section>
+<section id="which-artist-is-used-in-the-most-playlists" class="level2">
+<h2 class="anchored" data-anchor-id="which-artist-is-used-in-the-most-playlists">5. Which artist is used in the most playlists?</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  ar.name <span class="kw">AS</span> artist,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  g.name <span class="kw">AS</span> genre,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> pt.playlist_id) <span class="kw">AS</span> number_of_playlists,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> t.track_id) <span class="kw">AS</span> unique_tracks</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> artist ar</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> album al <span class="kw">ON</span> ar.artist_id<span class="op">=</span>al.artist_id</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> track t <span class="kw">ON</span> al.album_id<span class="op">=</span>t.album_id</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> playlist_track pt <span class="kw">ON</span> pt.track_id <span class="op">=</span> t.track_id</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> genre g <span class="kw">ON</span> g.genre_id <span class="op">=</span> t.genre_id</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> artist, genre</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> number_of_playlists <span class="kw">DESC</span>, unique_tracks <span class="kw">DESC</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>Displaying records 1 - 10</caption>
+<colgroup>
+<col style="width: 57%">
+<col style="width: 9%">
+<col style="width: 19%">
+<col style="width: 13%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">artist</th>
+<th style="text-align: left;">genre</th>
+<th style="text-align: right;">number_of_playlists</th>
+<th style="text-align: right;">unique_tracks</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Eugene Ormandy</td>
+<td style="text-align: left;">Classical</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Berliner Philharmoniker &amp; Herbert Von Karajan</td>
+<td style="text-align: left;">Classical</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">The King’s Singers</td>
+<td style="text-align: left;">Classical</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">English Concert &amp; Trevor Pinnock</td>
+<td style="text-align: left;">Classical</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Academy of St.&nbsp;Martin in the Fields &amp; Sir Neville Marriner</td>
+<td style="text-align: left;">Classical</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Michael Tilson Thomas &amp; San Francisco Symphony</td>
+<td style="text-align: left;">Classical</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Yo-Yo Ma</td>
+<td style="text-align: left;">Classical</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Wilhelm Kempff</td>
+<td style="text-align: left;">Classical</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ton Koopman</td>
+<td style="text-align: left;">Classical</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sir Georg Solti, Sumi Jo &amp; Wiener Philharmoniker</td>
+<td style="text-align: left;">Opera</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><a href="https://en.wikipedia.org/wiki/Eugene_Ormandy">Eugene Ormandy</a> takes the first place with only 3 unique tracks in 7 different playlists. His music belongs to the classical genre, which we have previously seen is one of the least popular genres in the USA.</p>
+<p>If we order this table by number of unique tracks, we get a completely different list.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  ar.name <span class="kw">AS</span> artist,</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  g.name <span class="kw">AS</span> genre,</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> pt.playlist_id) <span class="kw">AS</span> number_of_playlists,</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> t.track_id) <span class="kw">AS</span> unique_tracks</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> artist ar</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> album al <span class="kw">ON</span> ar.artist_id<span class="op">=</span>al.artist_id</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> track t <span class="kw">ON</span> al.album_id<span class="op">=</span>t.album_id</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> playlist_track pt <span class="kw">ON</span> pt.track_id <span class="op">=</span> t.track_id</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> genre g <span class="kw">ON</span> g.genre_id <span class="op">=</span> t.genre_id</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> artist, genre</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> unique_tracks <span class="kw">DESC</span>, number_of_playlists <span class="kw">DESC</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">artist</th>
+<th style="text-align: left;">genre</th>
+<th style="text-align: right;">number_of_playlists</th>
+<th style="text-align: right;">unique_tracks</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Led Zeppelin</td>
+<td style="text-align: left;">Rock</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">114</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Metallica</td>
+<td style="text-align: left;">Metal</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">112</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">U2</td>
+<td style="text-align: left;">Rock</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">112</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Iron Maiden</td>
+<td style="text-align: left;">Metal</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">95</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Deep Purple</td>
+<td style="text-align: left;">Rock</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">92</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Iron Maiden</td>
+<td style="text-align: left;">Rock</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">81</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Pearl Jam</td>
+<td style="text-align: left;">Rock</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">54</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Van Halen</td>
+<td style="text-align: left;">Rock</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">52</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Os Paralamas Do Sucesso</td>
+<td style="text-align: left;">Latin</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">49</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Lost</td>
+<td style="text-align: left;">TV Shows</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">48</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="how-many-tracks-have-been-purchased-vs-not-purchased" class="level2">
+<h2 class="anchored" data-anchor-id="how-many-tracks-have-been-purchased-vs-not-purchased">6. How many tracks have been purchased vs not purchased?</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> all_and_purchased_tracks <span class="kw">AS</span> (</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> </span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    t.track_id <span class="kw">AS</span> all_tracks,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    il.track_id <span class="kw">AS</span> purch_tracks</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> track t</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">LEFT</span> <span class="kw">JOIN</span> invoice_line il</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">ON</span> t.track_id <span class="op">=</span> il.track_id</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> all_tracks) <span class="kw">AS</span> total_tracks,</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> purch_tracks) <span class="kw">AS</span> pirchased,</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> all_tracks) <span class="op">-</span> <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> purch_tracks) <span class="kw">AS</span> not_purchased,</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ROUND</span>(<span class="fu">CAST</span>(<span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> purch_tracks) <span class="kw">AS</span> <span class="dt">FLOAT</span>)<span class="op">/</span><span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> all_tracks), <span class="dv">3</span>)</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AS</span> perc_purchased,</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ROUND</span>(<span class="fu">CAST</span>(<span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> all_tracks) <span class="op">-</span> <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> purch_tracks) </span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AS</span> <span class="dt">FLOAT</span>)<span class="op">/</span><span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> all_tracks), <span class="dv">3</span>)</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AS</span> perc_not_purchased</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> all_and_purchased_tracks</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>1 records</caption>
+<colgroup>
+<col style="width: 18%">
+<col style="width: 14%">
+<col style="width: 19%">
+<col style="width: 21%">
+<col style="width: 26%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">total_tracks</th>
+<th style="text-align: right;">pirchased</th>
+<th style="text-align: right;">not_purchased</th>
+<th style="text-align: right;">perc_purchased</th>
+<th style="text-align: right;">perc_not_purchased</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">3503</td>
+<td style="text-align: right;">1806</td>
+<td style="text-align: right;">1697</td>
+<td style="text-align: right;">0.516</td>
+<td style="text-align: right;">0.484</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pie</span>(<span class="fu">c</span>(<span class="fl">51.6</span>, <span class="fl">48.4</span>), <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"purchased"</span>, <span class="st">"not purchased"</span>), </span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">main =</span> <span class="st">"Purchased vs not purchased tracks"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="chinook_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Almost half of all the unique tracks available in the Chinook store were never bought, probably being of unpopular genre or unpopular artists.</p>
+</section>
+<section id="do-protected-vs-non-protected-media-types-have-an-effect-on-popularity" class="level2">
+<h2 class="anchored" data-anchor-id="do-protected-vs-non-protected-media-types-have-an-effect-on-popularity">7. Do protected vs non-protected media types have an effect on popularity?</h2>
+<p>Let’s take a look at the <code>media_type</code> table.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> media_type</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>5 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">media_type_id</th>
+<th style="text-align: left;">name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">MPEG audio file</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">Protected AAC audio file</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">Protected MPEG-4 video file</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">Purchased AAC audio file</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">AAC audio file</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>There are 2 out of 5 media types that are protected.</p>
+<div class="cell" data-output.var="by_media_type">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> t <span class="kw">AS</span> (</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> </span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    t.track_id,</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">CASE</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>      <span class="cf">WHEN</span> mt.name <span class="kw">LIKE</span> <span class="ot">"%protected%"</span> <span class="cf">THEN</span> <span class="ot">"yes"</span> <span class="cf">ELSE</span> <span class="ot">"no"</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>      <span class="cf">END</span> <span class="kw">AS</span> protected</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> track t</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="kw">JOIN</span> media_type mt <span class="kw">ON</span> mt.media_type_id <span class="op">=</span> t.media_type_id</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>  protected,</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> t.track_id) <span class="kw">AS</span> unique_tracks,</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ROUND</span>(<span class="fu">CAST</span>(<span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> t.track_id) <span class="kw">AS</span> <span class="dt">FLOAT</span>) <span class="op">/</span> (<span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">FROM</span> track), <span class="dv">2</span>)</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AS</span> <span class="st">'unique_tracks_%'</span>,</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> il.track_id) <span class="kw">AS</span> sold_unique_tracks,</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">COUNT</span>(il.track_id) <span class="kw">AS</span> sold_tracks,</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ROUND</span>(<span class="fu">CAST</span>(<span class="fu">COUNT</span>(il.track_id) <span class="kw">AS</span> <span class="dt">FLOAT</span>) <span class="op">/</span> (<span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">FROM</span> invoice_line), <span class="dv">2</span>)</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AS</span> <span class="st">'sold_tracks_%'</span></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> t</span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> invoice_line il <span class="kw">ON</span> t.track_id <span class="op">=</span> il.track_id</span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> protected</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 16%">
+<col style="width: 18%">
+<col style="width: 22%">
+<col style="width: 14%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">protected</th>
+<th style="text-align: right;">unique_tracks</th>
+<th style="text-align: right;">unique_tracks_%</th>
+<th style="text-align: right;">sold_unique_tracks</th>
+<th style="text-align: right;">sold_tracks</th>
+<th style="text-align: right;">sold_tracks_%</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">no</td>
+<td style="text-align: right;">3052</td>
+<td style="text-align: right;">0.87</td>
+<td style="text-align: right;">1652</td>
+<td style="text-align: right;">4315</td>
+<td style="text-align: right;">0.91</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">yes</td>
+<td style="text-align: right;">451</td>
+<td style="text-align: right;">0.13</td>
+<td style="text-align: right;">154</td>
+<td style="text-align: right;">442</td>
+<td style="text-align: right;">0.09</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>by_media_type <span class="sc">%&gt;%</span> </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(protected, unique_tracks, sold_tracks) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">unique =</span> unique_tracks, </span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">sold =</span> sold_tracks) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>protected, <span class="at">names_to =</span> <span class="st">"tracks"</span>, <span class="at">values_to =</span> <span class="st">"count"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">tracks =</span> <span class="fu">as.factor</span>(tracks) <span class="sc">%&gt;%</span> <span class="fu">fct_rev</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(tracks) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> count<span class="sc">/</span><span class="fu">sum</span>(count) <span class="sc">%&gt;%</span> <span class="fu">round</span>(<span class="dv">2</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>tracks, <span class="at">y=</span>count, <span class="at">fill=</span>protected)) <span class="sc">+</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">width =</span> <span class="fl">0.5</span>, <span class="at">position =</span> <span class="st">"stack"</span>, <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> count), <span class="at">position =</span> <span class="fu">position_stack</span>(<span class="at">vjust =</span> .<span class="dv">5</span>),</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">fontface =</span> <span class="st">"bold"</span>)<span class="sc">+</span></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#fbc02d"</span>, <span class="st">"#03a9f4"</span>)) <span class="sc">+</span></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>by_media_type <span class="sc">%&gt;%</span> </span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(protected, unique_tracks, sold_unique_tracks) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">unique =</span> unique_tracks, </span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">unique_sold =</span> sold_unique_tracks) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">unique_unsold =</span> unique <span class="sc">-</span> unique_sold) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>protected, <span class="at">names_to =</span> <span class="st">"tracks"</span>, <span class="at">values_to =</span> <span class="st">"count"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(tracks <span class="sc">!=</span> <span class="st">"unique"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(protected) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">percentage =</span> scales<span class="sc">::</span><span class="fu">percent</span>(count<span class="sc">/</span><span class="fu">sum</span>(count), <span class="at">accuracy =</span> <span class="fl">0.1</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>protected, <span class="at">y=</span>count, <span class="at">fill=</span>tracks)) <span class="sc">+</span></span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">width =</span> <span class="fl">0.5</span>, <span class="at">position =</span> <span class="st">"fill"</span>, <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"seagreen3"</span>, <span class="st">"tomato"</span>)) <span class="sc">+</span></span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> percentage), <span class="at">position =</span> <span class="fu">position_fill</span>(<span class="at">vjust =</span> .<span class="dv">5</span>), </span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>            <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">fontface =</span> <span class="st">"bold"</span>) <span class="sc">+</span></span>
+<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">"proportion"</span>) <span class="sc">+</span></span>
+<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="chinook_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid" width="384"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="chinook_files/figure-html/unnamed-chunk-28-2.png" class="img-fluid" width="384"></p>
+</div>
+</div>
+</div>
+</div>
+<p>We can make the following observations:</p>
+<ul>
+<li>Only 13% of all the unique tracks available in the Chinook store are of protected media types.</li>
+<li>Among all the tracks that were sold, those of protected media types amounts only to 9%.</li>
+<li>From all the unique tracks of protected media types, only 34,1% were sold, while from those of non-protected ones 54,1%.</li>
+</ul>
+<p>We can conclude that the <strong>tracks of protected media types are much less popular</strong> than those of non-protected.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp(/https:\/\/sandrajurela\.com/);
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script>
+<script src="https://giscus.app/client.js" data-repo="sandra-jurela/my-personal-Quarto-blog" data-repo-id="R_kgDOI6JBDg" data-category="General" data-category-id="DIC_kwDOI6JBDs4CUB2R" data-mapping="title" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="top" data-theme="light" data-lang="en" crossorigin="anonymous" async="">
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+      <div class="nav-footer-center">© 2023 Sandra Jurela. All Rights Reserved<br>
+Built with 🧠 and <a href="https://uarto.org/">Quarto</a> in RStudio.</div>
+  </div>
+</footer>
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>
