@@ -15,7 +15,481 @@
 <link>https://sandrajurela.com/index.html</link>
 </image>
 <generator>quarto-1.2.313</generator>
-<lastBuildDate>Wed, 08 Jun 2022 22:00:00 GMT</lastBuildDate>
+<lastBuildDate>Wed, 31 Aug 2022 22:00:00 GMT</lastBuildDate>
+<item>
+  <title>Scraping 200 Best Movies of 2010s from Rotten Tomatoes</title>
+  <dc:creator>Sandra Jurela</dc:creator>
+  <link>https://sandrajurela.com/posts/web-scraping-rotten-tomatoes/rotten-tomatoes.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>The goal of this project is to scrape data on the 200 best movies of the last decade from the <a href="https://editorial.rottentomatoes.com/guide/the-200-best-movies-of-the-2010s/">Rotten Tomatoes</a> website with the R <code>rvest</code> package, and finally create a dashboard in <a href="https://www.tableau.com/">Tableau</a>. The idea is to show all the movies in one place. Hovering over the movie should reveal relevant data in the tooltip for quick overview. Clicking on the movie should open the movie’s website for more information.</p>
+<p>I’ve learned so much while working on this project (like web scraping, writing functions, iteration, …). The <code>purrr</code> package for functional programming is super-cool. It allows iteration with just one line of code (a very handy replacement for <code>for loops</code>).</p>
+<p>I hope you’ll enjoy the process as much as I did. At times it was quite challenging, but that’s how we learn!</p>
+<section id="setting-up-the-programming-environment" class="level3">
+<h3 class="anchored" data-anchor-id="setting-up-the-programming-environment">Setting up the programming environment</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="co" style="color: #5E5E5E;"># loading packages</span></span>
+<span id="cb1-2"><span class="fu" style="color: #4758AB;">library</span>(tidyverse)</span>
+<span id="cb1-3"><span class="fu" style="color: #4758AB;">library</span>(rvest)</span></code></pre></div>
+</div>
+<p>Are we allowed to scrape data from the Rotten Tomatoes website?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1">robotstxt<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">paths_allowed</span>(<span class="st" style="color: #20794D;">"https://www.rottentomatoes.com/"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="plan" class="level2">
+<h2 class="anchored" data-anchor-id="plan">Plan</h2>
+<p>The data will be scraped from <a href="https://editorial.rottentomatoes.com/guide/the-200-best-movies-of-the-2010s/">this page</a>. Since it doesn’t contain all the data I am interested in, I have to visit every movie’s web page on the list and scrape data from there. Here is the plan:</p>
+<ol type="1">
+<li><p>Scrape data from the main page: the <code>url</code>s of movies, and the <code>url</code>s of images.</p></li>
+<li><p>Scrape <code>title</code>, <code>year_genre_runtime</code>, <code>critics_score</code>, <code>audiaece_score</code>, and <code>synopsis</code> from the first movie to develop the code.</p></li>
+<li><p>Write a function that scrapes data based on movie’s URL.</p></li>
+<li><p>Iteration - use this function to scrape data from each individual movie and create a data frame with the columns <code>title</code>, <code>year_genre_runtime</code>, <code>critics_score</code>, <code>audiaece_score</code>, <code>synopsis</code>, and <code>url</code>.</p></li>
+<li><p>Download images</p></li>
+<li><p>Prepare data for Tableau</p></li>
+<li><p>Create a dashboard in Tableau</p></li>
+</ol>
+</section>
+<section id="scraping-data-from-the-main-page" class="level2">
+<h2 class="anchored" data-anchor-id="scraping-data-from-the-main-page">1. Scraping data from the main page</h2>
+<p>Reading the main page with <code>read_html()</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1">main_url <span class="ot" style="color: #003B4F;">&lt;-</span> <span class="st" style="color: #20794D;">"https://editorial.rottentomatoes.com/guide/the-200-best-movies-of-the-2010s/"</span></span>
+<span id="cb4-2">main_page <span class="ot" style="color: #003B4F;">&lt;-</span> <span class="fu" style="color: #4758AB;">read_html</span>(main_url)</span></code></pre></div>
+</div>
+<p><br></p>
+<div class="cell" data-layout-align="left">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-left">
+<figure class="figure">
+<p><img src="https://sandrajurela.com/posts/web-scraping-rotten-tomatoes/images/img1.jpg" class="img-fluid figure-img" width="710"></p>
+<p></p><figcaption class="figure-caption">Figure 1: The main page</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>I make use of the <strong>SelectorGadget</strong> to identify the tags for the relevant nodes. Here is the <a href="https://chrome.google.com/webstore/detail/selectorgadget/mhjhnkcfbdhnjickkkdbjoemdmbfginb">link</a> for Chrome (recommended).</p>
+<section id="extracting-urls-of-movies" class="level4">
+<h4 class="anchored" data-anchor-id="extracting-urls-of-movies">Extracting <code>url</code>s of movies</h4>
+<p>The same nodes that contain the text for the titles also contain information on the links to individual movie pages for each title. We can extract this information using the <code>html_attr()</code> function, which extracts attributes.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1">movie_urls <span class="ot" style="color: #003B4F;">&lt;-</span> main_page <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb5-2">  <span class="fu" style="color: #4758AB;">html_nodes</span>(<span class="st" style="color: #20794D;">".article_movie_title a"</span>) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb5-3">  <span class="fu" style="color: #4758AB;">html_attr</span>(<span class="st" style="color: #20794D;">"href"</span>)</span>
+<span id="cb5-4"></span>
+<span id="cb5-5">movie_urls <span class="sc" style="color: #5E5E5E;">%&gt;%</span> <span class="fu" style="color: #4758AB;">head</span>()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "https://www.rottentomatoes.com/m/12_years_a_slave"    
+[2] "https://www.rottentomatoes.com/m/20_feet_from_stardom"
+[3] "https://www.rottentomatoes.com/m/45_years"            
+[4] "https://www.rottentomatoes.com/m/all_is_lost_2013"    
+[5] "https://www.rottentomatoes.com/m/amazing_grace_2018"  
+[6] "https://www.rottentomatoes.com/m/american_hustle"     </code></pre>
+</div>
+</div>
+</section>
+<section id="extracting-urls-of-images" class="level4">
+<h4 class="anchored" data-anchor-id="extracting-urls-of-images">Extracting <code>url</code>s of images</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1">image_urls <span class="ot" style="color: #003B4F;">&lt;-</span> main_page <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb7-2">  <span class="fu" style="color: #4758AB;">html_nodes</span>(<span class="st" style="color: #20794D;">".article_poster"</span>) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb7-3">  <span class="fu" style="color: #4758AB;">html_attr</span>(<span class="st" style="color: #20794D;">"src"</span>)</span></code></pre></div>
+</div>
+<p>Let’s check the image for the 6th title.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1">knitr<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">include_graphics</span>(image_urls[<span class="dv" style="color: #AD0000;">6</span>])</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://sandrajurela.com/posts/web-scraping-rotten-tomatoes/https:/resizing.flixster.com/5RRz_ps7sPP4cWIxG3nYebujtg4=/fit-in/180x240/v2/https:/flxt.tmsimg.com/assets/p10016553_p_v10_al.jpg" class="img-fluid"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="scraping-data-for-the-first-movie-on-the-list" class="level2">
+<h2 class="anchored" data-anchor-id="scraping-data-for-the-first-movie-on-the-list">2. Scraping data for the first movie on the list</h2>
+<p>Now I’m going to scrape data for the movie <em>12 Years a Slave</em> in order to develop the code.</p>
+<p>Reading page for the first movie.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1">url <span class="ot" style="color: #003B4F;">&lt;-</span> <span class="st" style="color: #20794D;">"https://www.rottentomatoes.com/m/12_years_a_slave"</span></span>
+<span id="cb9-2">movie_page <span class="ot" style="color: #003B4F;">&lt;-</span> <span class="fu" style="color: #4758AB;">read_html</span>(url)</span></code></pre></div>
+</div>
+<p><br></p>
+<div class="cell" data-layout-align="left">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-left">
+<figure class="figure">
+<p><img src="https://sandrajurela.com/posts/web-scraping-rotten-tomatoes/images/img2.jpg" class="img-fluid figure-img" width="828"></p>
+<p></p><figcaption class="figure-caption">Figure 2: Title, year, genre, runtime, critics and audience score</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Scroll down the page and you’ll find the movie synopsis.</p>
+<div class="cell" data-layout-align="left">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-left">
+<figure class="figure">
+<p><img src="https://sandrajurela.com/posts/web-scraping-rotten-tomatoes/images/img3.jpg" class="img-fluid figure-img" width="837"></p>
+<p></p><figcaption class="figure-caption">Figure 3: Synopsis</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="extracting-title" class="level4">
+<h4 class="anchored" data-anchor-id="extracting-title">Extracting <code>title</code></h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1">title <span class="ot" style="color: #003B4F;">&lt;-</span> movie_page <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb10-2">  <span class="fu" style="color: #4758AB;">html_node</span>(<span class="st" style="color: #20794D;">".scoreboard__title"</span>) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb10-3">  <span class="fu" style="color: #4758AB;">html_text</span>()</span>
+<span id="cb10-4"></span>
+<span id="cb10-5">title</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "12 Years a Slave"</code></pre>
+</div>
+</div>
+</section>
+<section id="extracting-year-genre-and-runtime" class="level4">
+<h4 class="anchored" data-anchor-id="extracting-year-genre-and-runtime">Extracting <code>year</code>, <code>genre</code>, and <code>runtime</code></h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1">year_genre_runtime <span class="ot" style="color: #003B4F;">&lt;-</span> movie_page <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb12-2">  <span class="fu" style="color: #4758AB;">html_node</span>(<span class="st" style="color: #20794D;">".scoreboard__info"</span>) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb12-3">  <span class="fu" style="color: #4758AB;">html_text</span>()</span>
+<span id="cb12-4"></span>
+<span id="cb12-5">year_genre_runtime</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "2013, History/Drama, 2h 14m"</code></pre>
+</div>
+</div>
+</section>
+<section id="extracting-critics-score" class="level4">
+<h4 class="anchored" data-anchor-id="extracting-critics-score">Extracting <code>critics score</code></h4>
+<p>The next two are tricky. I had to look at the page source and find them manually.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1">critics_score <span class="ot" style="color: #003B4F;">&lt;-</span> movie_page <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb14-2">  <span class="fu" style="color: #4758AB;">html_element</span>(<span class="st" style="color: #20794D;">"score-board"</span>) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb14-3">  <span class="fu" style="color: #4758AB;">html_attr</span>(<span class="st" style="color: #20794D;">"tomatometerscore"</span>) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb14-4">  <span class="fu" style="color: #4758AB;">str_c</span>(.,<span class="st" style="color: #20794D;">"%"</span>)</span>
+<span id="cb14-5"></span>
+<span id="cb14-6">critics_score</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "95%"</code></pre>
+</div>
+</div>
+</section>
+<section id="extracting-audience-score" class="level4">
+<h4 class="anchored" data-anchor-id="extracting-audience-score">Extracting <code>audience score</code></h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1">audience_score <span class="ot" style="color: #003B4F;">&lt;-</span> movie_page <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb16-2">  <span class="fu" style="color: #4758AB;">html_element</span>(<span class="st" style="color: #20794D;">"score-board"</span>) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb16-3">  <span class="fu" style="color: #4758AB;">html_attr</span>(<span class="st" style="color: #20794D;">"audiencescore"</span>) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb16-4">  <span class="fu" style="color: #4758AB;">str_c</span>(.,<span class="st" style="color: #20794D;">"%"</span>)</span>
+<span id="cb16-5"></span>
+<span id="cb16-6">audience_score</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "90%"</code></pre>
+</div>
+</div>
+</section>
+<section id="extracting-movie-synopsis" class="level4">
+<h4 class="anchored" data-anchor-id="extracting-movie-synopsis">Extracting movie <code>synopsis</code></h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1">synopsis <span class="ot" style="color: #003B4F;">&lt;-</span> movie_page <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb18-2">  <span class="fu" style="color: #4758AB;">html_node</span>(<span class="st" style="color: #20794D;">"#movieSynopsis"</span>) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb18-3">  <span class="fu" style="color: #4758AB;">html_text2</span>()</span>
+<span id="cb18-4"></span>
+<span id="cb18-5">synopsis</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "In the years before the Civil War, Solomon Northup (Chiwetel Ejiofor), a free black man from upstate New York, is kidnapped and sold into slavery in the South. Subjected to the cruelty of one malevolent owner (Michael Fassbender), he also finds unexpected kindness from another, as he struggles continually to survive and maintain some of his dignity. Then in the 12th year of the disheartening ordeal, a chance meeting with an abolitionist from Canada changes Solomon's life forever."</code></pre>
+</div>
+</div>
+</section>
+<section id="makinging-a-data-frame-of-extracted-elements" class="level3">
+<h3 class="anchored" data-anchor-id="makinging-a-data-frame-of-extracted-elements">Makinging a data frame of extracted elements</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1">movie  <span class="ot" style="color: #003B4F;">&lt;-</span> <span class="fu" style="color: #4758AB;">tibble</span>(<span class="at" style="color: #657422;">title =</span> title, </span>
+<span id="cb20-2">                 <span class="at" style="color: #657422;">year_genre_runtime =</span> year_genre_runtime,</span>
+<span id="cb20-3">                 <span class="at" style="color: #657422;">critics_score =</span> critics_score,</span>
+<span id="cb20-4">                 <span class="at" style="color: #657422;">audience_score =</span> audience_score,</span>
+<span id="cb20-5">                 <span class="at" style="color: #657422;">synopsis =</span> synopsis,  </span>
+<span id="cb20-6">                 <span class="at" style="color: #657422;">url =</span> url)</span>
+<span id="cb20-7"></span>
+<span id="cb20-8">movie <span class="sc" style="color: #5E5E5E;">%&gt;%</span> <span class="fu" style="color: #4758AB;">glimpse</span>()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 1
+Columns: 6
+$ title              &lt;chr&gt; "12 Years a Slave"
+$ year_genre_runtime &lt;chr&gt; "2013, History/Drama, 2h 14m"
+$ critics_score      &lt;chr&gt; "95%"
+$ audience_score     &lt;chr&gt; "90%"
+$ synopsis           &lt;chr&gt; "In the years before the Civil War, Solomon Northup…
+$ url                &lt;chr&gt; "https://www.rottentomatoes.com/m/12_years_a_slave"</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="writing-a-function" class="level2">
+<h2 class="anchored" data-anchor-id="writing-a-function">3. Writing a function</h2>
+<p>Instead of manually scraping individual movies, I’ll write a function to do the same.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1">scrape_movie <span class="ot" style="color: #003B4F;">&lt;-</span> <span class="cf" style="color: #003B4F;">function</span>(x, ...){</span>
+<span id="cb22-2">  </span>
+<span id="cb22-3">  movie_page <span class="ot" style="color: #003B4F;">&lt;-</span> <span class="fu" style="color: #4758AB;">read_html</span>(x)</span>
+<span id="cb22-4">  </span>
+<span id="cb22-5">  title <span class="ot" style="color: #003B4F;">&lt;-</span> movie_page <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb22-6">    <span class="fu" style="color: #4758AB;">html_node</span>(<span class="st" style="color: #20794D;">".scoreboard__title"</span>) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb22-7">    <span class="fu" style="color: #4758AB;">html_text</span>()</span>
+<span id="cb22-8">  </span>
+<span id="cb22-9">  year_genre_runtime <span class="ot" style="color: #003B4F;">&lt;-</span> movie_page <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb22-10">    <span class="fu" style="color: #4758AB;">html_node</span>(<span class="st" style="color: #20794D;">".scoreboard__info"</span>) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb22-11">    <span class="fu" style="color: #4758AB;">html_text</span>()</span>
+<span id="cb22-12">  </span>
+<span id="cb22-13">  critics_score <span class="ot" style="color: #003B4F;">&lt;-</span> movie_page <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb22-14">    <span class="fu" style="color: #4758AB;">html_element</span>(<span class="st" style="color: #20794D;">"score-board"</span>) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb22-15">    <span class="fu" style="color: #4758AB;">html_attr</span>(<span class="st" style="color: #20794D;">"tomatometerscore"</span>) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb22-16">    <span class="fu" style="color: #4758AB;">str_c</span>(.,<span class="st" style="color: #20794D;">"%"</span>)</span>
+<span id="cb22-17">  </span>
+<span id="cb22-18">  audience_score <span class="ot" style="color: #003B4F;">&lt;-</span> movie_page <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb22-19">    <span class="fu" style="color: #4758AB;">html_element</span>(<span class="st" style="color: #20794D;">"score-board"</span>) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb22-20">    <span class="fu" style="color: #4758AB;">html_attr</span>(<span class="st" style="color: #20794D;">"audiencescore"</span>) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb22-21">    <span class="fu" style="color: #4758AB;">str_c</span>(.,<span class="st" style="color: #20794D;">"%"</span>)</span>
+<span id="cb22-22">  </span>
+<span id="cb22-23">  synopsis <span class="ot" style="color: #003B4F;">&lt;-</span> movie_page <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb22-24">    <span class="fu" style="color: #4758AB;">html_node</span>(<span class="st" style="color: #20794D;">"#movieSynopsis"</span>) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb22-25">    <span class="fu" style="color: #4758AB;">html_text2</span>()</span>
+<span id="cb22-26">  </span>
+<span id="cb22-27">  movie_df <span class="ot" style="color: #003B4F;">&lt;-</span> <span class="fu" style="color: #4758AB;">tibble</span>(<span class="at" style="color: #657422;">title =</span> title, </span>
+<span id="cb22-28">                     <span class="at" style="color: #657422;">year_genre_runtime =</span> year_genre_runtime,</span>
+<span id="cb22-29">                     <span class="at" style="color: #657422;">critics_score =</span> critics_score,</span>
+<span id="cb22-30">                     <span class="at" style="color: #657422;">audience_score =</span> audience_score,</span>
+<span id="cb22-31">                     <span class="at" style="color: #657422;">synopsis =</span> synopsis,</span>
+<span id="cb22-32">                     <span class="at" style="color: #657422;">url =</span> x)</span>
+<span id="cb22-33">  </span>
+<span id="cb22-34">  <span class="fu" style="color: #4758AB;">return</span>(movie_df)</span>
+<span id="cb22-35">  </span>
+<span id="cb22-36">}</span></code></pre></div>
+</div>
+<section id="function-in-action" class="level4">
+<h4 class="anchored" data-anchor-id="function-in-action">Function in action</h4>
+<p>Now that we have the <code>scrape_movie()</code> function, let’s scrape data for the movie “American Hustle”.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><span class="fu" style="color: #4758AB;">scrape_movie</span>(movie_urls[<span class="dv" style="color: #AD0000;">6</span>]) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> <span class="fu" style="color: #4758AB;">glimpse</span>()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 1
+Columns: 6
+$ title              &lt;chr&gt; "American Hustle"
+$ year_genre_runtime &lt;chr&gt; "2013, Crime/Drama, 2h 18m"
+$ critics_score      &lt;chr&gt; "92%"
+$ audience_score     &lt;chr&gt; "74%"
+$ synopsis           &lt;chr&gt; "Irving Rosenfeld (Christian Bale) dabbles in forge…
+$ url                &lt;chr&gt; "https://www.rottentomatoes.com/m/american_hustle"</code></pre>
+</div>
+</div>
+<p>Or “Ex Machina” (an interesting SF movie).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"> <span class="fu" style="color: #4758AB;">scrape_movie</span>(movie_urls[<span class="dv" style="color: #AD0000;">53</span>]) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> <span class="fu" style="color: #4758AB;">glimpse</span>()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 1
+Columns: 6
+$ title              &lt;chr&gt; "Ex Machina"
+$ year_genre_runtime &lt;chr&gt; "2014, Sci-fi/Mystery &amp; thriller, 1h 47m"
+$ critics_score      &lt;chr&gt; "92%"
+$ audience_score     &lt;chr&gt; "86%"
+$ synopsis           &lt;chr&gt; "Caleb Smith (Domhnall Gleeson) a programmer at a h…
+$ url                &lt;chr&gt; "https://www.rottentomatoes.com/m/ex_machina"</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="iteration" class="level2">
+<h2 class="anchored" data-anchor-id="iteration">4. Iteration</h2>
+<p>To make my workflow a little more efficient, I make use of the <code>map_dfr()</code> function from the <code>purrr</code> package to iterate over all movie pages. <code>map_dfr()</code> will apply the <code>scrape_movie()</code>function to each element in the vector of links, and return a data frame created by row-binding. It’s as simple as that.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1">movies <span class="ot" style="color: #003B4F;">&lt;-</span> <span class="fu" style="color: #4758AB;">map_dfr</span>(movie_urls, scrape_movie)</span>
+<span id="cb27-2"></span>
+<span id="cb27-3">movies </span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 200 × 6
+   title                year_genre_runtime         criti…¹ audie…² synop…³ url  
+   &lt;chr&gt;                &lt;chr&gt;                      &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;
+ 1 12 Years a Slave     2013, History/Drama, 2h 1… 95%     90%     In the… http…
+ 2 20 Feet From Stardom 2013, Documentary, 1h 30m  99%     82%     Filmma… http…
+ 3 45 Years             2015, Drama, 1h 33m        97%     67%     As the… http…
+ 4 All Is Lost          2013, Adventure/Mystery &amp;… 94%     64%     During… http…
+ 5 Amazing Grace        2018, Documentary/Music, … 99%     80%     Singer… http…
+ 6 American Hustle      2013, Crime/Drama, 2h 18m  92%     74%     Irving… http…
+ 7 Amy                  2015, Documentary/Biograp… 95%     87%     Archiv… http…
+ 8 Anomalisa            2015, Comedy/Drama, 1h 30m 91%     71%     An ins… http…
+ 9 Ant-Man and The Wasp 2018, Action/Adventure, 1… 87%     80%     Scott … http…
+10 Apollo 11            2019, Documentary/History… 99%     90%     Never-… http…
+# … with 190 more rows, and abbreviated variable names ¹​critics_score,
+#   ²​audience_score, ³​synopsis</code></pre>
+</div>
+</div>
+</section>
+<section id="downloading-images" class="level2">
+<h2 class="anchored" data-anchor-id="downloading-images">5. Downloading images</h2>
+<p>I’ve already extracted urls of images in the first step and saved them to <code>image_urls</code>. Now I’m going to create a directory and directory paths for the images.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1">fs<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">dir_create</span>(<span class="st" style="color: #20794D;">"images/top_200_images/"</span>)</span>
+<span id="cb29-2"></span>
+<span id="cb29-3">paths <span class="ot" style="color: #003B4F;">&lt;-</span> <span class="fu" style="color: #4758AB;">c</span>(<span class="fu" style="color: #4758AB;">str_c</span>(<span class="st" style="color: #20794D;">"images/top_200_images/"</span>, <span class="fu" style="color: #4758AB;">sprintf</span>(<span class="st" style="color: #20794D;">"%0.3d"</span>, <span class="dv" style="color: #AD0000;">1</span><span class="sc" style="color: #5E5E5E;">:</span><span class="dv" style="color: #AD0000;">200</span>), <span class="st" style="color: #20794D;">".jpg"</span>))</span>
+<span id="cb29-4"></span>
+<span id="cb29-5">paths <span class="sc" style="color: #5E5E5E;">%&gt;%</span> <span class="fu" style="color: #4758AB;">head</span>()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "images/top_200_images/001.jpg" "images/top_200_images/002.jpg"
+[3] "images/top_200_images/003.jpg" "images/top_200_images/004.jpg"
+[5] "images/top_200_images/005.jpg" "images/top_200_images/006.jpg"</code></pre>
+</div>
+</div>
+<p>Since Tableau sorts images alphabetically (1, 11, 111, 2, 22, …) by default, these leading zeros will help Tableau to correctly match the images with the data so I don’t have to do it manually.</p>
+<section id="downloading-images-1" class="level4">
+<h4 class="anchored" data-anchor-id="downloading-images-1">Downloading images</h4>
+<p>This time I’ll use <code>map2()</code> function from the <code>purrr</code> package, It will apply the <code>download.file()</code> function to pairs of elements from two vectors, <code>image_urls</code> and <code>paths</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><span class="fu" style="color: #4758AB;">map2</span>(image_urls, paths, <span class="cf" style="color: #003B4F;">function</span>(.x, .y) <span class="fu" style="color: #4758AB;">download.file</span>(.x, .y, <span class="at" style="color: #657422;">mode=</span><span class="st" style="color: #20794D;">"wb"</span>)) </span></code></pre></div>
+</div>
+<p>Are the images properly saved? Let’s read in the image for the first movie.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1">knitr<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">include_graphics</span>(<span class="st" style="color: #20794D;">"images/top_200_images/001.jpg"</span>)</span></code></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="https://sandrajurela.com/posts/web-scraping-rotten-tomatoes/https:/resizing.flixster.com/omz-ZW3ToC8rY90ysUItce6Y1T0=/fit-in/180x240/v2/https:/flxt.tmsimg.com/assets/p10029562_p_v8_ac.jpg" class="img-fluid"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="data-wrangling" class="level2">
+<h2 class="anchored" data-anchor-id="data-wrangling">6. Data wrangling</h2>
+<p>Preparing the final dataset for Tableau.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1">movies <span class="ot" style="color: #003B4F;">&lt;-</span> movies <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb33-2">  </span>
+<span id="cb33-3">  <span class="co" style="color: #5E5E5E;"># separate year_genre_runtime column into year, genre, and runtime</span></span>
+<span id="cb33-4">  <span class="fu" style="color: #4758AB;">separate</span>(year_genre_runtime, <span class="at" style="color: #657422;">sep =</span> <span class="st" style="color: #20794D;">", "</span>, <span class="at" style="color: #657422;">into =</span> <span class="fu" style="color: #4758AB;">c</span>(<span class="st" style="color: #20794D;">"year"</span>, <span class="st" style="color: #20794D;">"genre"</span>, <span class="st" style="color: #20794D;">"runtime"</span>)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb33-5">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">year =</span> <span class="fu" style="color: #4758AB;">as.factor</span>(year)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb33-6">  </span>
+<span id="cb33-7">  <span class="co" style="color: #5E5E5E;"># separate genre column into primary and secondary genre</span></span>
+<span id="cb33-8">  <span class="fu" style="color: #4758AB;">separate</span>(genre, <span class="at" style="color: #657422;">sep =</span> <span class="st" style="color: #20794D;">"/"</span>, <span class="at" style="color: #657422;">into =</span> <span class="fu" style="color: #4758AB;">c</span>(<span class="st" style="color: #20794D;">"genre_1"</span>, <span class="st" style="color: #20794D;">"genre_2"</span>), <span class="at" style="color: #657422;">remove =</span> <span class="cn" style="color: #8f5902;">FALSE</span>) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb33-9">  </span>
+<span id="cb33-10">  <span class="co" style="color: #5E5E5E;"># create id column with leading zeroes so Tableau can automatically match the images</span></span>
+<span id="cb33-11">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">id =</span> <span class="fu" style="color: #4758AB;">sprintf</span>(<span class="st" style="color: #20794D;">"%0.3d"</span>, <span class="dv" style="color: #AD0000;">1</span><span class="sc" style="color: #5E5E5E;">:</span><span class="dv" style="color: #AD0000;">200</span>)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb33-12">  <span class="fu" style="color: #4758AB;">select</span>(id, <span class="fu" style="color: #4758AB;">everything</span>())</span>
+<span id="cb33-13"></span>
+<span id="cb33-14">movies <span class="sc" style="color: #5E5E5E;">%&gt;%</span> <span class="fu" style="color: #4758AB;">head</span>()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 11
+  id    title  year  genre genre_1 genre_2 runtime criti…¹ audie…² synop…³ url  
+  &lt;chr&gt; &lt;chr&gt;  &lt;fct&gt; &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;
+1 001   12 Ye… 2013  Hist… History Drama   2h 14m  95%     90%     In the… http…
+2 002   20 Fe… 2013  Docu… Docume… &lt;NA&gt;    1h 30m  99%     82%     Filmma… http…
+3 003   45 Ye… 2015  Drama Drama   &lt;NA&gt;    1h 33m  97%     67%     As the… http…
+4 004   All I… 2013  Adve… Advent… Myster… 1h 45m  94%     64%     During… http…
+5 005   Amazi… 2018  Docu… Docume… Music   1h 27m  99%     80%     Singer… http…
+6 006   Ameri… 2013  Crim… Crime   Drama   2h 18m  92%     74%     Irving… http…
+# … with abbreviated variable names ¹​critics_score, ²​audience_score, ³​synopsis</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><span class="co" style="color: #5E5E5E;"># number of unique values in genre column</span></span>
+<span id="cb35-2">movies<span class="sc" style="color: #5E5E5E;">$</span>genre <span class="sc" style="color: #5E5E5E;">%&gt;%</span> <span class="fu" style="color: #4758AB;">unique</span>() <span class="sc" style="color: #5E5E5E;">%&gt;%</span> <span class="fu" style="color: #4758AB;">length</span>()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 59</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><span class="co" style="color: #5E5E5E;"># unique values in genre_1</span></span>
+<span id="cb37-2">movies<span class="sc" style="color: #5E5E5E;">$</span>genre_1 <span class="sc" style="color: #5E5E5E;">%&gt;%</span> <span class="fu" style="color: #4758AB;">unique</span>()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "History"            "Documentary"        "Drama"             
+ [4] "Adventure"          "Crime"              "Comedy"            
+ [7] "Action"             "Sci-fi"             "Romance"           
+[10] "Horror"             "Biography"          "Mystery &amp; thriller"
+[13] "Kids &amp; family"      "War"                "Fantasy"           
+[16] "Musical"            "Western"           </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><span class="co" style="color: #5E5E5E;"># unique values in genre_2</span></span>
+<span id="cb39-2">movies<span class="sc" style="color: #5E5E5E;">$</span>genre_2 <span class="sc" style="color: #5E5E5E;">%&gt;%</span> <span class="fu" style="color: #4758AB;">unique</span>()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "Drama"              NA                   "Mystery &amp; thriller"
+ [4] "Music"              "Biography"          "Adventure"         
+ [7] "History"            "Romance"            "Comedy"            
+[10] "Lgbtq+"             "Action"             "War"               
+[13] "Fantasy"            "Sci-fi"             "Crime"             
+[16] "Musical"            "Western"            "Anime"             
+[19] "Horror"            </code></pre>
+</div>
+</div>
+<p>Finding values in <code>genre_2</code>, that are not in <code>genre_1</code>. This will help when creating a list parameter for filtering by primary or secondary genre.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><span class="fu" style="color: #4758AB;">setdiff</span>(movies<span class="sc" style="color: #5E5E5E;">$</span>genre_2, movies<span class="sc" style="color: #5E5E5E;">$</span>genre_1)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] NA       "Music"  "Lgbtq+" "Anime" </code></pre>
+</div>
+</div>
+<section id="dt-table" class="level3">
+<h3 class="anchored" data-anchor-id="dt-table">DT table</h3>
+<p>If you prefer to search a table for data, then this one is for you!</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1">movies <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb43-2">  <span class="fu" style="color: #4758AB;">select</span>(<span class="dv" style="color: #AD0000;">1</span><span class="sc" style="color: #5E5E5E;">:</span><span class="dv" style="color: #AD0000;">9</span>) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb43-3">  DT<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">datatable</span>(<span class="at" style="color: #657422;">rownames =</span> <span class="cn" style="color: #8f5902;">FALSE</span>)</span></code></pre></div>
+<div class="cell-output-display">
+
+<div id="htmlwidget-0c39fcac22bd076d4804" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-0c39fcac22bd076d4804">{"x":{"filter":"none","vertical":false,"data":[["001","002","003","004","005","006","007","008","009","010","011","012","013","014","015","016","017","018","019","020","021","022","023","024","025","026","027","028","029","030","031","032","033","034","035","036","037","038","039","040","041","042","043","044","045","046","047","048","049","050","051","052","053","054","055","056","057","058","059","060","061","062","063","064","065","066","067","068","069","070","071","072","073","074","075","076","077","078","079","080","081","082","083","084","085","086","087","088","089","090","091","092","093","094","095","096","097","098","099","100","101","102","103","104","105","106","107","108","109","110","111","112","113","114","115","116","117","118","119","120","121","122","123","124","125","126","127","128","129","130","131","132","133","134","135","136","137","138","139","140","141","142","143","144","145","146","147","148","149","150","151","152","153","154","155","156","157","158","159","160","161","162","163","164","165","166","167","168","169","170","171","172","173","174","175","176","177","178","179","180","181","182","183","184","185","186","187","188","189","190","191","192","193","194","195","196","197","198","199","200"],["12 Years a Slave","20 Feet From Stardom","45 Years","All Is Lost","Amazing Grace","American Hustle","Amy","Anomalisa","Ant-Man and The Wasp","Apollo 11","Argo","Arrival","Ash Is Purest White","The Artist","Avengers: Endgame","Avengers: Infinity War","The Babadook","Baby Driver","A Beautiful Day in the Neighborhood","Before Midnight","The Big Sick","Birdman or (The Unexpected Virtue of Ignorance)","Birds of Passage","Black Panther","Blackfish","BlacKkKlansman","Blade Runner 2049","Booksmart","Boyhood","BPM (Beats Per Minute)","Bridge of Spies","Brooklyn","Bumblebee","Burning","Call Me by Your Name","Cameraperson","Can You Ever Forgive Me?","Captain America: Civil War","Captain Phillips","Carol","Coco","Crazy Rich Asians","Creed","Dallas Buyers Club","Dawn of the Planet of the Apes","The Death of Stalin","The Disaster Artist","Doctor Strange","Dolemite Is My Name","Don't Think Twice","Dunkirk","Eighth Grade","Ex Machina","Eye in the Sky","Faces Places","A Fantastic Woman","The Farewell","The Favourite","Fighting With My Family","Finding Dory","First Man","First Reformed","The Florida Project","Ford v Ferrari","Free Solo","Get Out","A Ghost Story","Gloria","The Grand Budapest Hotel","Gravity","Guardians of the Galaxy","The Guilty","The Handmaiden","Harry Potter and the Deathly Hallows: Part 2","The Hate U Give","Hell or High Water","Her","Hereditary","Hidden Figures","Honeyland","How to Train Your Dragon","Hunt for the Wilderpeople","Hustlers","I Am Not Your Negro","I, Tonya","If Beale Street Could Talk","Incredibles 2","Inside Llewyn Davis","Inside Out","The Irishman","Isle of Dogs","It Follows","John Wick: Chapter 3 -- Parabellum","The Jungle Book","Kedi","The King's Speech","Knives Out","Kubo and the Two Strings","La La Land","Lady Bird","Leave No Trace","The LEGO Movie","Leviathan","Life Itself","The Lighthouse","Edge of Tomorrow","Logan","Logan Lucky","Looper","Love &amp; Friendship","Lucky","Mad Max: Fury Road","Maiden","Manchester by the Sea","Marriage Story","The Martian","Marvel's the Avengers","McQueen","Minding the Gap","Mission: Impossible -- Fallout","Mission: Impossible Rogue Nation","Moana","Moonlight","Mr. Turner","Mud","Mudbound","Mustang","My Life as a Zucchini","The Nice Guys","Nightcrawler","The Old Man &amp; the Gun","Once Upon a Time... In Hollywood","Paddington","Paddington 2","Pain and Glory","Parasite","Paterson","The Peanut Butter Falcon","Phantom Thread","Phoenix","Portrait of a Lady on Fire","The Post","A Quiet Place","Rocketman","Roma","Room","The Rider","The Salesman","Searching","Selma","A Separation","The Shape of Water","Shaun the Sheep Movie","Shazam!","Shoplifters","Short Term 12","Sicario","Sing Street","Skyfall","Snowpiercer","The Social Network","Son of Saul","Sorry to Bother You","Spider-Man: Far From Home","Spider-Man: Homecoming","Spider-Man: Into the Spider-Verse","Spotlight","Spy","Stan &amp; Ollie","A Star Is Born","Star Wars: The Force Awakens","Star Wars: The Last Jedi","Starred Up","Summer 1993","The Tale of the Princess Kaguya","They Shall Not Grow Old","Things to Come","Thor: Ragnarok","Three Billboards Outside Ebbing, Missouri","Three Identical Strangers","Tower","Toy Story 3","Toy Story 4","True Grit","Two Days One Night","Us","Wadjda","War for the Planet of the Apes","Weiner","What We Do in the Shadows","Whiplash","Widows","The Witch","Wildlife","Won't You Be My Neighbor?","Wonder Woman","X-Men: Days of Future Past","Your Name","Zero Dark Thirty","Zootopia"],["2013","2013","2015","2013","2018","2013","2015","2015","2018","2019","2012","2016","2018","2011","2019","2018","2014","2017","2019","2013","2017","2014","2018","2018","2013","2018","2017","2019","2014","2017","2015","2015","2018","2018","2017","2016","2018","2016","2013","2015","2017","2018","2015","2013","2014","2017","2017","2016","2019","2016","2017","2018","2014","2015","2017","2017","2019","2018","2019","2016","2018","2017","2017","2019","2018","2017","2017","2013","2014","2013","2014","2018","2016","2011","2018","2016","2013","2018","2016","2019","2010","2016","2019","2016","2017","2018","2018","2013","2015","2019","2018","2014","2019","2016","2016","2010","2019","2016","2016","2017","2018","2014","2014","2014","2019","2014","2017","2017","2012","2016","2017","2015","2018","2016","2019","2015","2012","2018","2018","2018","2015","2016","2016","2014","2013","2017","2015","2016","2016","2014","2018","2019","2014","2017","2019","2019","2016","2019","2017","2014","2019","2017","2018","2019","2018","2015","2017","2016","2018","2014","2011","2017","2015","2019","2018","2013","2015","2016","2012","2013","2010","2015","2018","2019","2017","2018","2015","2015","2018","2018","2015","2017","2013","2017","2013","2018","2016","2017","2017","2018","2016","2010","2019","2010","2014","2019","2012","2017","2016","2014","2014","2018","2015","2018","2018","2017","2014","2016","2012","2016"],["History/Drama","Documentary","Drama","Adventure/Mystery &amp; thriller","Documentary/Music","Crime/Drama","Documentary/Biography","Comedy/Drama","Action/Adventure","Documentary/History","History/Drama","Sci-fi/Mystery &amp; thriller","Drama/Romance","Romance/Comedy","Action/Adventure","Action/Adventure","Horror/Mystery &amp; thriller","Action/Mystery &amp; thriller","Biography/Drama","Romance/Drama","Romance/Comedy","Comedy/Drama","Crime/Drama","Action/Adventure","Documentary","Comedy/Drama","Sci-fi/Mystery &amp; thriller","Comedy/Lgbtq+","Drama","Drama/Lgbtq+","History/Drama","Romance/History","Action/Adventure","Mystery &amp; thriller/Drama","Romance/Drama","Documentary","Biography/Comedy","Action/Adventure","Drama/Action","Romance/Drama","Kids &amp; family/Comedy","Romance/Comedy","Drama","Drama/Lgbtq+","Sci-fi/Action","Comedy","Comedy/Drama","Action/Adventure","Biography/Comedy","Comedy/Drama","War/History","Comedy/Drama","Sci-fi/Mystery &amp; thriller","Mystery &amp; thriller/War","Documentary","Drama/Lgbtq+","Comedy/Drama","Comedy/Drama","Comedy/Drama","Kids &amp; family/Comedy","Biography/History","Mystery &amp; thriller/Drama","Drama","History/Drama","Documentary","Horror/Mystery &amp; thriller","Drama/Fantasy","Drama/Romance","Comedy/Drama","Drama/Sci-fi","Sci-fi/Adventure","Mystery &amp; thriller/Crime","Mystery &amp; thriller/Drama","Fantasy/Adventure","Crime/Drama","Crime/Drama","Comedy/Drama","Horror/Mystery &amp; thriller","History/Drama","Documentary","Kids &amp; family/Fantasy","Comedy/Adventure","Comedy/Drama","Documentary","Biography/Comedy","Crime/Drama","Kids &amp; family/Comedy","Drama/Comedy","Kids &amp; family/Comedy","Crime/Drama","Comedy/Adventure","Horror/Mystery &amp; thriller","Action/Mystery &amp; thriller","Kids &amp; family/Adventure","Documentary","History/Drama","Mystery &amp; thriller/Comedy","Kids &amp; family/Fantasy","Musical/Romance","Comedy/Drama","Drama","Kids &amp; family/Comedy","Drama","Documentary","Mystery &amp; thriller/Drama","Sci-fi/Action","Action/Adventure","Comedy/Crime","Sci-fi/Action","Comedy","Comedy/Drama","Action/Adventure","Documentary","Drama","Drama","Sci-fi/Adventure","Action/Adventure","Documentary","Documentary","Action/Adventure","Action/Adventure","Kids &amp; family/Musical","Drama/Lgbtq+","Biography/History","Drama/Adventure","History/Drama","Drama","Comedy/Drama","Action/Comedy","Mystery &amp; thriller/Crime","Comedy/Drama","Comedy/Drama","Kids &amp; family/Comedy","Kids &amp; family/Comedy","Drama","Comedy/Mystery &amp; thriller","Drama","Comedy/Drama","Drama/Romance","History/Drama","Romance/History","History/Drama","Horror/Mystery &amp; thriller","Musical/Biography","Drama","Drama","Drama/Western","Drama","Mystery &amp; thriller","History/Drama","Drama","Fantasy/Romance","Kids &amp; family/Comedy","Action/Adventure","Crime/Drama","Drama","Mystery &amp; thriller/Crime","Comedy/Drama","Action/Adventure","Sci-fi/Action","Drama/Biography","History/Drama","Comedy/Fantasy","Action/Adventure","Action/Adventure","Kids &amp; family/Action","Drama","Comedy/Action","Biography/Comedy","Romance/Drama","Sci-fi/Adventure","Sci-fi/Adventure","Crime/Drama","Drama","Fantasy/Anime","Documentary/History","Drama","Action/Adventure","Crime/Drama","Documentary/Biography","Documentary","Kids &amp; family/Comedy","Kids &amp; family/Comedy","Western/Drama","Drama","Horror/Mystery &amp; thriller","Drama","Sci-fi/Action","Documentary","Comedy/Horror","Drama/Music","Mystery &amp; thriller/Crime","Horror/History","Drama","Documentary","Action/Adventure","Action/Adventure","Fantasy/Romance","Drama/Mystery &amp; thriller","Kids &amp; family/Comedy"],["History","Documentary","Drama","Adventure","Documentary","Crime","Documentary","Comedy","Action","Documentary","History","Sci-fi","Drama","Romance","Action","Action","Horror","Action","Biography","Romance","Romance","Comedy","Crime","Action","Documentary","Comedy","Sci-fi","Comedy","Drama","Drama","History","Romance","Action","Mystery &amp; thriller","Romance","Documentary","Biography","Action","Drama","Romance","Kids &amp; family","Romance","Drama","Drama","Sci-fi","Comedy","Comedy","Action","Biography","Comedy","War","Comedy","Sci-fi","Mystery &amp; thriller","Documentary","Drama","Comedy","Comedy","Comedy","Kids &amp; family","Biography","Mystery &amp; thriller","Drama","History","Documentary","Horror","Drama","Drama","Comedy","Drama","Sci-fi","Mystery &amp; thriller","Mystery &amp; thriller","Fantasy","Crime","Crime","Comedy","Horror","History","Documentary","Kids &amp; family","Comedy","Comedy","Documentary","Biography","Crime","Kids &amp; family","Drama","Kids &amp; family","Crime","Comedy","Horror","Action","Kids &amp; family","Documentary","History","Mystery &amp; thriller","Kids &amp; family","Musical","Comedy","Drama","Kids &amp; family","Drama","Documentary","Mystery &amp; thriller","Sci-fi","Action","Comedy","Sci-fi","Comedy","Comedy","Action","Documentary","Drama","Drama","Sci-fi","Action","Documentary","Documentary","Action","Action","Kids &amp; family","Drama","Biography","Drama","History","Drama","Comedy","Action","Mystery &amp; thriller","Comedy","Comedy","Kids &amp; family","Kids &amp; family","Drama","Comedy","Drama","Comedy","Drama","History","Romance","History","Horror","Musical","Drama","Drama","Drama","Drama","Mystery &amp; thriller","History","Drama","Fantasy","Kids &amp; family","Action","Crime","Drama","Mystery &amp; thriller","Comedy","Action","Sci-fi","Drama","History","Comedy","Action","Action","Kids &amp; family","Drama","Comedy","Biography","Romance","Sci-fi","Sci-fi","Crime","Drama","Fantasy","Documentary","Drama","Action","Crime","Documentary","Documentary","Kids &amp; family","Kids &amp; family","Western","Drama","Horror","Drama","Sci-fi","Documentary","Comedy","Drama","Mystery &amp; thriller","Horror","Drama","Documentary","Action","Action","Fantasy","Drama","Kids &amp; family"],["Drama",null,null,"Mystery &amp; thriller","Music","Drama","Biography","Drama","Adventure","History","Drama","Mystery &amp; thriller","Romance","Comedy","Adventure","Adventure","Mystery &amp; thriller","Mystery &amp; thriller","Drama","Drama","Comedy","Drama","Drama","Adventure",null,"Drama","Mystery &amp; thriller","Lgbtq+",null,"Lgbtq+","Drama","History","Adventure","Drama","Drama",null,"Comedy","Adventure","Action","Drama","Comedy","Comedy",null,"Lgbtq+","Action",null,"Drama","Adventure","Comedy","Drama","History","Drama","Mystery &amp; thriller","War",null,"Lgbtq+","Drama","Drama","Drama","Comedy","History","Drama",null,"Drama",null,"Mystery &amp; thriller","Fantasy","Romance","Drama","Sci-fi","Adventure","Crime","Drama","Adventure","Drama","Drama","Drama","Mystery &amp; thriller","Drama",null,"Fantasy","Adventure","Drama",null,"Comedy","Drama","Comedy","Comedy","Comedy","Drama","Adventure","Mystery &amp; thriller","Mystery &amp; thriller","Adventure",null,"Drama","Comedy","Fantasy","Romance","Drama",null,"Comedy",null,null,"Drama","Action","Adventure","Crime","Action",null,"Drama","Adventure",null,null,null,"Adventure","Adventure",null,null,"Adventure","Adventure","Musical","Lgbtq+","History","Adventure","Drama",null,"Drama","Comedy","Crime","Drama","Drama","Comedy","Comedy",null,"Mystery &amp; thriller",null,"Drama","Romance","Drama","History","Drama","Mystery &amp; thriller","Biography",null,null,"Western",null,null,"Drama",null,"Romance","Comedy","Adventure","Drama",null,"Crime","Drama","Adventure","Action","Biography","Drama","Fantasy","Adventure","Adventure","Action",null,"Action","Comedy","Drama","Adventure","Adventure","Drama",null,"Anime","History",null,"Adventure","Drama","Biography",null,"Comedy","Comedy","Drama",null,"Mystery &amp; thriller",null,"Action",null,"Horror","Music","Crime","History",null,null,"Adventure","Adventure","Romance","Mystery &amp; thriller","Comedy"],["2h 14m","1h 30m","1h 33m","1h 45m","1h 27m","2h 18m","2h 8m","1h 30m","1h 58m","1h 33m","2h 0m","1h 56m","2h 21m","1h 40m","3h 1m","2h 29m","1h 33m","1h 53m","1h 47m","1h 49m","2h 0m","1h 59m","2h 5m","2h 14m","1h 23m","2h 14m","2h 44m","1h 42m","2h 45m","2h 23m","2h 21m","1h 52m","1h 54m","2h 28m","2h 12m","1h 42m","1h 46m","2h 26m","2h 13m","1h 58m","1h 49m","2h 0m","2h 13m","1h 57m","2h 10m","1h 47m","1h 43m","1h 55m","1h 58m","1h 28m","1h 47m","1h 33m","1h 47m","1h 42m","1h 29m","1h 43m","1h 40m","2h 0m","1h 47m","1h 43m","2h 21m","1h 53m","1h 55m","2h 32m","1h 40m","1h 44m","1h 30m","1h 49m","1h 39m","1h 31m","2h 1m","1h 25m","2h 24m","2h 11m","2h 13m","1h 37m","1h 59m","2h 7m","2h 7m","1h 25m","1h 38m","1h 41m","1h 50m","1h 35m","2h 1m","1h 59m","1h 58m","1h 44m","1h 35m","3h 29m","1h 41m","1h 41m","2h 11m","1h 45m","1h 20m","1h 58m","2h 10m","1h 42m","2h 8m","1h 34m","1h 48m","1h 35m","2h 22m","2h 0m","1h 50m","1h 53m","2h 17m","1h 59m","1h 59m","1h 33m","1h 28m","2h 0m","1h 33m","2h 17m","2h 16m","2h 22m","2h 23m","1h 51m","1h 33m","2h 27m","2h 11m","1h 53m","1h 51m","2h 29m","2h 10m","2h 14m","1h 37m","1h 6m","1h 56m","1h 57m","1h 33m","2h 39m","1h 35m","1h 43m","1h 53m","2h 12m","1h 58m","1h 36m","2h 10m","1h 38m","2h 1m","1h 55m","1h 30m","2h 1m","2h 15m","1h 58m","1h 44m","2h 5m","1h 42m","2h 8m","2h 3m","2h 3m","1h 25m","2h 12m","2h 1m","1h 36m","2h 1m","1h 46m","2h 23m","2h 5m","2h 0m","1h 47m","1h 45m","2h 9m","2h 13m","1h 57m","2h 8m","1h 55m","1h 37m","2h 15m","2h 16m","2h 32m","1h 40m","1h 38m","2h 17m","1h 39m","1h 41m","2h 10m","1h 55m","1h 36m","1h 38m","1h 42m","1h 40m","1h 50m","1h 35m","1h 56m","1h 38m","2h 22m","1h 36m","1h 26m","1h 46m","2h 8m","1h 32m","1h 44m","1h 34m","2h 21m","2h 11m","1h 46m","2h 37m","1h 48m"],["95%","99%","97%","94%","99%","92%","95%","91%","87%","99%","96%","95%","99%","95%","94%","85%","98%","92%","95%","98%","98%","91%","96%","96%","98%","96%","88%","96%","97%","99%","91%","97%","91%","95%","94%","99%","98%","90%","93%","94%","97%","91%","95%","92%","91%","94%","91%","89%","97%","98%","92%","99%","92%","95%","99%","94%","97%","93%","93%","94%","87%","94%","96%","92%","98%","98%","91%","100%","92%","96%","92%","98%","96%","96%","97%","97%","94%","90%","93%","100%","99%","97%","87%","99%","90%","95%","93%","92%","98%","95%","90%","95%","89%","94%","98%","94%","97%","97%","91%","99%","100%","96%","97%","98%","90%","91%","94%","92%","93%","96%","97%","97%","98%","96%","95%","91%","91%","99%","100%","97%","94%","95%","98%","97%","97%","97%","97%","99%","91%","95%","93%","85%","97%","99%","96%","99%","96%","95%","91%","98%","97%","88%","96%","89%","96%","93%","97%","96%","92%","99%","99%","92%","99%","90%","99%","98%","92%","95%","92%","94%","96%","96%","93%","90%","92%","97%","97%","95%","92%","90%","93%","91%","99%","100%","100%","99%","99%","93%","90%","96%","99%","98%","97%","95%","97%","93%","99%","94%","96%","96%","94%","91%","90%","94%","97%","93%","90%","98%","91%","98%"],["90%","82%","67%","64%","80%","74%","87%","71%","80%","90%","90%","82%","69%","87%","90%","92%","72%","86%","92%","82%","88%","78%","85%","79%","90%","83%","82%","77%","81%","84%","87%","87%","74%","80%","86%","69%","81%","89%","89%","74%","94%","76%","89%","91%","88%","78%","85%","86%","91%","69%","81%","82%","86%","82%","89%","77%","87%","70%","86%","84%","67%","69%","80%","98%","93%","86%","66%","65%","86%","79%","92%","87%","91%","89%","82%","88%","82%","69%","93%","86%","91%","91%","65%","83%","88%","71%","84%","74%","89%","86%","87%","66%","86%","86%","85%","92%","92%","86%","81%","79%","80%","87%","80%","88%","72%","90%","90%","76%","82%","60%","81%","86%","97%","78%","85%","91%","91%","79%","91%","88%","87%","89%","79%","56%","80%","85%","88%","89%","79%","86%","62%","70%","80%","88%","91%","90%","72%","96%","71%","78%","92%","73%","83%","88%","72%","93%","82%","84%","87%","86%","92%","72%","81%","82%","91%","92%","85%","92%","86%","73%","87%","80%","70%","95%","87%","93%","93%","78%","83%","80%","85%","42%","84%","83%","90%","91%","71%","87%","87%","88%","89%","90%","94%","85%","76%","60%","88%","84%","83%","87%","94%","61%","60%","71%","94%","83%","91%","94%","80%","92%"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>title<\/th>\n      <th>year<\/th>\n      <th>genre<\/th>\n      <th>genre_1<\/th>\n      <th>genre_2<\/th>\n      <th>runtime<\/th>\n      <th>critics_score<\/th>\n      <th>audience_score<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="writing-file" class="level3">
+<h3 class="anchored" data-anchor-id="writing-file">Writing file</h3>
+<p>I choose to save the data in an excel file only because the csv will remove the leading zeros in the <code>id</code> column.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1">movies <span class="sc" style="color: #5E5E5E;">%&gt;%</span> writexl<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">write_xlsx</span>(<span class="st" style="color: #20794D;">"datasets/top_200_movies_2010s_rotten_tomatoes.xlsx"</span>)</span></code></pre></div>
+</div>
+</section>
+</section>
+<section id="tableau-dashboard" class="level2">
+<h2 class="anchored" data-anchor-id="tableau-dashboard">7. Tableau dashboard</h2>
+<p>The final dashboard is created in Tableau. It’s actually a jitter plot, which separates overlapping movies with the same critics’ score.</p>
+<p>To avoid two filters, one for primary and one for secondary genre, a list parameter is created that filters movies by primary or secondary genre, or “All” values.</p>
+<p>For the best viewing experience, please click on the full screen in the bottom right corner.</p>
+<p>You can nteract with the embedded dashboard below or go to <a href="https://public.tableau.com/app/profile/sandra.jurela/viz/RottenTomatoes-The200BestMoviesofthe2010s/Dashboard?publish=yes">Tableau Public</a>. Enjoy!</p>
+
+<div class="tableauPlaceholder" id="viz1676446199516" style="position: relative"><noscript><img alt="Dashboard  " src="https://sandrajurela.com/posts/web-scraping-rotten-tomatoes/https:/public.tableau.com/static/images/Ro/RottenTomatoes-The200BestMoviesofthe2010s/Dashboard/1_rss.png" style="border: none"></noscript><object class="tableauViz" style="display:none;"><param name="host_url" value="https%3A%2F%2Fpublic.tableau.com%2F"> <param name="embed_code_version" value="3"> <param name="site_root" value=""><param name="name" value="RottenTomatoes-The200BestMoviesofthe2010s/Dashboard"><param name="tabs" value="no"><param name="toolbar" value="yes"><param name="static_image" value="https://public.tableau.com/static/images/Ro/RottenTomatoes-The200BestMoviesofthe2010s/Dashboard/1.png"> <param name="animate_transition" value="yes"><param name="display_static_image" value="yes"><param name="display_spinner" value="yes"><param name="display_overlay" value="yes"><param name="display_count" value="yes"><param name="language" value="en-US"></object></div>                
+<script type="text/javascript">                    
+var divElement = document.getElementById('viz1676446199516');                    
+var vizElement = divElement.getElementsByTagName('object')[0];                    
+if ( divElement.offsetWidth > 800 ) { vizElement.style.width='800px';vizElement.style.height='627px';} 
+else if ( divElement.offsetWidth > 500 ) { vizElement.style.width='800px';vizElement.style.height='627px';} 
+else { vizElement.style.width='100%';vizElement.style.height='527px';}                     
+var scriptElement = document.createElement('script');                    
+scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                
+</script>
+
+
+</section>
+
+ ]]></description>
+  <category>web scraping</category>
+  <category>data wtangling</category>
+  <category>rvest</category>
+  <category>R</category>
+  <category>Tableau</category>
+  <guid>https://sandrajurela.com/posts/web-scraping-rotten-tomatoes/rotten-tomatoes.html</guid>
+  <pubDate>Wed, 31 Aug 2022 22:00:00 GMT</pubDate>
+  <media:content url="https://sandrajurela.com/posts/web-scraping-rotten-tomatoes/images/dashboard.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>Titanic Survival Exercises</title>
   <dc:creator>Sandra Jurela</dc:creator>

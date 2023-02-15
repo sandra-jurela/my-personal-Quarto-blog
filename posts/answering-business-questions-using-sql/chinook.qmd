@@ -158,7 +158,6 @@ ORDER BY tracks_sold DESC
 knitr::kable(genre_perc)
 ```
 
-
 ```{r}
 #| fig-height: 6
 #| code-fold: true
@@ -291,7 +290,6 @@ sales_by_country %>%
   theme(legend.position = "top")
 ```
 
-
 ```{r}
 #| code-fold: true
 sales_by_country %>% 
@@ -312,7 +310,6 @@ sales_by_country %>%
   scale_x_continuous(labels = scales::percent) +
   theme(legend.position = "top")
 ```
-
 
 The USA has the largest customer base and, consequently, the highest total sales.
 
@@ -491,7 +488,6 @@ GROUP BY protected
 knitr::kable(by_media_type)
 ```
 
-
 ```{r}
 #| layout-ncol: 2
 #| fig-width: 4
@@ -532,8 +528,8 @@ by_media_type %>%
 
 We can make the following observations:
 
-- Only 13% of all the unique tracks available in the Chinook store are of protected media types.
-- Among all the tracks that were sold, those of protected media types amounts only to 9%.
-- From all the unique tracks of protected media types, only 34,1% were sold, while from those of non-protected ones 54,1%.
+-   Only 13% of all the unique tracks available in the Chinook store are of protected media types.
+-   Among all the tracks that were sold, those of protected media types amounts only to 9%.
+-   From all the unique tracks of protected media types, only 34,1% were sold, while from those of non-protected ones 54,1%.
 
 We can conclude that the **tracks of protected media types are much less popular** than those of non-protected.

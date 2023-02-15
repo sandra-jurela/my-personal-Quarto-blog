@@ -1,0 +1,378 @@
+---
+title: "Scraping 200 Best Movies of 2010s from Rotten Tomatoes"
+description: "Scraping data on movies from Rotten Tomatoes and finally creating a dashboard in Tableau"
+date: "2022-09-01"
+categories: 
+- web scraping
+- data wtangling
+- rvest
+- R 
+- Tableau
+image: images/dashboard.jpg
+---
+
+## Introduction
+
+The goal of this project is to scrape data on the 200 best movies of the last decade from the [Rotten Tomatoes](https://editorial.rottentomatoes.com/guide/the-200-best-movies-of-the-2010s/) website with the R `rvest` package, and finally create a dashboard in [Tableau](https://www.tableau.com/). The idea is to show all the movies in one place. Hovering over the movie should reveal relevant data in the tooltip for quick overview. Clicking on the movie should open the movie's website for more information.
+
+I've learned so much while working on this project (like web scraping, writing functions, iteration, ...). The `purrr` package for functional programming is super-cool. It allows iteration with just one line of code (a very handy replacement for `for loops`).
+
+I hope you'll enjoy the process as much as I did. At times it was quite challenging, but that's how we learn!
+
+### Setting up the programming environment
+
+```{r}
+# loading packages
+library(tidyverse)
+library(rvest)
+```
+
+Are we allowed to scrape data from the Rotten Tomatoes website?
+
+```{r}
+robotstxt::paths_allowed("https://www.rottentomatoes.com/")
+```
+
+## Plan
+
+The data will be scraped from [this page](https://editorial.rottentomatoes.com/guide/the-200-best-movies-of-the-2010s/). Since it doesn't contain all the data I am interested in, I have to visit every movie's web page on the list and scrape data from there. Here is the plan:
+
+1.  Scrape data from the main page: the `url`s of movies, and the `url`s of images.
+
+2.  Scrape `title`, `year_genre_runtime`, `critics_score`, `audiaece_score`, and `synopsis` from the first movie to develop the code.
+
+3.  Write a function that scrapes data based on movie's URL.
+
+4.  Iteration - use this function to scrape data from each individual movie and create a data frame with the columns `title`, `year_genre_runtime`, `critics_score`, `audiaece_score`, `synopsis`, and `url`.
+
+5.  Download images
+
+6.  Prepare data for Tableau
+
+7.  Create a dashboard in Tableau
+
+## 1. Scraping data from the main page
+
+Reading the main page with `read_html()`.
+
+```{r}
+main_url <- "https://editorial.rottentomatoes.com/guide/the-200-best-movies-of-the-2010s/"
+main_page <- read_html(main_url)
+```
+
+<br/>
+
+```{r}
+#| echo: false
+#| fig-align: "left"
+#| fig-cap: "Figure 1: The main page"
+knitr::include_graphics("images/img1.jpg")
+```
+
+I make use of the **SelectorGadget** to identify the tags for the relevant nodes. Here is the [link](https://chrome.google.com/webstore/detail/selectorgadget/mhjhnkcfbdhnjickkkdbjoemdmbfginb) for Chrome (recommended).
+
+#### Extracting `url`s of movies
+
+The same nodes that contain the text for the titles also contain information on the links to individual movie pages for each title. We can extract this information using the `html_attr()` function, which extracts attributes.
+
+```{r}
+movie_urls <- main_page %>% 
+  html_nodes(".article_movie_title a") %>% 
+  html_attr("href")
+
+movie_urls %>% head()
+```
+
+#### Extracting `url`s of images
+
+```{r}
+image_urls <- main_page %>% 
+  html_nodes(".article_poster") %>% 
+  html_attr("src")
+```
+
+Let's check the image for the 6th title.
+
+```{r}
+knitr::include_graphics(image_urls[6])
+```
+
+## 2. Scraping data for the first movie on the list
+
+Now I'm going to scrape data for the movie *12 Years a Slave* in order to develop the code.
+
+Reading page for the first movie.
+
+```{r}
+url <- "https://www.rottentomatoes.com/m/12_years_a_slave"
+movie_page <- read_html(url)
+```
+
+<br/>
+
+```{r}
+#| echo: false
+#| fig-align: "left"
+#| fig-cap: "Figure 2: Title, year, genre, runtime, critics and audience score"
+knitr::include_graphics("images/img2.jpg")
+```
+
+Scroll down the page and you'll find the movie synopsis.
+
+```{r, echo=FALSE, fig.align='center', fig.cap="Synopsis"}
+#| echo: false
+#| fig-align: "left"
+#| fig-cap: "Figure 3: Synopsis"
+knitr::include_graphics("images/img3.jpg")
+```
+
+#### Extracting `title`
+
+```{r}
+title <- movie_page %>% 
+  html_node(".scoreboard__title") %>% 
+  html_text()
+
+title
+```
+
+#### Extracting `year`, `genre`, and `runtime`
+
+```{r}
+year_genre_runtime <- movie_page %>% 
+  html_node(".scoreboard__info") %>% 
+  html_text()
+
+year_genre_runtime
+```
+
+#### Extracting `critics score`
+
+The next two are tricky. I had to look at the page source and find them manually.
+
+```{r}
+critics_score <- movie_page %>% 
+  html_element("score-board") %>% 
+  html_attr("tomatometerscore") %>% 
+  str_c(.,"%")
+
+critics_score
+```
+
+#### Extracting `audience score`
+
+```{r}
+audience_score <- movie_page %>% 
+  html_element("score-board") %>% 
+  html_attr("audiencescore") %>% 
+  str_c(.,"%")
+
+audience_score
+```
+
+#### Extracting movie `synopsis`
+
+```{r}
+synopsis <- movie_page %>% 
+  html_node("#movieSynopsis") %>% 
+  html_text2()
+
+synopsis
+```
+
+### Makinging a data frame of extracted elements
+
+```{r}
+movie  <- tibble(title = title, 
+                 year_genre_runtime = year_genre_runtime,
+                 critics_score = critics_score,
+                 audience_score = audience_score,
+                 synopsis = synopsis,  
+                 url = url)
+
+movie %>% glimpse()
+```
+
+## 3. Writing a function
+
+Instead of manually scraping individual movies, I'll write a function to do the same.
+
+```{r}
+scrape_movie <- function(x, ...){
+  
+  movie_page <- read_html(x)
+  
+  title <- movie_page %>% 
+    html_node(".scoreboard__title") %>% 
+    html_text()
+  
+  year_genre_runtime <- movie_page %>% 
+    html_node(".scoreboard__info") %>% 
+    html_text()
+  
+  critics_score <- movie_page %>% 
+    html_element("score-board") %>% 
+    html_attr("tomatometerscore") %>% 
+    str_c(.,"%")
+  
+  audience_score <- movie_page %>% 
+    html_element("score-board") %>% 
+    html_attr("audiencescore") %>% 
+    str_c(.,"%")
+  
+  synopsis <- movie_page %>% 
+    html_node("#movieSynopsis") %>% 
+    html_text2()
+  
+  movie_df <- tibble(title = title, 
+                     year_genre_runtime = year_genre_runtime,
+                     critics_score = critics_score,
+                     audience_score = audience_score,
+                     synopsis = synopsis,
+                     url = x)
+  
+  return(movie_df)
+  
+}
+```
+
+#### Function in action
+
+Now that we have the `scrape_movie()` function, let's scrape data for the movie "American Hustle".
+
+```{r}
+scrape_movie(movie_urls[6]) %>% glimpse()
+```
+
+Or "Ex Machina" (an interesting SF movie).
+
+```{r}
+ scrape_movie(movie_urls[53]) %>% glimpse()
+```
+
+## 4. Iteration
+
+To make my workflow a little more efficient, I make use of the `map_dfr()` function from the `purrr` package to iterate over all movie pages. `map_dfr()` will apply the `scrape_movie()`function to each element in the vector of links, and return a data frame created by row-binding. It's as simple as that.
+
+```{r}
+movies <- map_dfr(movie_urls, scrape_movie)
+
+movies 
+```
+
+## 5. Downloading images
+
+I've already extracted urls of images in the first step and saved them to `image_urls`. Now I'm going to create a directory and directory paths for the images.
+
+```{r}
+fs::dir_create("images/top_200_images/")
+
+paths <- c(str_c("images/top_200_images/", sprintf("%0.3d", 1:200), ".jpg"))
+
+paths %>% head()
+```
+
+Since Tableau sorts images alphabetically (1, 11, 111, 2, 22, ...) by default, these leading zeros will help Tableau to correctly match the images with the data so I don't have to do it manually.
+
+#### Downloading images
+
+This time I'll use `map2()` function from the `purrr` package, It will apply the `download.file()` function to pairs of elements from two vectors, `image_urls` and `paths`.
+
+```{r, results=FALSE}
+map2(image_urls, paths, function(.x, .y) download.file(.x, .y, mode="wb")) 
+```
+
+Are the images properly saved? Let's read in the image for the first movie.
+
+```{r}
+#| fig-width: 500
+#| eval: false
+knitr::include_graphics("images/top_200_images/001.jpg")
+```
+
+```{r, eval=TRUE, echo=FALSE}
+knitr::include_graphics(image_urls[1])
+```
+
+## 6. Data wrangling
+
+Preparing the final dataset for Tableau.
+
+```{r}
+movies <- movies %>% 
+  
+  # separate year_genre_runtime column into year, genre, and runtime
+  separate(year_genre_runtime, sep = ", ", into = c("year", "genre", "runtime")) %>% 
+  mutate(year = as.factor(year)) %>% 
+  
+  # separate genre column into primary and secondary genre
+  separate(genre, sep = "/", into = c("genre_1", "genre_2"), remove = FALSE) %>% 
+  
+  # create id column with leading zeroes so Tableau can automatically match the images
+  mutate(id = sprintf("%0.3d", 1:200)) %>% 
+  select(id, everything())
+
+movies %>% head()
+```
+
+```{r}
+# number of unique values in genre column
+movies$genre %>% unique() %>% length()
+```
+
+```{r}
+# unique values in genre_1
+movies$genre_1 %>% unique()
+```
+
+```{r}
+# unique values in genre_2
+movies$genre_2 %>% unique()
+```
+
+Finding values in `genre_2`, that are not in `genre_1`. This will help when creating a list parameter for filtering by primary or secondary genre.
+
+```{r}
+setdiff(movies$genre_2, movies$genre_1)
+```
+
+### DT table
+
+If you prefer to search a table for data, then this one is for you!
+
+```{r}
+movies %>% 
+  select(1:9) %>% 
+  DT::datatable(rownames = FALSE)
+```
+
+### Writing file
+
+I choose to save the data in an excel file only because the csv will remove the leading zeros in the `id` column.
+
+```{r}
+movies %>% writexl::write_xlsx("datasets/top_200_movies_2010s_rotten_tomatoes.xlsx")
+```
+
+## 7. Tableau dashboard
+
+The final dashboard is created in Tableau. It's actually a jitter plot, which separates overlapping movies with the same critics' score.
+
+To avoid two filters, one for primary and one for secondary genre, a list parameter is created that filters movies by primary or secondary genre, or "All" values.
+
+For the best viewing experience, please click on the full screen in the bottom right corner.
+
+You can nteract with the embedded dashboard below or go to [Tableau Public](https://public.tableau.com/app/profile/sandra.jurela/viz/RottenTomatoes-The200BestMoviesofthe2010s/Dashboard?publish=yes). Enjoy!
+
+```{=html}
+<div class='tableauPlaceholder' id='viz1676446199516' style='position: relative'><noscript><a href='#'><img alt='Dashboard  ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Ro&#47;RottenTomatoes-The200BestMoviesofthe2010s&#47;Dashboard&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='RottenTomatoes-The200BestMoviesofthe2010s&#47;Dashboard' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Ro&#47;RottenTomatoes-The200BestMoviesofthe2010s&#47;Dashboard&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /></object></div>                
+<script type='text/javascript'>                    
+var divElement = document.getElementById('viz1676446199516');                    
+var vizElement = divElement.getElementsByTagName('object')[0];                    
+if ( divElement.offsetWidth > 800 ) { vizElement.style.width='800px';vizElement.style.height='627px';} 
+else if ( divElement.offsetWidth > 500 ) { vizElement.style.width='800px';vizElement.style.height='627px';} 
+else { vizElement.style.width='100%';vizElement.style.height='527px';}                     
+var scriptElement = document.createElement('script');                    
+scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                
+</script>
+```

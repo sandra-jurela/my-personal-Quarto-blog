@@ -22,5 +22,11 @@
   },
   "posts/customer-analysis-advanced-plots-with-ggplot2/customer-analysis-advanced-plots-with-ggplot2.qmd": {
     "customer-analysis-advanced-plots-with-ggplot2.html": "59db8103"
+  },
+  "posts/cyclistic-bike-share-analysis/cyclistic.qmd": {
+    "cyclistic.html": "fec11e20"
+  },
+  "posts/web-scraping-rotten-tomatoes/rotten-tomatoes.qmd": {
+    "rotten-tomatoes.html": "17bde03b"
   }
 }
