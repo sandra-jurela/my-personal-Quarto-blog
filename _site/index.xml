@@ -482,7 +482,7 @@ scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';     
 
  ]]></description>
   <category>web scraping</category>
-  <category>data wtangling</category>
+  <category>data wrangling</category>
   <category>rvest</category>
   <category>R</category>
   <category>Tableau</category>

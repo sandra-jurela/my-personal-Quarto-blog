@@ -28,5 +28,8 @@
   },
   "posts/web-scraping-rotten-tomatoes/rotten-tomatoes.qmd": {
     "rotten-tomatoes.html": "17bde03b"
+  },
+  "posts/grocery_cust_segmentation/grocery.qmd": {
+    "grocery.html": "2b2b86e5"
   }
 }
