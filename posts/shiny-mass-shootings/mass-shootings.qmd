@@ -16,7 +16,7 @@ Sharing just the `shiny app` for now. Data cleaning with exploratory data analys
 <br>
 
 ::: column-page
-<iframe height="700" width="100%" frameborder="no" src="https://sandra-jurela.shinyapps.io/shiny-mass-shootings-usa/">
+<iframe height="800" width="100%" frameborder="no" src="https://sandra-jurela.shinyapps.io/shiny-mass-shootings-usa/">
 
 </iframe>
 :::
