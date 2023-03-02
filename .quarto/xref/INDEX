@@ -31,5 +31,14 @@
   },
   "posts/grocery_cust_segmentation/grocery.qmd": {
     "grocery.html": "2b2b86e5"
+  },
+  "posts/cyclistic-top-n/cyclistic-top-n.knit.md": {
+    "cyclistic-top-n.knit.html": "122f4f97"
+  },
+  "posts/shiny-test/shiny-test.qmd": {
+    "shiny-test.html": "8c29d543"
+  },
+  "posts/shiny-mass-shootings/mass-shootings.qmd": {
+    "mass-shootings.html": "e02b1060"
   }
 }

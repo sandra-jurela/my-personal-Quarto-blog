@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/shiny-mass-shootings/mass-shootings.html",
       "/posts/web-scraping-rotten-tomatoes/rotten-tomatoes.html",
       "/posts/titanic-survival-exercises/titanic-survival-exercises.html",
       "/posts/customer-analysis-advanced-plots-with-ggplot2/customer-analysis-advanced-plots-with-ggplot2.html",

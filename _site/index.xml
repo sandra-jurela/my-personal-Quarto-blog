@@ -15,7 +15,45 @@
 <link>https://sandrajurela.com/index.html</link>
 </image>
 <generator>quarto-1.2.313</generator>
-<lastBuildDate>Wed, 31 Aug 2022 22:00:00 GMT</lastBuildDate>
+<lastBuildDate>Tue, 28 Feb 2023 23:00:00 GMT</lastBuildDate>
+<item>
+  <title>Shiny App: Mass Shootings in the USA</title>
+  <dc:creator>Sandra Jurela</dc:creator>
+  <link>https://sandrajurela.com/posts/shiny-mass-shootings/mass-shootings.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<div class="callout-note callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Sharing just the <code>shiny app</code> for now. Data cleaning with exploratory data analysis will be added soon…</p>
+</div>
+</div>
+<p><br></p>
+<div class="column-page">
+<iframe height="700" width="100%" frameborder="no" src="https://sandra-jurela.shinyapps.io/shiny-mass-shootings-usa/">
+</iframe>
+</div>
+
+
+
+ ]]></description>
+  <category>R</category>
+  <category>shiny</category>
+  <category>EDA</category>
+  <guid>https://sandrajurela.com/posts/shiny-mass-shootings/mass-shootings.html</guid>
+  <pubDate>Tue, 28 Feb 2023 23:00:00 GMT</pubDate>
+  <media:content url="https://sandrajurela.com/posts/shiny-mass-shootings/images/preview.png" medium="image" type="image/png" height="88" width="144"/>
+</item>
 <item>
   <title>Scraping 200 Best Movies of 2010s from Rotten Tomatoes</title>
   <dc:creator>Sandra Jurela</dc:creator>

@@ -1,0 +1,22 @@
+---
+title: "Shiny App: Mass Shootings in the USA"
+description: "EDA with Shiny app on mass shootings in the USA between Aug 20th, 1982 and Feb 13th, 2023."
+date: "2023-03-01"
+categories: 
+  - R
+  - shiny
+  - EDA
+image: images/preview.png
+---
+
+::: {.callout-note}
+Sharing just the `shiny app` for now. Data cleaning with exploratory data analysis will be added soon...
+:::
+
+<br>
+
+::: column-page
+<iframe height="700" width="100%" frameborder="no" src="https://sandra-jurela.shinyapps.io/shiny-mass-shootings-usa/">
+
+</iframe>
+:::
