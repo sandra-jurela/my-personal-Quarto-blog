@@ -1,22 +1,303 @@
 ---
-title: "Shiny App: Mass Shootings in the USA"
-description: "EDA with Shiny app on mass shootings in the USA between Aug 20th, 1982 and Feb 13th, 2023."
+title: "Shiny App - Mass Shootings in the USA"
+description: "EDA with Shiny app on mass shootings between August 20th, 1982 and February 13th, 2023."
 date: "2023-03-01"
 categories: 
   - R
   - shiny
   - EDA
+  - data cleaning
 image: images/preview.png
 ---
 
-::: {.callout-note}
-Sharing just the `shiny app` for now. Data cleaning with exploratory data analysis will be added soon...
-:::
+## Introduction
+
+Mass Shootings have been a topic of intense discussion in the United States. A public "database" of mass shootings since 1982 has been made available by the [Mother Jones](https://www.motherjones.com/politics/2012/12/mass-shootings-mother-jones-full-data/), a non-profit organization. This "database" is stored in a Google spreadsheet and you can view it [here](https://docs.google.com/spreadsheets/d/1b9o6uDO18sLxBqPwl_Gh9bnhW-ev_dABH83M5Vb5L8o/edit#gid=0) and download as a CSV file.
+
+
+## Data overview
+
+```{r}
+library(tidyverse)
+library(tidygeocoder)
+library(plotly)
+theme_set(theme_classic())
+
+mass_shootings <- read_csv("data/mass_shootings_usa_1982-2023.csv")
+
+mass_shootings %>% glimpse()
+```
+
+
+We have 140 cases, described with 24 variables. At first glance, this dataset clearly needs extensive cleaning.
+
+## Data cleaning
+
+### &#129529; Step 1. Innitial cleaning
+
+The first cleaning step includes:
+
+- selecting columns of interest,
+- replacing the character value``"-"`` with `NA` in all columns with character data type,
+- renaming location columns,
+- converting character data type to numeric for specific columns.
+
+
+```{r}
+mass_shootings_cln <- mass_shootings %>% 
+  select(1:6, 8:10, 12, 16, 17, 21:24) %>% 
+  mutate(across(where(is.character), ~na_if(., "-"))) %>% 
+  rename(location = location...2, location_2 = location...8) %>% 
+  mutate_at(c("injured", "age_of_shooter", "latitude", "longitude"), as.numeric)
+  
+mass_shootings_cln %>% glimpse()
+```
+
+🔎 Are there any duplicates? No.
+
+```{r}
+sum(duplicated(mass_shootings))
+```
+
+
+🔎 Number of missing values, `NA`, per column.
+
+```{r}
+mass_shootings_cln %>% 
+  summarise_all(~sum(is.na(.))) %>% 
+  # transposing for better visibility
+  pivot_longer(cols = everything(), names_to = "column", values_to = "n_missing")
+  
+```
+
+14 of the most recent cases don't have location coordinates at all. We'll address this in the final cleanup step.
+
+
+### &#129529; Step 2. Fixing unique values for categorical variables
+
+🔎 Let's take a look at the unique values of the `gender` column.
+
+```{r}
+mass_shootings_cln %>% 
+  group_by(gender) %>% 
+  count(sort = TRUE) %>% 
+  ungroup()
+```
+
+Almost all categorical variables need unique values correction. 
+
+To make a long story short, I'll correct them all in one step using `case_when` function, and we'll look at them later during the analysis.
+
+
+```{r}
+mass_shootings_cln <- mass_shootings_cln %>% 
+  mutate(gender = case_when(gender == "F" ~ "Female",
+                            gender == "M" ~ "Male", 
+                            TRUE ~ gender),
+         race = case_when(race == "white" ~ "White",
+                          race == "black" ~ "Black",
+                          race == "unclear" ~ "Unclear",
+                          TRUE ~ race),
+         location_2 = 
+           case_when(location_2 %in% c("workplace", "\nWorkplace") ~ "Workplace",
+                                location_2 == "Other\n" ~ "Other",
+                                location_2 == "religious" ~ "Religious",
+                                TRUE ~ location_2),
+         prior_signs_mental_health_issues = 
+           case_when(prior_signs_mental_health_issues == "yes" ~ "Yes",
+                     prior_signs_mental_health_issues == "TBD" ~ "To be determined",
+                     TRUE ~ prior_signs_mental_health_issues),
+         weapons_obtained_legally = 
+           case_when(weapons_obtained_legally %in% c("yes", "\nYes") ~ "Yes",
+                     weapons_obtained_legally == "TBD" ~ "To be determined",
+                     weapons_obtained_legally %>% str_detect("Kelley") ~ "Unknown",
+                     weapons_obtained_legally %>% str_detect("some") ~ "Partially",
+                     TRUE ~ weapons_obtained_legally))
+```
+
+
+### &#129529; Step 3. Geocoding locations with missing coordinates
+
+There are 14 cases with missing location coordinates. In this step we'll convert locations to coordinates with geocoding. and use them later to create a `leaflet` map for a `shiny app`.
+
+The `tidygeocoder` package provides geocoding services. It's designed to work easily with the `tidyverse.` It also provides access to several different geocoding services, including [LocationIQ](https://locationiq.com/) which I'm going to use here. LocationIQ is a freemium service that provides a free tier, which doesn't require you to give them your billing details. When you sign up to LocationIQ, they'll take you to the Manage Your API Access Tokens page, which is where we obtain our API token. Next, you need to provide the `tidygeocoder` package with your API key.
+
+The first step is to select only locations with missing coordinates and geocode them.
+
+```{r}
+geocoded_locations <- mass_shootings_cln %>% 
+  filter(is.na(latitude) | is.na(longitude)) %>% 
+  select(location) %>% 
+  geocode(location, method = "iq")
+
+geocoded_locations
+```
+
+The next step is to join mass shootings table with geocoded locations and replace missing latitudes and longitudes with geocoded.
+
+```{r}
+mass_shootings_cln <- mass_shootings_cln %>% 
+  left_join(geocoded_locations, by = "location") %>% 
+  mutate(latitude = ifelse(is.na(latitude), lat, latitude),
+         longitude = ifelse(is.na(longitude), long, longitude))
+
+sum(is.na(mass_shootings_cln$latitude))
+sum(is.na(mass_shootings_cln$longitude))
+```
+
+OK, this looks fine.
+
+## Exploratory data analysis (EDA)
+
+### 📄 Breakdown by categorical variables
+
+#### Gender
+
+```{r}
+mass_shootings_cln %>% 
+  group_by(gender) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  mutate(percent = scales::percent(n/sum(n), accuracy = 0.1)) %>% 
+  arrange(desc(n))
+```
+#### Race
+
+```{r}
+mass_shootings_cln %>% 
+  group_by(race) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  mutate(percent = scales::percent(n/sum(n), accuracy = 0.1)) %>% 
+  arrange(desc(n))
+```
+
+#### Specific location
+
+```{r}
+mass_shootings_cln %>% 
+  group_by(location_2) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  mutate(percent = scales::percent(n/sum(n), accuracy = 0.1)) %>% 
+  arrange(desc(n))
+```
+
+#### Prior signs of mental health issues
+
+```{r}
+mass_shootings_cln %>% 
+  group_by(prior_signs_mental_health_issues) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  mutate(percent = scales::percent(n/sum(n), accuracy = 0.1)) %>% 
+  arrange(desc(n))
+```
+
+
+#### Weapons obtained legally
+
+```{r}
+mass_shootings_cln %>% 
+  group_by(weapons_obtained_legally) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  mutate(percent = scales::percent(n/sum(n), accuracy = 0.1)) %>% 
+  arrange(desc(n))
+```
+
+#### Type
+
+```{r}
+mass_shootings_cln %>% 
+  group_by(type) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  mutate(percent = scales::percent(n/sum(n), accuracy = 0.1)) %>% 
+  arrange(desc(n))
+```
+
+Note: Spree shootings here have three or more victims in a short time in multiple locations.
+
+### 📊 Age of shooter distribution
+
+```{r}
+mass_shootings_cln %>% 
+  ggplot(aes(age_of_shooter)) +
+  geom_histogram(fill = "indianred", color = "white", binwidth = 5) +
+  labs(title = "Age Distribution", x = "age of shooter")
+```
+
+- The vast majority of shooters were between 20 and 50 years old. 
+- Most shooters were in the 20-25 age group.
+
+🔎 Who was the youngest shooter?
+
+```{r}
+index <- which.min(mass_shootings_cln$age_of_shooter)
+
+mass_shootings_cln[index, ] %>% 
+  select(case, date, summary, fatalities) %>% 
+  knitr::kable()
+```
+
+
+
+### 📊 Number of cases per year
+
+```{r}
+p1 <- mass_shootings_cln %>%
+  group_by(year) %>%
+  summarise(count = n()) %>% 
+  ggplot(aes(year, count)) +
+  geom_col(fill = "steelblue") + 
+  geom_vline(xintercept = 2012, color = "red") +
+  labs(title = "Number of Cases per Year") 
+
+ggplotly(p1)
+```
 
 <br>
 
+- We can see an increase in mass shootings in the last 10 years. 
+- 2020 has a smaller number of cases probably due to Covid restrictions.
+- The data for 2023 is incomplete, but 3 cases in the first two months seems a lot.
+
+### 📊 Fatalities-Injured relationship
+
+```{r}
+p3 <- mass_shootings_cln %>%
+  ggplot(aes(x = fatalities, y = injured)) +
+  geom_jitter() +
+  scale_y_log10() +
+  labs(title = "Fatalities-Injured Relationship")
+  
+ggplotly(p3)
+```
+
+<br>
+
+Please note that the `Injured` values are log-scaled for better visibility.
+
+__Summary of fatalities__
+
+```{r}
+summary(mass_shootings_cln$fatalities)
+```
+
+__Summary of injured people__
+
+```{r}
+summary(mass_shootings_cln$injured)
+```
+
+
+## Shiny app
+
+The app you can see below is embedded in this `quarto` document since my website is static. It was originally published on [shinyapps.io](https://www.shinyapps.io/) and you can also interact with it [here](https://sandra-jurela.shinyapps.io/shiny-mass-shootings-usa/). 
+
+__A quick note:__ With a free account I have 25 active hours (when my applications are not idle). If these 25 active hours are exceeded, my app will not be available again until the following month cycle. Hope you get lucky! 😊
+
+📢 By clicking on each circle, you can read a summary of the mass shooting case.
+
+<br>
+  
 ::: column-page
 <iframe height="800" width="100%" frameborder="no" src="https://sandra-jurela.shinyapps.io/shiny-mass-shootings-usa/">
-
+  
 </iframe>
 :::
