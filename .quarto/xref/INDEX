@@ -40,5 +40,11 @@
   },
   "posts/shiny-mass-shootings/mass-shootings.qmd": {
     "mass-shootings.html": "e02b1060"
+  },
+  "posts/sql-pizza-runner/8-week-sql-challenge-2-pizza-runner.qmd": {
+    "8-week-sql-challenge-2-pizza-runner.html": "0a30ac07"
+  },
+  "posts/cryptocurrency-sql-case-study/cryptocurrency.qmd": {
+    "cryptocurrency.html": "f705bcd9"
   }
 }

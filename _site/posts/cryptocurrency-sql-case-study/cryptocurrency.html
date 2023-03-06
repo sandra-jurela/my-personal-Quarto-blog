@@ -1,0 +1,2650 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.313">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Sandra Jurela">
+<meta name="dcterms.date" content="2022-11-25">
+<meta name="description" content="Data with Danny - SQL masterclass - O’Reilly. With R solutions for Part 4: Window functions.">
+
+<title>Sandra Jurela - Cryptocurrency SQL Case Study</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../img/logo.png" rel="icon" type="image/png">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/quarto-contrib/fontawesome6-0.1.0/all.css" rel="stylesheet">
+<link href="../../site_libs/quarto-contrib/fontawesome6-0.1.0/latex-fontsize.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JH321LBKZY"></script>
+
+<script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-JH321LBKZY', { 'anonymize_ip': true});
+</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="Sandra Jurela - Cryptocurrency SQL Case Study">
+<meta property="og:description" content="Data with Danny - SQL masterclass - O’Reilly. With R solutions for Part 4: Window functions.">
+<meta property="og:image" content="https://sandrajurela.com/posts\cryptocurrency-sql-case-study\images\erd_trading.png">
+<meta property="og:site-name" content="Sandra Jurela">
+<meta property="og:image:height" content="1108">
+<meta property="og:image:width" content="1537">
+<meta name="twitter:title" content="Sandra Jurela - Cryptocurrency SQL Case Study">
+<meta name="twitter:description" content="Data with Danny - SQL masterclass - O’Reilly. With R solutions for Part 4: Window functions.">
+<meta name="twitter:image" content="https://sandrajurela.com/posts\cryptocurrency-sql-case-study\images\erd_trading.png">
+<meta name="twitter:image-height" content="1108">
+<meta name="twitter:image-width" content="1537">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../img/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Sandra Jurela</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html">
+ <span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/sandra-jurela"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/sandra-jurela-a95985211/"><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../index.xml"><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Cryptocurrency SQL Case Study</h1>
+                  <div>
+        <div class="description">
+          Data with Danny - SQL masterclass - O’Reilly. With R solutions for Part 4: Window functions.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">SQL</div>
+                <div class="quarto-category">PostgreSQL</div>
+                <div class="quarto-category">EDA</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Sandra Jurela </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">November 25, 2022</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of Contents</h2>
+   
+  <ul>
+  <li><a href="#foreword" id="toc-foreword" class="nav-link active" data-scroll-target="#foreword">Foreword</a>
+  <ul class="collapse">
+  <li><a href="#setting-up-the-programming-environment" id="toc-setting-up-the-programming-environment" class="nav-link" data-scroll-target="#setting-up-the-programming-environment">Setting up the programming environment</a></li>
+  <li><a href="#creating-a-connection-to-the-trading-database" id="toc-creating-a-connection-to-the-trading-database" class="nav-link" data-scroll-target="#creating-a-connection-to-the-trading-database">Creating a connection to the <code>trading</code> database</a></li>
+  </ul></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a>
+  <ul class="collapse">
+  <li><a href="#available-datasets" id="toc-available-datasets" class="nav-link" data-scroll-target="#available-datasets">Available Datasets</a></li>
+  <li><a href="#entity-relationship-diagram" id="toc-entity-relationship-diagram" class="nav-link" data-scroll-target="#entity-relationship-diagram">Entity Relationship Diagram</a></li>
+  <li><a href="#data-dictionary-and-overview" id="toc-data-dictionary-and-overview" class="nav-link" data-scroll-target="#data-dictionary-and-overview">Data Dictionary and Overview</a></li>
+  </ul></li>
+  <li><a href="#part-1-basic-data-analysis-techniques" id="toc-part-1-basic-data-analysis-techniques" class="nav-link" data-scroll-target="#part-1-basic-data-analysis-techniques">PART 1️⃣: Basic Data Analysis Techniques</a>
+  <ul class="collapse">
+  <li><a href="#question-1.1" id="toc-question-1.1" class="nav-link" data-scroll-target="#question-1.1">Question 1.1</a></li>
+  <li><a href="#question-1.2" id="toc-question-1.2" class="nav-link" data-scroll-target="#question-1.2">Question 1.2</a></li>
+  <li><a href="#question-1.3" id="toc-question-1.3" class="nav-link" data-scroll-target="#question-1.3">Question 1.3</a></li>
+  <li><a href="#question-1.4" id="toc-question-1.4" class="nav-link" data-scroll-target="#question-1.4">Question 1.4</a></li>
+  <li><a href="#question-1.5" id="toc-question-1.5" class="nav-link" data-scroll-target="#question-1.5">Question 1.5</a></li>
+  </ul></li>
+  <li><a href="#part-2-aggregate-functions-for-data-analysis" id="toc-part-2-aggregate-functions-for-data-analysis" class="nav-link" data-scroll-target="#part-2-aggregate-functions-for-data-analysis">PART 2️⃣: Aggregate Functions for Data Analysis</a>
+  <ul class="collapse">
+  <li><a href="#question-2.1" id="toc-question-2.1" class="nav-link" data-scroll-target="#question-2.1">Question 2.1</a></li>
+  <li><a href="#question-2.2" id="toc-question-2.2" class="nav-link" data-scroll-target="#question-2.2">Question 2.2</a></li>
+  <li><a href="#question-2.3" id="toc-question-2.3" class="nav-link" data-scroll-target="#question-2.3">Question 2.3</a></li>
+  <li><a href="#question-2.4" id="toc-question-2.4" class="nav-link" data-scroll-target="#question-2.4">Question 2.4</a></li>
+  </ul></li>
+  <li><a href="#part-3-case-when-statements" id="toc-part-3-case-when-statements" class="nav-link" data-scroll-target="#part-3-case-when-statements">PART 3️⃣: Case When Statements</a>
+  <ul class="collapse">
+  <li><a href="#question-3.1" id="toc-question-3.1" class="nav-link" data-scroll-target="#question-3.1">Question 3.1</a></li>
+  <li><a href="#question-3.2" id="toc-question-3.2" class="nav-link" data-scroll-target="#question-3.2">Question 3.2</a></li>
+  <li><a href="#question-3.3" id="toc-question-3.3" class="nav-link" data-scroll-target="#question-3.3">Question 3.3</a></li>
+  </ul></li>
+  <li><a href="#part-4-window-functions" id="toc-part-4-window-functions" class="nav-link" data-scroll-target="#part-4-window-functions">PART 4️⃣: Window Functions</a>
+  <ul class="collapse">
+  <li><a href="#question-4.1" id="toc-question-4.1" class="nav-link" data-scroll-target="#question-4.1">Question 4.1</a></li>
+  <li><a href="#question-4.2" id="toc-question-4.2" class="nav-link" data-scroll-target="#question-4.2">Question 4.2</a></li>
+  <li><a href="#question-4.3" id="toc-question-4.3" class="nav-link" data-scroll-target="#question-4.3">Question 4.3</a></li>
+  <li><a href="#question-4.4" id="toc-question-4.4" class="nav-link" data-scroll-target="#question-4.4">Question 4.4</a></li>
+  </ul></li>
+  <li><a href="#part-5-table-joins" id="toc-part-5-table-joins" class="nav-link" data-scroll-target="#part-5-table-joins">PART 5️⃣: Table Joins</a>
+  <ul class="collapse">
+  <li><a href="#question-5.1---inner-joins" id="toc-question-5.1---inner-joins" class="nav-link" data-scroll-target="#question-5.1---inner-joins">Question 5.1 - Inner Joins</a></li>
+  <li><a href="#question-5.2---left-joins" id="toc-question-5.2---left-joins" class="nav-link" data-scroll-target="#question-5.2---left-joins">Question 5.2 - Left Joins</a></li>
+  <li><a href="#question-5.3---multiple-table-joins" id="toc-question-5.3---multiple-table-joins" class="nav-link" data-scroll-target="#question-5.3---multiple-table-joins">Question 5.3 - Multiple Table Joins</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="foreword" class="level2">
+<h2 class="anchored" data-anchor-id="foreword">Foreword</h2>
+<p>On November 18, 2022 I attended the SQL masterclass “SQL and PostgreSQL for Data Analytics”, presented live by Danny Ma on O’Reilly platform.</p>
+<p>This <a href="https://github.com/DataWithDanny/sql-masterclass">Github repository</a> contains all the necessary data, sql scripts, and other materials.</p>
+<p>I’m posting some parts of it here for my own reference, but I strongly recommend that you register for that event that takes place every once in a while. It’s free and worth it. Danny Ma is an excellent teacher and his explanations are outstanding.</p>
+<section id="setting-up-the-programming-environment" class="level3">
+<h3 class="anchored" data-anchor-id="setting-up-the-programming-environment">Setting up the programming environment</h3>
+<p>For the purposes of this project, I created the local <code>trading</code> Postgres database on my machine and ran the sql script to create and populate the tables.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># loading packages</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DBI)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RPostgres)  </span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The <code>sql</code> engine uses the <code>DBI</code> package to execute SQL queries, print their results, and optionally assign the results to a data frame. To use the <code>sql</code> engine, we first need to establish a DBI connection to a database (typically via the <code>DBI::dbConnect()</code> function).</p>
+</section>
+<section id="creating-a-connection-to-the-trading-database" class="level3">
+<h3 class="anchored" data-anchor-id="creating-a-connection-to-the-trading-database">Creating a connection to the <code>trading</code> database</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>mycon <span class="ot">&lt;-</span> DBI<span class="sc">::</span><span class="fu">dbConnect</span>(RPostgres<span class="sc">::</span><span class="fu">Postgres</span>(), </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">dbname =</span> <span class="st">"trading"</span>, </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">host =</span> <span class="st">"localhost"</span>,  </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>                        <span class="at">port =</span> <span class="st">"5432"</span>,  </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>                        <span class="at">user =</span> rstudioapi<span class="sc">::</span><span class="fu">askForPassword</span>(<span class="st">"Database username"</span>),</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>                        <span class="at">password =</span> rstudioapi<span class="sc">::</span><span class="fu">askForPassword</span>(<span class="st">"Database password"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>There are several options to <a href="https://solutions.posit.co/connections/db/best-practices/managing-credentials/index.html">secure your credentials</a> in R. Here I use prompting for credentials via <code>rstudioapi</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>mycon</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;PqConnection&gt; trading@localhost:5432</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>In this fictitious case study - Danny’s data mentors from the Data With Danny team have been busy trading cryptocurrency markets since 2017.</p>
+<p>The main purpose for this case study is to analyze the performance of the DWD mentors over time. We will accomplish this by writing SQL queries to utilize all available datasets to answer a series of realistic business questions.</p>
+<section id="available-datasets" class="level3">
+<h3 class="anchored" data-anchor-id="available-datasets">Available Datasets</h3>
+<p>All of our data for this case study exists within the <code>trading</code> schema in the <strong>PostgreSQL database</strong>.</p>
+<p>There are 3 data tables available in this schema:</p>
+<ul>
+<li><code>members</code></li>
+<li><code>prices</code></li>
+<li><code>transactions</code></li>
+</ul>
+</section>
+<section id="entity-relationship-diagram" class="level3">
+<h3 class="anchored" data-anchor-id="entity-relationship-diagram">Entity Relationship Diagram</h3>
+<p>I drew the ERD <a href="https://dbdiagram.io/home">here</a>.</p>
+<p><img src="images/erd_trading.png" class="preview-image img-fluid"></p>
+</section>
+<section id="data-dictionary-and-overview" class="level3">
+<h3 class="anchored" data-anchor-id="data-dictionary-and-overview">Data Dictionary and Overview</h3>
+<p>The <strong><code>trading.members</code> table</strong> consists of information about the mentors from the Data With Danny team.</p>
+<table class="table">
+<caption><code>trading.members</code> table</caption>
+<thead>
+<tr class="header">
+<th>Column name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>member_id</code></td>
+<td>unique id for each mentor</td>
+</tr>
+<tr class="even">
+<td><code>first_name</code></td>
+<td>first name for each mentor</td>
+</tr>
+<tr class="odd">
+<td><code>region</code></td>
+<td>region where each mentor is from</td>
+</tr>
+</tbody>
+</table>
+<div class="cell" data-max.print="null">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> trading.members</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>14 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">member_id</th>
+<th style="text-align: left;">first_name</th>
+<th style="text-align: left;">region</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">c4ca42</td>
+<td style="text-align: left;">Danny</td>
+<td style="text-align: left;">Australia</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">c81e72</td>
+<td style="text-align: left;">Vipul</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">eccbc8</td>
+<td style="text-align: left;">Charlie</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">a87ff6</td>
+<td style="text-align: left;">Nandita</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">e4da3b</td>
+<td style="text-align: left;">Rowan</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">167909</td>
+<td style="text-align: left;">Ayush</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">8f14e4</td>
+<td style="text-align: left;">Alex</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">c9f0f8</td>
+<td style="text-align: left;">Abe</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">45c48c</td>
+<td style="text-align: left;">Ben</td>
+<td style="text-align: left;">Australia</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">d3d944</td>
+<td style="text-align: left;">Enoch</td>
+<td style="text-align: left;">Africa</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">6512bd</td>
+<td style="text-align: left;">Vikram</td>
+<td style="text-align: left;">India</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">c20ad4</td>
+<td style="text-align: left;">Leah</td>
+<td style="text-align: left;">Asia</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">c51ce4</td>
+<td style="text-align: left;">Pavan</td>
+<td style="text-align: left;">Australia</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">aab323</td>
+<td style="text-align: left;">Sonia</td>
+<td style="text-align: left;">Australia</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The <strong><code>trading.prices</code> table</strong> consists of daily price and volume information from January 2017 through to August 2021 for the 2 most popular cryptocurrency tickers: Bitcoin and Ethereum.</p>
+<table class="table">
+<caption><code>trading.prices</code> table</caption>
+<thead>
+<tr class="header">
+<th>Column name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>ticker</code></td>
+<td>one of either BTC or ETH</td>
+</tr>
+<tr class="even">
+<td><code>market_date</code></td>
+<td>the date for each record</td>
+</tr>
+<tr class="odd">
+<td><code>price</code></td>
+<td>closing price at end of day</td>
+</tr>
+<tr class="even">
+<td><code>open</code></td>
+<td>the opening price</td>
+</tr>
+<tr class="odd">
+<td><code>high</code></td>
+<td>the highest price for that day</td>
+</tr>
+<tr class="even">
+<td><code>low</code></td>
+<td>the lowest price for that day</td>
+</tr>
+<tr class="odd">
+<td><code>volume</code></td>
+<td>the total volume traded</td>
+</tr>
+<tr class="even">
+<td><code>change</code></td>
+<td>% change in daily price</td>
+</tr>
+</tbody>
+</table>
+<p>The first 5 rows from this dataset.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> trading.prices <span class="kw">LIMIT</span> <span class="dv">5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>5 records</caption>
+<colgroup>
+<col style="width: 10%">
+<col style="width: 18%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">ticker</th>
+<th style="text-align: left;">market_date</th>
+<th style="text-align: right;">price</th>
+<th style="text-align: right;">open</th>
+<th style="text-align: right;">high</th>
+<th style="text-align: right;">low</th>
+<th style="text-align: left;">volume</th>
+<th style="text-align: left;">change</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-29</td>
+<td style="text-align: right;">3177.84</td>
+<td style="text-align: right;">3243.96</td>
+<td style="text-align: right;">3282.21</td>
+<td style="text-align: right;">3162.79</td>
+<td style="text-align: left;">582.04K</td>
+<td style="text-align: left;">-2.04%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-28</td>
+<td style="text-align: right;">3243.90</td>
+<td style="text-align: right;">3273.78</td>
+<td style="text-align: right;">3284.58</td>
+<td style="text-align: right;">3212.24</td>
+<td style="text-align: left;">466.21K</td>
+<td style="text-align: left;">-0.91%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-27</td>
+<td style="text-align: right;">3273.58</td>
+<td style="text-align: right;">3093.78</td>
+<td style="text-align: right;">3279.93</td>
+<td style="text-align: right;">3063.37</td>
+<td style="text-align: left;">839.54K</td>
+<td style="text-align: left;">5.82%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-26</td>
+<td style="text-align: right;">3093.54</td>
+<td style="text-align: right;">3228.03</td>
+<td style="text-align: right;">3249.62</td>
+<td style="text-align: right;">3057.48</td>
+<td style="text-align: left;">118.44K</td>
+<td style="text-align: left;">-4.17%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-25</td>
+<td style="text-align: right;">3228.15</td>
+<td style="text-align: right;">3172.12</td>
+<td style="text-align: right;">3247.43</td>
+<td style="text-align: right;">3080.70</td>
+<td style="text-align: left;">923.13K</td>
+<td style="text-align: left;">1.73%</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The <strong><code>trading.transactions</code> table</strong> consists of buy and sell transactions data for each trade made by the DWD mentors.</p>
+<table class="table">
+<caption><code>trading.transactions</code> table</caption>
+<thead>
+<tr class="header">
+<th>Column name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>txn_id</code></td>
+<td>unique ID for each transaction</td>
+</tr>
+<tr class="even">
+<td><code>member_id</code></td>
+<td>member identifier for each trade</td>
+</tr>
+<tr class="odd">
+<td><code>ticker</code></td>
+<td>the ticker for each trade</td>
+</tr>
+<tr class="even">
+<td><code>txn_date</code></td>
+<td>the date for each transaction</td>
+</tr>
+<tr class="odd">
+<td><code>txn_type</code></td>
+<td>either BUY or SELL</td>
+</tr>
+<tr class="even">
+<td><code>quantity</code></td>
+<td>the total quantity for each trade</td>
+</tr>
+<tr class="odd">
+<td><code>percentage_fee</code></td>
+<td>% of total amount charged as fees</td>
+</tr>
+<tr class="even">
+<td><code>txn_time</code></td>
+<td>the timestamp for each trade</td>
+</tr>
+</tbody>
+</table>
+<p>The first 5 frows from this transactions table.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> trading.transactions <span class="kw">LIMIT</span> <span class="dv">5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>5 records</caption>
+<colgroup>
+<col style="width: 8%">
+<col style="width: 12%">
+<col style="width: 8%">
+<col style="width: 13%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 18%">
+<col style="width: 13%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">txn_id</th>
+<th style="text-align: left;">member_id</th>
+<th style="text-align: left;">ticker</th>
+<th style="text-align: left;">txn_date</th>
+<th style="text-align: left;">txn_type</th>
+<th style="text-align: right;">quantity</th>
+<th style="text-align: right;">percentage_fee</th>
+<th style="text-align: left;">txn_time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">c81e72</td>
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2017-01-01</td>
+<td style="text-align: left;">BUY</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: left;">2017-01-01</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">eccbc8</td>
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2017-01-01</td>
+<td style="text-align: left;">BUY</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: left;">2017-01-01</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">a87ff6</td>
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2017-01-01</td>
+<td style="text-align: left;">BUY</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: left;">2017-01-01</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">e4da3b</td>
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2017-01-01</td>
+<td style="text-align: left;">BUY</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: left;">2017-01-01</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">167909</td>
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2017-01-01</td>
+<td style="text-align: left;">BUY</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: left;">2017-01-01</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+</section>
+<section id="part-1-basic-data-analysis-techniques" class="level2">
+<h2 class="anchored" data-anchor-id="part-1-basic-data-analysis-techniques">PART 1️⃣: Basic Data Analysis Techniques</h2>
+<section id="question-1.1" class="level3">
+<h3 class="anchored" data-anchor-id="question-1.1">Question 1.1</h3>
+<p>Show only the top 5 rows from the <code>trading.members</code> table.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> trading.members</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>5 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">member_id</th>
+<th style="text-align: left;">first_name</th>
+<th style="text-align: left;">region</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">c4ca42</td>
+<td style="text-align: left;">Danny</td>
+<td style="text-align: left;">Australia</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">c81e72</td>
+<td style="text-align: left;">Vipul</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">eccbc8</td>
+<td style="text-align: left;">Charlie</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">a87ff6</td>
+<td style="text-align: left;">Nandita</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">e4da3b</td>
+<td style="text-align: left;">Rowan</td>
+<td style="text-align: left;">United States</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="question-1.2" class="level3">
+<h3 class="anchored" data-anchor-id="question-1.2">Question 1.2</h3>
+<p>Sort all the rows in the <code>trading.members</code> table by <code>first_name</code> in alphabetical order and show the top 3 rows with all columns.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> trading.members</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> first_name</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>3 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">member_id</th>
+<th style="text-align: left;">first_name</th>
+<th style="text-align: left;">region</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">c9f0f8</td>
+<td style="text-align: left;">Abe</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">8f14e4</td>
+<td style="text-align: left;">Alex</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">167909</td>
+<td style="text-align: left;">Ayush</td>
+<td style="text-align: left;">United States</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="question-1.3" class="level3">
+<h3 class="anchored" data-anchor-id="question-1.3">Question 1.3</h3>
+<p>Count the number of records from the <code>trading.members</code> table which have United States as the <code>region</code> value.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> record_count</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> trading.members</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> region <span class="op">=</span> <span class="st">'United States'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>1 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">record_count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">7</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="question-1.4" class="level3">
+<h3 class="anchored" data-anchor-id="question-1.4">Question 1.4</h3>
+<p>Select only the <code>first_name</code> and <code>region</code> columns for mentors who are not from Australia.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  first_name, </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  region</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> trading.members</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> region <span class="op">!=</span> <span class="st">'Australia'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">first_name</th>
+<th style="text-align: left;">region</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Vipul</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Charlie</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Nandita</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Rowan</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ayush</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Alex</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Abe</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Enoch</td>
+<td style="text-align: left;">Africa</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Vikram</td>
+<td style="text-align: left;">India</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Leah</td>
+<td style="text-align: left;">Asia</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="question-1.5" class="level3">
+<h3 class="anchored" data-anchor-id="question-1.5">Question 1.5</h3>
+<p>Return only the unique <code>region</code> values from the <code>trading.members</code> table and sort the output by reverse alphabetical order.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="kw">DISTINCT</span> region</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> trading.members</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> region <span class="kw">DESC</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>5 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">region</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">India</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Asia</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Africa</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+</section>
+<section id="part-2-aggregate-functions-for-data-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="part-2-aggregate-functions-for-data-analysis">PART 2️⃣: Aggregate Functions for Data Analysis</h2>
+<section id="question-2.1" class="level3">
+<h3 class="anchored" data-anchor-id="question-2.1">Question 2.1</h3>
+<p>How many records are there per <code>ticker</code> value in the <code>trading.prices</code> table?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  ticker,</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> record_count</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> trading.prices</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> ticker</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>2 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">ticker</th>
+<th style="text-align: right;">record_count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: right;">1702</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: right;">1702</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="question-2.2" class="level3">
+<h3 class="anchored" data-anchor-id="question-2.2">Question 2.2</h3>
+<p>What is the maximum, minimum values for the <code>price</code> column for both Bitcoin and Ethereum in 2020?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  ticker,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">MIN</span>(price) <span class="kw">AS</span> min_price,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">MAX</span>(price) <span class="kw">AS</span> max_price</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> trading.prices</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> market_date <span class="kw">BETWEEN</span> <span class="st">'2020-01-01'</span> <span class="kw">AND</span> <span class="st">'2020-12-31'</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> ticker</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>2 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">ticker</th>
+<th style="text-align: right;">min_price</th>
+<th style="text-align: right;">max_price</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: right;">4826.0</td>
+<td style="text-align: right;">28949.4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: right;">107.9</td>
+<td style="text-align: right;">751.8</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="question-2.3" class="level3">
+<h3 class="anchored" data-anchor-id="question-2.3">Question 2.3</h3>
+<p>What is the annual minimum, maximum and average price for each ticker?</p>
+<ul>
+<li>Include a calendar_year column with the year from 2017 through to 2021</li>
+<li>Calculate a <code>spread</code> column which calculates the difference between the min and max prices</li>
+<li>Round the average price output to 2 decimal places</li>
+<li>Sort the output in chronological order with Bitcoin records before Ethereum within each year</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">EXTRACT</span>(<span class="dt">YEAR</span> <span class="kw">FROM</span> market_date) <span class="kw">AS</span> calendar_year,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  ticker,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">MIN</span>(price) <span class="kw">AS</span> min_price,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">MAX</span>(price) <span class="kw">AS</span> max_price,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ROUND</span>(<span class="fu">AVG</span>(price):<span class="ch">:NUMERIC</span>, <span class="dv">2</span>) <span class="kw">AS</span> avg_price,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">MAX</span>(price) <span class="op">-</span> <span class="fu">MIN</span>(price) <span class="kw">AS</span> spread</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> trading.prices</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> calendar_year, ticker</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> calendar_year, ticker</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">calendar_year</th>
+<th style="text-align: left;">ticker</th>
+<th style="text-align: right;">min_price</th>
+<th style="text-align: right;">max_price</th>
+<th style="text-align: right;">avg_price</th>
+<th style="text-align: right;">spread</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">2017</td>
+<td style="text-align: left;">BTC</td>
+<td style="text-align: right;">785.40</td>
+<td style="text-align: right;">19345.50</td>
+<td style="text-align: right;">3981.07</td>
+<td style="text-align: right;">18560.10</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2017</td>
+<td style="text-align: left;">ETH</td>
+<td style="text-align: right;">8.20</td>
+<td style="text-align: right;">799.98</td>
+<td style="text-align: right;">220.34</td>
+<td style="text-align: right;">791.78</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2018</td>
+<td style="text-align: left;">BTC</td>
+<td style="text-align: right;">3228.70</td>
+<td style="text-align: right;">17172.30</td>
+<td style="text-align: right;">7552.16</td>
+<td style="text-align: right;">13943.60</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2018</td>
+<td style="text-align: left;">ETH</td>
+<td style="text-align: right;">83.81</td>
+<td style="text-align: right;">1380.00</td>
+<td style="text-align: right;">481.33</td>
+<td style="text-align: right;">1296.19</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2019</td>
+<td style="text-align: left;">BTC</td>
+<td style="text-align: right;">3397.70</td>
+<td style="text-align: right;">13063.80</td>
+<td style="text-align: right;">7371.82</td>
+<td style="text-align: right;">9666.10</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2019</td>
+<td style="text-align: left;">ETH</td>
+<td style="text-align: right;">104.55</td>
+<td style="text-align: right;">338.54</td>
+<td style="text-align: right;">180.99</td>
+<td style="text-align: right;">233.99</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2020</td>
+<td style="text-align: left;">BTC</td>
+<td style="text-align: right;">4826.00</td>
+<td style="text-align: right;">28949.40</td>
+<td style="text-align: right;">11111.63</td>
+<td style="text-align: right;">24123.40</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2020</td>
+<td style="text-align: left;">ETH</td>
+<td style="text-align: right;">107.90</td>
+<td style="text-align: right;">751.80</td>
+<td style="text-align: right;">307.30</td>
+<td style="text-align: right;">643.90</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2021</td>
+<td style="text-align: left;">BTC</td>
+<td style="text-align: right;">29359.90</td>
+<td style="text-align: right;">63540.90</td>
+<td style="text-align: right;">44353.55</td>
+<td style="text-align: right;">34181.00</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2021</td>
+<td style="text-align: left;">ETH</td>
+<td style="text-align: right;">729.12</td>
+<td style="text-align: right;">4167.78</td>
+<td style="text-align: right;">2199.12</td>
+<td style="text-align: right;">3438.66</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="question-2.4" class="level3">
+<h3 class="anchored" data-anchor-id="question-2.4">Question 2.4</h3>
+<p>What is the monthly average of the <code>price</code> column for each ticker from January 2020 and after?</p>
+<ul>
+<li>Create a <code>month_start</code> column with the first day of each month</li>
+<li>Sort the output by ticker in alphabetical order and months in chronological order</li>
+<li>Round the <code>average_price</code> column to 2 decimal places</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  ticker,</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  DATE_TRUNC(<span class="st">'MON'</span>, market_date):<span class="ch">:DATE</span> <span class="kw">AS</span> month_start,</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ROUND</span>(<span class="fu">AVG</span>(price):<span class="ch">:NUMERIC</span>, <span class="dv">2</span>) <span class="kw">AS</span> average_price</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> trading.prices</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> market_date <span class="op">&gt;=</span> <span class="st">'2020-01-01'</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> ticker, month_start</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> ticker, month_start</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">ticker</th>
+<th style="text-align: left;">month_start</th>
+<th style="text-align: right;">average_price</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-01-01</td>
+<td style="text-align: right;">8378.80</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-02-01</td>
+<td style="text-align: right;">9636.56</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-03-01</td>
+<td style="text-align: right;">6863.11</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-04-01</td>
+<td style="text-align: right;">7211.03</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-05-01</td>
+<td style="text-align: right;">9253.55</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-06-01</td>
+<td style="text-align: right;">9481.85</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-07-01</td>
+<td style="text-align: right;">9592.10</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-08-01</td>
+<td style="text-align: right;">11638.41</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-09-01</td>
+<td style="text-align: right;">10643.33</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-10-01</td>
+<td style="text-align: right;">11888.36</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+</section>
+<section id="part-3-case-when-statements" class="level2">
+<h2 class="anchored" data-anchor-id="part-3-case-when-statements">PART 3️⃣: Case When Statements</h2>
+<section id="question-3.1" class="level3">
+<h3 class="anchored" data-anchor-id="question-3.1">Question 3.1</h3>
+<p>Convert the <code>volume</code> column in the <code>trading.prices</code> table with an adjusted integer value to take into the unit values</p>
+<ul>
+<li>Return only the <code>market_date</code>, <code>price</code>, <code>volume</code> and <code>adjusted_volume</code> columns for the first 10 days of August 2021 for Ethereum only</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  market_date,</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  price,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  volume,    </span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">CASE</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">WHEN</span> <span class="kw">RIGHT</span>(volume, <span class="dv">1</span>) <span class="op">=</span> <span class="st">'K'</span> <span class="cf">THEN</span> <span class="kw">LEFT</span>(volume, <span class="fu">LENGTH</span>(volume) <span class="op">-</span> <span class="dv">1</span>):<span class="ch">:NUMERIC</span> <span class="op">*</span> <span class="dv">1000</span> </span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">WHEN</span> <span class="kw">RIGHT</span>(volume, <span class="dv">1</span>) <span class="op">=</span> <span class="st">'M'</span> <span class="cf">THEN</span> <span class="kw">LEFT</span>(volume, <span class="fu">LENGTH</span>(volume) <span class="op">-</span> <span class="dv">1</span>):<span class="ch">:NUMERIC</span> <span class="op">*</span> <span class="dv">1000000</span> </span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">WHEN</span> volume <span class="op">=</span> <span class="st">'-'</span> <span class="cf">THEN</span> <span class="dv">0</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">END</span> <span class="kw">AS</span> adjusted_volume</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> trading.prices</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> ticker <span class="op">=</span> <span class="st">'ETH'</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">AND</span> market_date <span class="kw">BETWEEN</span> <span class="st">'2021-08-01'</span> <span class="kw">AND</span> <span class="st">'2021-08-10'</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> market_date</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">market_date</th>
+<th style="text-align: right;">price</th>
+<th style="text-align: left;">volume</th>
+<th style="text-align: right;">adjusted_volume</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">2021-08-01</td>
+<td style="text-align: right;">2556.23</td>
+<td style="text-align: left;">1.20M</td>
+<td style="text-align: right;">1200000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2021-08-02</td>
+<td style="text-align: right;">2608.04</td>
+<td style="text-align: left;">970.67K</td>
+<td style="text-align: right;">970670</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2021-08-03</td>
+<td style="text-align: right;">2506.65</td>
+<td style="text-align: left;">158.45K</td>
+<td style="text-align: right;">158450</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2021-08-04</td>
+<td style="text-align: right;">2725.29</td>
+<td style="text-align: left;">1.23M</td>
+<td style="text-align: right;">1230000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2021-08-05</td>
+<td style="text-align: right;">2827.21</td>
+<td style="text-align: left;">1.65M</td>
+<td style="text-align: right;">1650000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2021-08-06</td>
+<td style="text-align: right;">2889.43</td>
+<td style="text-align: left;">1.06M</td>
+<td style="text-align: right;">1060000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2021-08-07</td>
+<td style="text-align: right;">3158.00</td>
+<td style="text-align: left;">64.84K</td>
+<td style="text-align: right;">64840</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2021-08-08</td>
+<td style="text-align: right;">3012.07</td>
+<td style="text-align: left;">1.25M</td>
+<td style="text-align: right;">1250000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2021-08-09</td>
+<td style="text-align: right;">3162.93</td>
+<td style="text-align: left;">1.44M</td>
+<td style="text-align: right;">1440000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2021-08-10</td>
+<td style="text-align: right;">3140.71</td>
+<td style="text-align: left;">1.12M</td>
+<td style="text-align: right;">1120000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="question-3.2" class="level3">
+<h3 class="anchored" data-anchor-id="question-3.2">Question 3.2</h3>
+<p>How many “breakout” days were there in 2020 where the <code>price</code> column is greater than the <code>open</code> column for each <code>ticker</code>? In the same query also calculate the number of “non breakout” days where the <code>price</code> column was lower than or equal to the <code>open</code> column.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  ticker,</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">SUM</span>(<span class="cf">CASE</span> <span class="cf">WHEN</span> price <span class="op">&gt;</span> <span class="kw">open</span> <span class="cf">THEN</span> <span class="dv">1</span> <span class="cf">ELSE</span> <span class="dv">0</span> <span class="cf">END</span>) <span class="kw">AS</span> breakout_days,</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">SUM</span>(<span class="cf">CASE</span> <span class="cf">WHEN</span> price <span class="op">&lt;=</span> <span class="kw">open</span> <span class="cf">THEN</span> <span class="dv">1</span> <span class="cf">ELSE</span> <span class="dv">0</span> <span class="cf">END</span>) <span class="kw">AS</span> non_breakout_days</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> trading.prices</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> market_date <span class="kw">BETWEEN</span> <span class="st">'2020-01-01'</span> <span class="kw">AND</span> <span class="st">'2020-12-31'</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> ticker</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>2 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">ticker</th>
+<th style="text-align: right;">breakout_days</th>
+<th style="text-align: right;">non_breakout_days</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: right;">207</td>
+<td style="text-align: right;">159</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: right;">200</td>
+<td style="text-align: right;">166</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="question-3.3" class="level3">
+<h3 class="anchored" data-anchor-id="question-3.3">Question 3.3</h3>
+<p>What was the final quantity Bitcoin and Ethereum held by all Data With Danny mentors based off the <code>trading.transactions</code> table?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  ticker,</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">SUM</span>(<span class="cf">CASE</span> <span class="cf">WHEN</span> txn_type <span class="op">=</span> <span class="st">'SELL'</span> <span class="cf">THEN</span> <span class="op">-</span>quantity <span class="cf">ELSE</span> quantity <span class="cf">END</span>) <span class="kw">AS</span> final_btc_holding</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> trading.transactions</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> ticker</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>2 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">ticker</th>
+<th style="text-align: right;">final_btc_holding</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: right;">42848.67</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: right;">32801.04</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Divided by quantity bought and quantity sold.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  ticker,</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">SUM</span>(<span class="cf">CASE</span> <span class="cf">WHEN</span> txn_type <span class="op">=</span> <span class="st">'BUY'</span> <span class="cf">THEN</span> quantity <span class="cf">ELSE</span> <span class="dv">0</span> <span class="cf">END</span>) <span class="kw">AS</span> qty_bought,</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">SUM</span>(<span class="cf">CASE</span> <span class="cf">WHEN</span> txn_type <span class="op">=</span> <span class="st">'SELL'</span> <span class="cf">THEN</span> quantity <span class="cf">ELSE</span> <span class="dv">0</span> <span class="cf">END</span>) <span class="kw">AS</span> qty_sold</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> trading.transactions</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> ticker</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>2 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">ticker</th>
+<th style="text-align: right;">qty_bought</th>
+<th style="text-align: right;">qty_sold</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: right;">53250.15</td>
+<td style="text-align: right;">10401.485</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: right;">42599.20</td>
+<td style="text-align: right;">9798.154</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+</section>
+<section id="part-4-window-functions" class="level2">
+<h2 class="anchored" data-anchor-id="part-4-window-functions">PART 4️⃣: Window Functions</h2>
+<section id="question-4.1" class="level3">
+<h3 class="anchored" data-anchor-id="question-4.1">Question 4.1</h3>
+<p>What are the <code>market_date</code>, <code>price</code> and <code>volume</code> and <code>price_rank</code> values for the days with the top 5 highest <code>price</code> values for each tickers in the <code>trading.prices</code> table?</p>
+<ul>
+<li>The <code>price_rank</code> column is the ranking for price values for each ticker with rank = 1 for the highest value.</li>
+<li>Return the output for Bitcoin, followed by Ethereum in price rank order.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> cte_rank <span class="kw">AS</span> (</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    ticker,</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    market_date,</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    price, </span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    volume,</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">RANK</span>() <span class="kw">OVER</span> (<span class="kw">PARTITION</span> <span class="kw">BY</span> ticker <span class="kw">ORDER</span> <span class="kw">BY</span> price <span class="kw">DESC</span>) <span class="kw">AS</span> price_rank</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> trading.prices</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> cte_rank</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> price_rank <span class="op">&lt;=</span> <span class="dv">5</span></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> ticker, price_rank</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">ticker</th>
+<th style="text-align: left;">market_date</th>
+<th style="text-align: right;">price</th>
+<th style="text-align: left;">volume</th>
+<th style="text-align: right;">price_rank</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-04-13</td>
+<td style="text-align: right;">63540.90</td>
+<td style="text-align: left;">126.56K</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-04-15</td>
+<td style="text-align: right;">63216.00</td>
+<td style="text-align: left;">76.97K</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-04-14</td>
+<td style="text-align: right;">62980.40</td>
+<td style="text-align: left;">130.43K</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-04-16</td>
+<td style="text-align: right;">61379.70</td>
+<td style="text-align: left;">136.85K</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-03-13</td>
+<td style="text-align: right;">61195.30</td>
+<td style="text-align: left;">134.64K</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-05-11</td>
+<td style="text-align: right;">4167.78</td>
+<td style="text-align: left;">1.27M</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-05-14</td>
+<td style="text-align: right;">4075.38</td>
+<td style="text-align: left;">2.06M</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-05-10</td>
+<td style="text-align: right;">3947.90</td>
+<td style="text-align: left;">2.70M</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-05-09</td>
+<td style="text-align: right;">3922.23</td>
+<td style="text-align: left;">1.94M</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-05-08</td>
+<td style="text-align: right;">3905.55</td>
+<td style="text-align: left;">1.34M</td>
+<td style="text-align: right;">5</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="question-4.1---fa-brands-r-project-solution" class="level4">
+<h4 class="anchored" data-anchor-id="question-4.1---fa-brands-r-project-solution">Question 4.1 - <i class="fa-brands fa-r-project" aria-label="r-project"></i> solution</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>members <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/members_tbl.csv"</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>prices <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/prices_tbl.csv"</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>transactions <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/transactions_tbl.csv"</span>)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>prices <span class="sc">%&gt;%</span> <span class="fu">head</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 8
+  ticker market_date price  open  high   low volume  change
+  &lt;chr&gt;  &lt;date&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt; 
+1 ETH    2021-08-29  3178. 3244. 3282. 3163. 582.04K -2.04%
+2 ETH    2021-08-28  3244. 3274. 3285. 3212. 466.21K -0.91%
+3 ETH    2021-08-27  3274. 3094. 3280. 3063. 839.54K 5.82% 
+4 ETH    2021-08-26  3094. 3228. 3250. 3057. 118.44K -4.17%
+5 ETH    2021-08-25  3228. 3172. 3247. 3081. 923.13K 1.73% 
+6 ETH    2021-08-24  3173. 3323. 3358. 3151. 988.82K -4.41%</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># R solution</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>prices <span class="sc">%&gt;%</span> </span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(ticker, market_date, price, volume) <span class="sc">%&gt;%</span> </span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(ticker) <span class="sc">%&gt;%</span> </span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(ticker, <span class="fu">desc</span>(price)) <span class="sc">%&gt;%</span> </span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">price_rank =</span> <span class="fu">row_number</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(price_rank <span class="sc">&lt;=</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 5
+# Groups:   ticker [2]
+   ticker market_date  price volume  price_rank
+   &lt;chr&gt;  &lt;date&gt;       &lt;dbl&gt; &lt;chr&gt;        &lt;int&gt;
+ 1 BTC    2021-04-13  63541. 126.56K          1
+ 2 BTC    2021-04-15  63216  76.97K           2
+ 3 BTC    2021-04-14  62980. 130.43K          3
+ 4 BTC    2021-04-16  61380. 136.85K          4
+ 5 BTC    2021-03-13  61195. 134.64K          5
+ 6 ETH    2021-05-11   4168. 1.27M            1
+ 7 ETH    2021-05-14   4075. 2.06M            2
+ 8 ETH    2021-05-10   3948. 2.70M            3
+ 9 ETH    2021-05-09   3922. 1.94M            4
+10 ETH    2021-05-08   3906. 1.34M            5</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="question-4.2" class="level3">
+<h3 class="anchored" data-anchor-id="question-4.2">Question 4.2</h3>
+<p>Calculate a 7 day rolling average for the <code>price</code> and <code>volume</code> columns in the <code>trading.prices</code> table for each ticker.</p>
+<ul>
+<li>Return only the first 10 days of August 2021</li>
+</ul>
+<div class="cell" data-max.print="null">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Step 1 - Adjusted prices CTE</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> cte_adjusted_prices <span class="kw">AS</span> (</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    ticker,</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    market_date,</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    price,</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">CASE</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>      <span class="cf">WHEN</span> <span class="kw">RIGHT</span>(volume, <span class="dv">1</span>) <span class="op">=</span> <span class="st">'K'</span> <span class="cf">THEN</span> <span class="kw">LEFT</span>(volume, <span class="fu">LENGTH</span>(volume)<span class="op">-</span><span class="dv">1</span>):<span class="ch">:NUMERIC</span> <span class="op">*</span> <span class="dv">1000</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>      <span class="cf">WHEN</span> <span class="kw">RIGHT</span>(volume, <span class="dv">1</span>) <span class="op">=</span> <span class="st">'M'</span> <span class="cf">THEN</span> <span class="kw">LEFT</span>(volume, <span class="fu">LENGTH</span>(volume)<span class="op">-</span><span class="dv">1</span>):<span class="ch">:NUMERIC</span> <span class="op">*</span> <span class="dv">1000000</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>      <span class="cf">WHEN</span> volume <span class="op">=</span> <span class="st">'-'</span> <span class="cf">THEN</span> <span class="dv">0</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">END</span> <span class="kw">AS</span> volume</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> trading.prices</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>),</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a><span class="co">-- Step 2 - Moving Averages CTE</span></span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>cte_moving_averages <span class="kw">AS</span> (</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span></span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>    ticker,</span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>    market_date,</span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>    price,</span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">AVG</span>(price) <span class="kw">OVER</span> (</span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>      <span class="kw">PARTITION</span> <span class="kw">BY</span> ticker</span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>      <span class="kw">ORDER</span> <span class="kw">BY</span> market_date</span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>      <span class="kw">RANGE</span> <span class="kw">BETWEEN</span> <span class="st">'6 DAYS'</span> <span class="kw">PRECEDING</span> <span class="kw">AND</span> <span class="kw">CURRENT</span> <span class="kw">ROW</span>  </span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>    ) <span class="kw">AS</span> moving_avg_price,</span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>    volume,</span>
+<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">AVG</span>(volume) <span class="kw">OVER</span> (</span>
+<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a>      <span class="kw">PARTITION</span> <span class="kw">BY</span> ticker</span>
+<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a>      <span class="kw">ORDER</span> <span class="kw">BY</span> market_date</span>
+<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a>      <span class="kw">RANGE</span> <span class="kw">BETWEEN</span> <span class="st">'6 DAYS'</span> <span class="kw">PRECEDING</span> <span class="kw">AND</span> <span class="kw">CURRENT</span> <span class="kw">ROW</span>  </span>
+<span id="cb26-31"><a href="#cb26-31" aria-hidden="true" tabindex="-1"></a>    ) <span class="kw">AS</span> moving_avg_volume</span>
+<span id="cb26-32"><a href="#cb26-32" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> cte_adjusted_prices</span>
+<span id="cb26-33"><a href="#cb26-33" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb26-34"><a href="#cb26-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-35"><a href="#cb26-35" aria-hidden="true" tabindex="-1"></a><span class="co">-- final output</span></span>
+<span id="cb26-36"><a href="#cb26-36" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> cte_moving_averages</span>
+<span id="cb26-37"><a href="#cb26-37" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> market_date <span class="kw">BETWEEN</span> <span class="st">'2021-08-01'</span> <span class="kw">AND</span> <span class="st">'2021-08-10'</span></span>
+<span id="cb26-38"><a href="#cb26-38" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> ticker, market_date;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>20 records</caption>
+<colgroup>
+<col style="width: 9%">
+<col style="width: 16%">
+<col style="width: 12%">
+<col style="width: 23%">
+<col style="width: 11%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">ticker</th>
+<th style="text-align: left;">market_date</th>
+<th style="text-align: right;">price</th>
+<th style="text-align: right;">moving_avg_price</th>
+<th style="text-align: right;">volume</th>
+<th style="text-align: right;">moving_avg_volume</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-01</td>
+<td style="text-align: right;">39878.30</td>
+<td style="text-align: right;">40052.657</td>
+<td style="text-align: right;">80330</td>
+<td style="text-align: right;">103645.71</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-02</td>
+<td style="text-align: right;">39168.40</td>
+<td style="text-align: right;">40322.914</td>
+<td style="text-align: right;">74810</td>
+<td style="text-align: right;">88957.14</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-03</td>
+<td style="text-align: right;">38130.30</td>
+<td style="text-align: right;">40134.100</td>
+<td style="text-align: right;">260</td>
+<td style="text-align: right;">74674.29</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-04</td>
+<td style="text-align: right;">39736.90</td>
+<td style="text-align: right;">40096.057</td>
+<td style="text-align: right;">79220</td>
+<td style="text-align: right;">64717.14</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-05</td>
+<td style="text-align: right;">40867.20</td>
+<td style="text-align: right;">40219.743</td>
+<td style="text-align: right;">130600</td>
+<td style="text-align: right;">72617.14</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-06</td>
+<td style="text-align: right;">42795.40</td>
+<td style="text-align: right;">40304.314</td>
+<td style="text-align: right;">111930</td>
+<td style="text-align: right;">74542.86</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-07</td>
+<td style="text-align: right;">44614.20</td>
+<td style="text-align: right;">40741.529</td>
+<td style="text-align: right;">112840</td>
+<td style="text-align: right;">84284.29</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-08</td>
+<td style="text-align: right;">43792.80</td>
+<td style="text-align: right;">41300.743</td>
+<td style="text-align: right;">105250</td>
+<td style="text-align: right;">87844.29</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-09</td>
+<td style="text-align: right;">46284.30</td>
+<td style="text-align: right;">42317.300</td>
+<td style="text-align: right;">117080</td>
+<td style="text-align: right;">93882.86</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-10</td>
+<td style="text-align: right;">45593.80</td>
+<td style="text-align: right;">43383.514</td>
+<td style="text-align: right;">80550</td>
+<td style="text-align: right;">105352.86</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-01</td>
+<td style="text-align: right;">2556.23</td>
+<td style="text-align: right;">2394.166</td>
+<td style="text-align: right;">1200000</td>
+<td style="text-align: right;">1069824.29</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-02</td>
+<td style="text-align: right;">2608.04</td>
+<td style="text-align: right;">2448.239</td>
+<td style="text-align: right;">970670</td>
+<td style="text-align: right;">938491.43</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-03</td>
+<td style="text-align: right;">2506.65</td>
+<td style="text-align: right;">2477.729</td>
+<td style="text-align: right;">158450</td>
+<td style="text-align: right;">782555.71</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-04</td>
+<td style="text-align: right;">2725.29</td>
+<td style="text-align: right;">2538.611</td>
+<td style="text-align: right;">1230000</td>
+<td style="text-align: right;">819850.00</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-05</td>
+<td style="text-align: right;">2827.21</td>
+<td style="text-align: right;">2602.366</td>
+<td style="text-align: right;">1650000</td>
+<td style="text-align: right;">963742.86</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-06</td>
+<td style="text-align: right;">2889.43</td>
+<td style="text-align: right;">2663.577</td>
+<td style="text-align: right;">1060000</td>
+<td style="text-align: right;">968028.57</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-07</td>
+<td style="text-align: right;">3158.00</td>
+<td style="text-align: right;">2752.979</td>
+<td style="text-align: right;">64840</td>
+<td style="text-align: right;">904851.43</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-08</td>
+<td style="text-align: right;">3012.07</td>
+<td style="text-align: right;">2818.099</td>
+<td style="text-align: right;">1250000</td>
+<td style="text-align: right;">911994.29</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-09</td>
+<td style="text-align: right;">3162.93</td>
+<td style="text-align: right;">2897.369</td>
+<td style="text-align: right;">1440000</td>
+<td style="text-align: right;">979041.43</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-10</td>
+<td style="text-align: right;">3140.71</td>
+<td style="text-align: right;">2987.949</td>
+<td style="text-align: right;">1120000</td>
+<td style="text-align: right;">1116405.71</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="question-4.2---fa-brands-r-project-solution" class="level4">
+<h4 class="anchored" data-anchor-id="question-4.2---fa-brands-r-project-solution">Question 4.2 - <i class="fa-brands fa-r-project" aria-label="r-project"></i> solution</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>prices <span class="sc">%&gt;%</span> </span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">volume =</span> <span class="fu">case_when</span>(</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_sub</span>(volume, <span class="sc">-</span><span class="dv">1</span>) <span class="sc">==</span> <span class="st">"K"</span> <span class="sc">~</span> <span class="fu">as.numeric</span>(<span class="fu">str_sub</span>(volume, <span class="dv">1</span>, <span class="fu">str_length</span>(volume) <span class="sc">-</span> <span class="dv">1</span>)) <span class="sc">*</span> <span class="dv">10</span><span class="sc">^</span><span class="dv">3</span>,</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_sub</span>(volume, <span class="sc">-</span><span class="dv">1</span>) <span class="sc">==</span> <span class="st">"M"</span> <span class="sc">~</span> <span class="fu">as.numeric</span>(<span class="fu">str_sub</span>(volume, <span class="dv">1</span>, <span class="fu">str_length</span>(volume) <span class="sc">-</span> <span class="dv">1</span>)) <span class="sc">*</span> <span class="dv">10</span><span class="sc">^</span><span class="dv">6</span>,</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_sub</span>(volume, <span class="sc">-</span><span class="dv">1</span>) <span class="sc">==</span> <span class="st">"-"</span> <span class="sc">~</span> <span class="fu">as.numeric</span>(<span class="fu">str_sub</span>(volume, <span class="dv">1</span>, <span class="fu">str_length</span>(volume) <span class="sc">-</span> <span class="dv">1</span>)) <span class="sc">*</span> <span class="dv">0</span>)</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(ticker) <span class="sc">%&gt;%</span> </span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(ticker, market_date) <span class="sc">%&gt;%</span> </span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">moving_avg_price =</span> zoo<span class="sc">::</span><span class="fu">rollmean</span>(price, <span class="at">k =</span> <span class="dv">7</span>, <span class="at">align =</span> <span class="st">"right"</span>, <span class="at">fill =</span> <span class="cn">NA</span>),</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">moving_avg_volume =</span> zoo<span class="sc">::</span><span class="fu">rollmean</span>(volume, <span class="at">k =</span> <span class="dv">7</span>, <span class="at">align =</span> <span class="st">"right"</span>, <span class="at">fill =</span> <span class="cn">NA</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(ticker, market_date, price, moving_avg_price, volume, moving_avg_volume) <span class="sc">%&gt;%</span> </span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(market_date <span class="sc">&gt;=</span> <span class="st">"2021-08-01"</span>, market_date <span class="sc">&lt;=</span> <span class="st">"2021-08-10"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 20 × 6
+# Groups:   ticker [2]
+   ticker market_date  price moving_avg_price  volume moving_avg_volume
+   &lt;chr&gt;  &lt;date&gt;       &lt;dbl&gt;            &lt;dbl&gt;   &lt;dbl&gt;             &lt;dbl&gt;
+ 1 BTC    2021-08-01  39878.           40053.   80330           103646.
+ 2 BTC    2021-08-02  39168.           40323.   74810            88957.
+ 3 BTC    2021-08-03  38130.           40134.     260            74674.
+ 4 BTC    2021-08-04  39737.           40096.   79220            64717.
+ 5 BTC    2021-08-05  40867.           40220.  130600            72617.
+ 6 BTC    2021-08-06  42795.           40304.  111930            74543.
+ 7 BTC    2021-08-07  44614.           40742.  112840            84284.
+ 8 BTC    2021-08-08  43793.           41301.  105250            87844.
+ 9 BTC    2021-08-09  46284.           42317.  117080            93883.
+10 BTC    2021-08-10  45594.           43384.   80550           105353.
+11 ETH    2021-08-01   2556.            2394. 1200000          1069824.
+12 ETH    2021-08-02   2608.            2448.  970670           938491.
+13 ETH    2021-08-03   2507.            2478.  158450           782556.
+14 ETH    2021-08-04   2725.            2539. 1230000           819850 
+15 ETH    2021-08-05   2827.            2602. 1650000           963743.
+16 ETH    2021-08-06   2889.            2664. 1060000           968029.
+17 ETH    2021-08-07   3158             2753.   64840           904851.
+18 ETH    2021-08-08   3012.            2818. 1250000           911994.
+19 ETH    2021-08-09   3163.            2897. 1440000           979041.
+20 ETH    2021-08-10   3141.            2988. 1120000          1116406.</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="question-4.3" class="level3">
+<h3 class="anchored" data-anchor-id="question-4.3">Question 4.3</h3>
+<p>Calculate the monthly cumulative volume traded for each ticker in 2020</p>
+<ul>
+<li>Sort the output by ticker in chronological order with the <code>month_start</code> as the first day of each month</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> cte_monthly_volume <span class="kw">AS</span> (</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    ticker,</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    DATE_TRUNC(<span class="st">'MON'</span>, market_date):<span class="ch">:DATE</span> <span class="kw">AS</span> month_start,</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">SUM</span>(</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>      <span class="cf">CASE</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>      <span class="cf">WHEN</span> <span class="kw">RIGHT</span>(volume, <span class="dv">1</span>) <span class="op">=</span> <span class="st">'K'</span> <span class="cf">THEN</span> <span class="kw">LEFT</span>(volume, <span class="fu">LENGTH</span>(volume)<span class="op">-</span><span class="dv">1</span>):<span class="ch">:NUMERIC</span> <span class="op">*</span> <span class="dv">1000</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>      <span class="cf">WHEN</span> <span class="kw">RIGHT</span>(volume, <span class="dv">1</span>) <span class="op">=</span> <span class="st">'M'</span> <span class="cf">THEN</span> <span class="kw">LEFT</span>(volume, <span class="fu">LENGTH</span>(volume)<span class="op">-</span><span class="dv">1</span>):<span class="ch">:NUMERIC</span> <span class="op">*</span> <span class="dv">1000000</span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>      <span class="cf">WHEN</span> volume <span class="op">=</span> <span class="st">'-'</span> <span class="cf">THEN</span> <span class="dv">0</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">END</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="kw">AS</span> monthly_volume</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> trading.prices</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>  <span class="kw">WHERE</span> market_date <span class="kw">BETWEEN</span> <span class="st">'2020-01-01'</span> <span class="kw">AND</span> <span class="st">'2020-12-31'</span></span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>  <span class="kw">GROUP</span> <span class="kw">BY</span> ticker, month_start</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>  ticker,</span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>  month_start,</span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">SUM</span>(monthly_volume) <span class="kw">OVER</span> (</span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>    <span class="kw">PARTITION</span> <span class="kw">BY</span> ticker</span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ORDER</span> <span class="kw">BY</span> month_start</span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ROWS</span> <span class="kw">BETWEEN</span> <span class="kw">UNBOUNDED</span> <span class="kw">PRECEDING</span> <span class="kw">AND</span> <span class="kw">CURRENT</span> <span class="kw">ROW</span></span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>  ) <span class="kw">AS</span> cumulative_monthly_volume</span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> cte_monthly_volume</span>
+<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> ticker, month_start</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">ticker</th>
+<th style="text-align: left;">month_start</th>
+<th style="text-align: right;">cumulative_monthly_volume</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-01-01</td>
+<td style="text-align: right;">23451920</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-02-01</td>
+<td style="text-align: right;">46839130</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-03-01</td>
+<td style="text-align: right;">94680450</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-04-01</td>
+<td style="text-align: right;">134302740</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-05-01</td>
+<td style="text-align: right;">172687010</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-06-01</td>
+<td style="text-align: right;">188026610</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-07-01</td>
+<td style="text-align: right;">201272600</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-08-01</td>
+<td style="text-align: right;">216762630</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-09-01</td>
+<td style="text-align: right;">300641440</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-10-01</td>
+<td style="text-align: right;">303060020</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="question-4.3---fa-brands-r-project-solution" class="level4">
+<h4 class="anchored" data-anchor-id="question-4.3---fa-brands-r-project-solution">Question 4.3 - <i class="fa-brands fa-r-project" aria-label="r-project"></i> solution</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>prices <span class="sc">%&gt;%</span> </span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(ticker, market_date, volume) <span class="sc">%&gt;%</span> </span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(market_date <span class="sc">&gt;=</span> <span class="st">"2020-01-01"</span>, market_date <span class="sc">&lt;=</span> <span class="st">"2020-12-31"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month_start =</span> lubridate<span class="sc">::</span><span class="fu">floor_date</span>(market_date, <span class="at">unit =</span> <span class="st">"month"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(ticker, month_start) <span class="sc">%&gt;%</span> </span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">monthly_volume =</span> <span class="fu">sum</span>(</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">case_when</span>(</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_sub</span>(volume, <span class="sc">-</span><span class="dv">1</span>) <span class="sc">==</span> <span class="st">"K"</span> <span class="sc">~</span> <span class="fu">as.numeric</span>(<span class="fu">str_sub</span>(volume, <span class="dv">1</span>, <span class="fu">str_length</span>(volume) <span class="sc">-</span> <span class="dv">1</span>)) <span class="sc">*</span> <span class="dv">10</span><span class="sc">^</span><span class="dv">3</span>,</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_sub</span>(volume, <span class="sc">-</span><span class="dv">1</span>) <span class="sc">==</span> <span class="st">"M"</span> <span class="sc">~</span> <span class="fu">as.numeric</span>(<span class="fu">str_sub</span>(volume, <span class="dv">1</span>, <span class="fu">str_length</span>(volume) <span class="sc">-</span> <span class="dv">1</span>)) <span class="sc">*</span> <span class="dv">10</span><span class="sc">^</span><span class="dv">6</span>,</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_sub</span>(volume, <span class="sc">-</span><span class="dv">1</span>) <span class="sc">==</span> <span class="st">"-"</span> <span class="sc">~</span> <span class="fu">as.numeric</span>(<span class="fu">str_sub</span>(volume, <span class="dv">1</span>, <span class="fu">str_length</span>(volume) <span class="sc">-</span> <span class="dv">1</span>)) <span class="sc">*</span> <span class="dv">0</span>)</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(ticker) <span class="sc">%&gt;%</span> </span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">cumulative_monthly_volume =</span> <span class="fu">cumsum</span>(monthly_volume)) <span class="sc">%&gt;%</span> </span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 24 × 4
+   ticker month_start monthly_volume cumulative_monthly_volume
+   &lt;chr&gt;  &lt;date&gt;               &lt;dbl&gt;                     &lt;dbl&gt;
+ 1 BTC    2020-01-01        23451920                  23451920
+ 2 BTC    2020-02-01        23387210                  46839130
+ 3 BTC    2020-03-01        47841320                  94680450
+ 4 BTC    2020-04-01        39622290                 134302740
+ 5 BTC    2020-05-01        38384270                 172687010
+ 6 BTC    2020-06-01        15339600                 188026610
+ 7 BTC    2020-07-01        13245990                 201272600
+ 8 BTC    2020-08-01        15490030                 216762630
+ 9 BTC    2020-09-01        83878810                 300641440
+10 BTC    2020-10-01         2418580                 303060020
+# … with 14 more rows</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="question-4.4" class="level3">
+<h3 class="anchored" data-anchor-id="question-4.4">Question 4.4</h3>
+<p>Calculate the daily percentage change in volume for each ticker in the <code>trading.prices</code> table</p>
+<ul>
+<li>Percentage change can be calculated as (current - previous) / previous</li>
+<li>Multiply the percentage by 100 and round the value to 2 decimal places</li>
+<li>Return data for the first 10 days of August 2021</li>
+</ul>
+<div class="cell" data-max.print="null">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> cte_adjusted_prices <span class="kw">AS</span> (</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    ticker,</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    market_date,</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">CASE</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>      <span class="cf">WHEN</span> <span class="kw">RIGHT</span>(volume, <span class="dv">1</span>) <span class="op">=</span> <span class="st">'K'</span> <span class="cf">THEN</span> <span class="kw">LEFT</span>(volume, <span class="fu">LENGTH</span>(volume)<span class="op">-</span><span class="dv">1</span>):<span class="ch">:NUMERIC</span> <span class="op">*</span> <span class="dv">1000</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>      <span class="cf">WHEN</span> <span class="kw">RIGHT</span>(volume, <span class="dv">1</span>) <span class="op">=</span> <span class="st">'M'</span> <span class="cf">THEN</span> <span class="kw">LEFT</span>(volume, <span class="fu">LENGTH</span>(volume)<span class="op">-</span><span class="dv">1</span>):<span class="ch">:NUMERIC</span> <span class="op">*</span> <span class="dv">1000000</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>      <span class="cf">WHEN</span> volume <span class="op">=</span> <span class="st">'-'</span> <span class="cf">THEN</span> <span class="dv">0</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">END</span> <span class="kw">AS</span> volume</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> trading.prices</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>),</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>cte_previous_volume <span class="kw">AS</span> (</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span></span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>    ticker,</span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>    market_date,</span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>    volume,</span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">LAG</span>(volume) <span class="kw">OVER</span> (<span class="kw">PARTITION</span> <span class="kw">BY</span> ticker <span class="kw">ORDER</span> <span class="kw">BY</span> market_date) <span class="kw">AS</span> previous_volume</span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> cte_adjusted_prices</span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>  <span class="kw">WHERE</span> volume <span class="op">!=</span> <span class="dv">0</span></span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
+<span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a>  ticker,</span>
+<span id="cb32-25"><a href="#cb32-25" aria-hidden="true" tabindex="-1"></a>  market_date,</span>
+<span id="cb32-26"><a href="#cb32-26" aria-hidden="true" tabindex="-1"></a>  volume,</span>
+<span id="cb32-27"><a href="#cb32-27" aria-hidden="true" tabindex="-1"></a>  previous_volume,</span>
+<span id="cb32-28"><a href="#cb32-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ROUND</span>(<span class="dv">100</span> <span class="op">*</span> (volume <span class="op">-</span> previous_volume) <span class="op">/</span> previous_volume, <span class="dv">2</span>) <span class="kw">AS</span> daily_change</span>
+<span id="cb32-29"><a href="#cb32-29" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> cte_previous_volume</span>
+<span id="cb32-30"><a href="#cb32-30" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> market_date <span class="kw">BETWEEN</span> <span class="st">'2021-08-01'</span> <span class="kw">AND</span> <span class="st">'2021-08-10'</span></span>
+<span id="cb32-31"><a href="#cb32-31" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> ticker, market_date</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>20 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">ticker</th>
+<th style="text-align: left;">market_date</th>
+<th style="text-align: right;">volume</th>
+<th style="text-align: right;">previous_volume</th>
+<th style="text-align: right;">daily_change</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-01</td>
+<td style="text-align: right;">80330</td>
+<td style="text-align: right;">44650</td>
+<td style="text-align: right;">79.91</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-02</td>
+<td style="text-align: right;">74810</td>
+<td style="text-align: right;">80330</td>
+<td style="text-align: right;">-6.87</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-03</td>
+<td style="text-align: right;">260</td>
+<td style="text-align: right;">74810</td>
+<td style="text-align: right;">-99.65</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-04</td>
+<td style="text-align: right;">79220</td>
+<td style="text-align: right;">260</td>
+<td style="text-align: right;">30369.23</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-05</td>
+<td style="text-align: right;">130600</td>
+<td style="text-align: right;">79220</td>
+<td style="text-align: right;">64.86</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-06</td>
+<td style="text-align: right;">111930</td>
+<td style="text-align: right;">130600</td>
+<td style="text-align: right;">-14.30</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-07</td>
+<td style="text-align: right;">112840</td>
+<td style="text-align: right;">111930</td>
+<td style="text-align: right;">0.81</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-08</td>
+<td style="text-align: right;">105250</td>
+<td style="text-align: right;">112840</td>
+<td style="text-align: right;">-6.73</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-09</td>
+<td style="text-align: right;">117080</td>
+<td style="text-align: right;">105250</td>
+<td style="text-align: right;">11.24</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-10</td>
+<td style="text-align: right;">80550</td>
+<td style="text-align: right;">117080</td>
+<td style="text-align: right;">-31.20</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-01</td>
+<td style="text-align: right;">1200000</td>
+<td style="text-align: right;">507080</td>
+<td style="text-align: right;">136.65</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-02</td>
+<td style="text-align: right;">970670</td>
+<td style="text-align: right;">1200000</td>
+<td style="text-align: right;">-19.11</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-03</td>
+<td style="text-align: right;">158450</td>
+<td style="text-align: right;">970670</td>
+<td style="text-align: right;">-83.68</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-04</td>
+<td style="text-align: right;">1230000</td>
+<td style="text-align: right;">158450</td>
+<td style="text-align: right;">676.27</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-05</td>
+<td style="text-align: right;">1650000</td>
+<td style="text-align: right;">1230000</td>
+<td style="text-align: right;">34.15</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-06</td>
+<td style="text-align: right;">1060000</td>
+<td style="text-align: right;">1650000</td>
+<td style="text-align: right;">-35.76</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-07</td>
+<td style="text-align: right;">64840</td>
+<td style="text-align: right;">1060000</td>
+<td style="text-align: right;">-93.88</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-08</td>
+<td style="text-align: right;">1250000</td>
+<td style="text-align: right;">64840</td>
+<td style="text-align: right;">1827.82</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-09</td>
+<td style="text-align: right;">1440000</td>
+<td style="text-align: right;">1250000</td>
+<td style="text-align: right;">15.20</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-10</td>
+<td style="text-align: right;">1120000</td>
+<td style="text-align: right;">1440000</td>
+<td style="text-align: right;">-22.22</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="question-4.4---fa-brands-r-project-solution" class="level4">
+<h4 class="anchored" data-anchor-id="question-4.4---fa-brands-r-project-solution">Question 4.4 - <i class="fa-brands fa-r-project" aria-label="r-project"></i> solution</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>prices <span class="sc">%&gt;%</span> </span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(ticker, market_date, volume) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">volume =</span> <span class="fu">case_when</span>(</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_sub</span>(volume, <span class="sc">-</span><span class="dv">1</span>) <span class="sc">==</span> <span class="st">"K"</span> <span class="sc">~</span> <span class="fu">as.numeric</span>(<span class="fu">str_sub</span>(volume, <span class="dv">1</span>, <span class="fu">str_length</span>(volume) <span class="sc">-</span> <span class="dv">1</span>)) <span class="sc">*</span> <span class="dv">10</span><span class="sc">^</span><span class="dv">3</span>,</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_sub</span>(volume, <span class="sc">-</span><span class="dv">1</span>) <span class="sc">==</span> <span class="st">"M"</span> <span class="sc">~</span> <span class="fu">as.numeric</span>(<span class="fu">str_sub</span>(volume, <span class="dv">1</span>, <span class="fu">str_length</span>(volume) <span class="sc">-</span> <span class="dv">1</span>)) <span class="sc">*</span> <span class="dv">10</span><span class="sc">^</span><span class="dv">6</span>,</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_sub</span>(volume, <span class="sc">-</span><span class="dv">1</span>) <span class="sc">==</span> <span class="st">"-"</span> <span class="sc">~</span> <span class="fu">as.numeric</span>(<span class="fu">str_sub</span>(volume, <span class="dv">1</span>, <span class="fu">str_length</span>(volume) <span class="sc">-</span> <span class="dv">1</span>)) <span class="sc">*</span> <span class="dv">0</span>)</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(ticker, market_date) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">volume_prev_day =</span> <span class="fu">lag</span>(volume)) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">daily_change_perc =</span> <span class="fu">round</span>(<span class="dv">100</span><span class="sc">*</span>(volume <span class="sc">-</span> volume_prev_day)<span class="sc">/</span>volume_prev_day, <span class="dv">2</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(market_date <span class="sc">&gt;=</span> <span class="st">"2021-08-01"</span>, market_date <span class="sc">&lt;=</span> <span class="st">"2021-08-10"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 20 × 5
+   ticker market_date  volume volume_prev_day daily_change_perc
+   &lt;chr&gt;  &lt;date&gt;        &lt;dbl&gt;           &lt;dbl&gt;             &lt;dbl&gt;
+ 1 BTC    2021-08-01    80330           44650             79.9 
+ 2 BTC    2021-08-02    74810           80330             -6.87
+ 3 BTC    2021-08-03      260           74810            -99.6 
+ 4 BTC    2021-08-04    79220             260          30369.  
+ 5 BTC    2021-08-05   130600           79220             64.9 
+ 6 BTC    2021-08-06   111930          130600            -14.3 
+ 7 BTC    2021-08-07   112840          111930              0.81
+ 8 BTC    2021-08-08   105250          112840             -6.73
+ 9 BTC    2021-08-09   117080          105250             11.2 
+10 BTC    2021-08-10    80550          117080            -31.2 
+11 ETH    2021-08-01  1200000          507080            137.  
+12 ETH    2021-08-02   970670         1200000            -19.1 
+13 ETH    2021-08-03   158450          970670            -83.7 
+14 ETH    2021-08-04  1230000          158450            676.  
+15 ETH    2021-08-05  1650000         1230000             34.2 
+16 ETH    2021-08-06  1060000         1650000            -35.8 
+17 ETH    2021-08-07    64840         1060000            -93.9 
+18 ETH    2021-08-08  1250000           64840           1828.  
+19 ETH    2021-08-09  1440000         1250000             15.2 
+20 ETH    2021-08-10  1120000         1440000            -22.2 </code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="part-5-table-joins" class="level2">
+<h2 class="anchored" data-anchor-id="part-5-table-joins">PART 5️⃣: Table Joins</h2>
+<section id="question-5.1---inner-joins" class="level3">
+<h3 class="anchored" data-anchor-id="question-5.1---inner-joins">Question 5.1 - Inner Joins</h3>
+<p>Which top 3 mentors have the most Bitcoin quantity? Return the f<code>irst_name</code> of the mentors and sort the output from highest to lowest <code>total_quantity</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  m.first_name,</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">SUM</span>(</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">CASE</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>      <span class="cf">WHEN</span> t.txn_type <span class="op">=</span> <span class="st">'BUY'</span> <span class="cf">THEN</span> t.quantity </span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>      <span class="cf">WHEN</span> t.txn_type <span class="op">=</span> <span class="st">'SELL'</span> <span class="cf">THEN</span> <span class="op">-</span>t.quantity </span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>      <span class="cf">END</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="kw">AS</span> total_quantity</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> trading.transactions t</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a><span class="kw">INNER</span> <span class="kw">JOIN</span> trading.members m</span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>  <span class="kw">ON</span> t.member_id <span class="op">=</span> m.member_id</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> ticker <span class="op">=</span> <span class="st">'BTC'</span> </span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">By</span> m.first_name</span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> total_quantity <span class="kw">DESC</span></span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>3 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">first_name</th>
+<th style="text-align: right;">total_quantity</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Nandita</td>
+<td style="text-align: right;">4160.220</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Leah</td>
+<td style="text-align: right;">4046.091</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ayush</td>
+<td style="text-align: right;">3945.198</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="question-5.2---left-joins" class="level3">
+<h3 class="anchored" data-anchor-id="question-5.2---left-joins">Question 5.2 - Left Joins</h3>
+<p>Show the <code>market_date</code> values which have less than 5 transactions? Sort the output in reverse chronological order.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  p.market_date,</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">COUNT</span>(t.txn_id) <span class="kw">AS</span> transaction_count</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> trading.prices p</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> trading.transactions t</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">ON</span> p.market_date <span class="op">=</span> t.txn_date</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">AND</span> p.ticker <span class="op">=</span> t.ticker</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> p.market_date</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a><span class="kw">HAVING</span> <span class="fu">COUNT</span>(t.txn_id) <span class="op">&lt;</span> <span class="dv">5</span></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> p.market_date <span class="kw">DESC</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>8 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">market_date</th>
+<th style="text-align: right;">transaction_count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">2021-08-29</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2021-08-28</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2021-07-17</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2021-01-06</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2020-01-17</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2019-07-15</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2019-06-14</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2018-10-20</td>
+<td style="text-align: right;">4</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="question-5.3---multiple-table-joins" class="level3">
+<h3 class="anchored" data-anchor-id="question-5.3---multiple-table-joins">Question 5.3 - Multiple Table Joins</h3>
+<p><strong>Part 1:</strong> Calculate the Dollar Cost Average</p>
+<p>What is the dollar cost average (<code>btc_dca</code>) for all Bitcoin purchases by region for each calendar year?</p>
+<ul>
+<li>Create a column called <code>year_start</code> and use the start of the calendar year</li>
+<li>The dollar cost average calculation is <code>btc_dca</code> = SUM(<code>quantit</code>y x <code>price</code>) / SUM(<code>quantity</code>)</li>
+</ul>
+<p><strong>Part 2:</strong> Yearly Dollar Cost Average Ranking</p>
+<p>Use this <code>btc_dca</code> value to generate a <code>dca_ranking</code> column for each year</p>
+<ul>
+<li>The region with the lowest <code>btc_dca</code> each year has a rank of 1</li>
+</ul>
+<p><strong>Part 3:</strong> Dollar Cost Average Yearly Percentage Change</p>
+<p>Calculate the yearly percentage change in DCA for each region to 2 decimal places</p>
+<ul>
+<li>This calculation is (current - previous) / previous</li>
+</ul>
+<p>Finally order the output by <code>region</code> and <code>year_start</code> columns.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> cte_dollar_cost_average <span class="kw">AS</span> (</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    DATE_TRUNC(<span class="st">'YEAR'</span>, transactions.txn_date):<span class="ch">:DATE</span> <span class="kw">AS</span> year_start,</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    members.region,</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">SUM</span>(transactions.quantity <span class="op">*</span> prices.price) <span class="op">/</span> <span class="fu">SUM</span>(transactions.quantity) <span class="kw">AS</span> btc_dca</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> trading.transactions</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">INNER</span> <span class="kw">JOIN</span> trading.prices</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ON</span> transactions.ticker <span class="op">=</span> prices.ticker</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> transactions.txn_date <span class="op">=</span> prices.market_date</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">INNER</span> <span class="kw">JOIN</span> trading.members</span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ON</span> transactions.member_id <span class="op">=</span> members.member_id</span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">WHERE</span> transactions.ticker <span class="op">=</span> <span class="st">'BTC'</span></span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> transactions.txn_type <span class="op">=</span> <span class="st">'BUY'</span></span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>  <span class="kw">GROUP</span> <span class="kw">BY</span> year_start, members.region</span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>),</span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>cte_window_functions <span class="kw">AS</span> (</span>
+<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span></span>
+<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>    year_start,</span>
+<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a>    region,</span>
+<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a>    btc_dca,</span>
+<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">RANK</span>() <span class="kw">OVER</span> (<span class="kw">PARTITION</span> <span class="kw">BY</span> year_start <span class="kw">ORDER</span> <span class="kw">BY</span> btc_dca) <span class="kw">AS</span> dca_ranking,</span>
+<span id="cb37-23"><a href="#cb37-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">LAG</span>(btc_dca) <span class="kw">OVER</span> (<span class="kw">PARTITION</span> <span class="kw">BY</span> region <span class="kw">ORDER</span> <span class="kw">BY</span> year_start) <span class="kw">AS</span> previous_btc_dca</span>
+<span id="cb37-24"><a href="#cb37-24" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> cte_dollar_cost_average</span>
+<span id="cb37-25"><a href="#cb37-25" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb37-26"><a href="#cb37-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb37-27"><a href="#cb37-27" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
+<span id="cb37-28"><a href="#cb37-28" aria-hidden="true" tabindex="-1"></a>  year_start,</span>
+<span id="cb37-29"><a href="#cb37-29" aria-hidden="true" tabindex="-1"></a>  region,</span>
+<span id="cb37-30"><a href="#cb37-30" aria-hidden="true" tabindex="-1"></a>  btc_dca,</span>
+<span id="cb37-31"><a href="#cb37-31" aria-hidden="true" tabindex="-1"></a>  dca_ranking,</span>
+<span id="cb37-32"><a href="#cb37-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ROUND</span>(</span>
+<span id="cb37-33"><a href="#cb37-33" aria-hidden="true" tabindex="-1"></a>    (<span class="dv">100</span> <span class="op">*</span> (btc_dca <span class="op">-</span> previous_btc_dca) <span class="op">/</span> previous_btc_dca):<span class="ch">:NUMERIC</span>,</span>
+<span id="cb37-34"><a href="#cb37-34" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2</span></span>
+<span id="cb37-35"><a href="#cb37-35" aria-hidden="true" tabindex="-1"></a>  ) <span class="kw">AS</span> dca_percentage_change</span>
+<span id="cb37-36"><a href="#cb37-36" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> cte_window_functions</span>
+<span id="cb37-37"><a href="#cb37-37" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> region, year_start</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">year_start</th>
+<th style="text-align: left;">region</th>
+<th style="text-align: right;">btc_dca</th>
+<th style="text-align: right;">dca_ranking</th>
+<th style="text-align: right;">dca_percentage_change</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">2017-01-01</td>
+<td style="text-align: left;">Africa</td>
+<td style="text-align: right;">3987.626</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2018-01-01</td>
+<td style="text-align: left;">Africa</td>
+<td style="text-align: right;">7690.713</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">92.86</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2019-01-01</td>
+<td style="text-align: left;">Africa</td>
+<td style="text-align: right;">7368.820</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">-4.19</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2020-01-01</td>
+<td style="text-align: left;">Africa</td>
+<td style="text-align: right;">11114.125</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">50.83</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2021-01-01</td>
+<td style="text-align: left;">Africa</td>
+<td style="text-align: right;">44247.215</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">298.12</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2017-01-01</td>
+<td style="text-align: left;">Asia</td>
+<td style="text-align: right;">4002.939</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2018-01-01</td>
+<td style="text-align: left;">Asia</td>
+<td style="text-align: right;">7829.999</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">95.61</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2019-01-01</td>
+<td style="text-align: left;">Asia</td>
+<td style="text-align: right;">7267.679</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">-7.18</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2020-01-01</td>
+<td style="text-align: left;">Asia</td>
+<td style="text-align: right;">10759.621</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">48.05</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2021-01-01</td>
+<td style="text-align: left;">Asia</td>
+<td style="text-align: right;">44570.901</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">314.24</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><br></p>
+<p>Thanks for reading!</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp(/https:\/\/sandrajurela\.com/);
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script>
+<script src="https://giscus.app/client.js" data-repo="sandra-jurela/my-personal-Quarto-blog" data-repo-id="R_kgDOI6JBDg" data-category="General" data-category-id="DIC_kwDOI6JBDs4CUB2R" data-mapping="title" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="top" data-theme="light" data-lang="en" crossorigin="anonymous" async="">
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+      <div class="nav-footer-center">© 2023 Sandra Jurela. All Rights Reserved<br>
+Built with 🧠 and <a href="https://quarto.org">Quarto</a> in RStudio.</div>
+  </div>
+</footer>
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

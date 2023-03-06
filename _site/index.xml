@@ -506,6 +506,2206 @@ $ year                             &lt;dbl&gt; 2023, 2023, 2023, 2022, 2022, 202
   <media:content url="https://sandrajurela.com/posts/shiny-mass-shootings/images/preview.png" medium="image" type="image/png" height="88" width="144"/>
 </item>
 <item>
+  <title>Cryptocurrency SQL Case Study</title>
+  <dc:creator>Sandra Jurela</dc:creator>
+  <link>https://sandrajurela.com/posts/cryptocurrency-sql-case-study/cryptocurrency.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<section id="foreword" class="level2">
+<h2 class="anchored" data-anchor-id="foreword">Foreword</h2>
+<p>On November 18, 2022 I attended the SQL masterclass “SQL and PostgreSQL for Data Analytics”, presented live by Danny Ma on O’Reilly platform.</p>
+<p>This <a href="https://github.com/DataWithDanny/sql-masterclass">Github repository</a> contains all the necessary data, sql scripts, and other materials.</p>
+<p>I’m posting some parts of it here for my own reference, but I strongly recommend that you register for that event that takes place every once in a while. It’s free and worth it. Danny Ma is an excellent teacher and his explanations are outstanding.</p>
+<section id="setting-up-the-programming-environment" class="level3">
+<h3 class="anchored" data-anchor-id="setting-up-the-programming-environment">Setting up the programming environment</h3>
+<p>For the purposes of this project, I created the local <code>trading</code> Postgres database on my machine and ran the sql script to create and populate the tables.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="co" style="color: #5E5E5E;"># loading packages</span></span>
+<span id="cb1-2"><span class="fu" style="color: #4758AB;">library</span>(DBI)</span>
+<span id="cb1-3"><span class="fu" style="color: #4758AB;">library</span>(RPostgres)  </span>
+<span id="cb1-4"><span class="fu" style="color: #4758AB;">library</span>(tidyverse)</span></code></pre></div>
+</div>
+<p>The <code>sql</code> engine uses the <code>DBI</code> package to execute SQL queries, print their results, and optionally assign the results to a data frame. To use the <code>sql</code> engine, we first need to establish a DBI connection to a database (typically via the <code>DBI::dbConnect()</code> function).</p>
+</section>
+<section id="creating-a-connection-to-the-trading-database" class="level3">
+<h3 class="anchored" data-anchor-id="creating-a-connection-to-the-trading-database">Creating a connection to the <code>trading</code> database</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1">mycon <span class="ot" style="color: #003B4F;">&lt;-</span> DBI<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">dbConnect</span>(RPostgres<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">Postgres</span>(), </span>
+<span id="cb2-2">                        <span class="at" style="color: #657422;">dbname =</span> <span class="st" style="color: #20794D;">"trading"</span>, </span>
+<span id="cb2-3">                        <span class="at" style="color: #657422;">host =</span> <span class="st" style="color: #20794D;">"localhost"</span>,  </span>
+<span id="cb2-4">                        <span class="at" style="color: #657422;">port =</span> <span class="st" style="color: #20794D;">"5432"</span>,  </span>
+<span id="cb2-5">                        <span class="at" style="color: #657422;">user =</span> rstudioapi<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">askForPassword</span>(<span class="st" style="color: #20794D;">"Database username"</span>),</span>
+<span id="cb2-6">                        <span class="at" style="color: #657422;">password =</span> rstudioapi<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">askForPassword</span>(<span class="st" style="color: #20794D;">"Database password"</span>))</span></code></pre></div>
+</div>
+<p>There are several options to <a href="https://solutions.posit.co/connections/db/best-practices/managing-credentials/index.html">secure your credentials</a> in R. Here I use prompting for credentials via <code>rstudioapi</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1">mycon</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;PqConnection&gt; trading@localhost:5432</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>In this fictitious case study - Danny’s data mentors from the Data With Danny team have been busy trading cryptocurrency markets since 2017.</p>
+<p>The main purpose for this case study is to analyze the performance of the DWD mentors over time. We will accomplish this by writing SQL queries to utilize all available datasets to answer a series of realistic business questions.</p>
+<section id="available-datasets" class="level3">
+<h3 class="anchored" data-anchor-id="available-datasets">Available Datasets</h3>
+<p>All of our data for this case study exists within the <code>trading</code> schema in the <strong>PostgreSQL database</strong>.</p>
+<p>There are 3 data tables available in this schema:</p>
+<ul>
+<li><code>members</code></li>
+<li><code>prices</code></li>
+<li><code>transactions</code></li>
+</ul>
+</section>
+<section id="entity-relationship-diagram" class="level3">
+<h3 class="anchored" data-anchor-id="entity-relationship-diagram">Entity Relationship Diagram</h3>
+<p>I drew the ERD <a href="https://dbdiagram.io/home">here</a>.</p>
+<p><img src="https://sandrajurela.com/posts/cryptocurrency-sql-case-study/images/erd_trading.png" class="preview-image img-fluid"></p>
+</section>
+<section id="data-dictionary-and-overview" class="level3">
+<h3 class="anchored" data-anchor-id="data-dictionary-and-overview">Data Dictionary and Overview</h3>
+<p>The <strong><code>trading.members</code> table</strong> consists of information about the mentors from the Data With Danny team.</p>
+<table class="table">
+<caption><code>trading.members</code> table</caption>
+<thead>
+<tr class="header">
+<th>Column name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>member_id</code></td>
+<td>unique id for each mentor</td>
+</tr>
+<tr class="even">
+<td><code>first_name</code></td>
+<td>first name for each mentor</td>
+</tr>
+<tr class="odd">
+<td><code>region</code></td>
+<td>region where each mentor is from</td>
+</tr>
+</tbody>
+</table>
+<div class="cell" data-max.print="null">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb5-1"><span class="kw" style="color: #003B4F;">SELECT</span> <span class="op" style="color: #5E5E5E;">*</span> <span class="kw" style="color: #003B4F;">FROM</span> trading.members</span></code></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>14 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">member_id</th>
+<th style="text-align: left;">first_name</th>
+<th style="text-align: left;">region</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">c4ca42</td>
+<td style="text-align: left;">Danny</td>
+<td style="text-align: left;">Australia</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">c81e72</td>
+<td style="text-align: left;">Vipul</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">eccbc8</td>
+<td style="text-align: left;">Charlie</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">a87ff6</td>
+<td style="text-align: left;">Nandita</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">e4da3b</td>
+<td style="text-align: left;">Rowan</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">167909</td>
+<td style="text-align: left;">Ayush</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">8f14e4</td>
+<td style="text-align: left;">Alex</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">c9f0f8</td>
+<td style="text-align: left;">Abe</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">45c48c</td>
+<td style="text-align: left;">Ben</td>
+<td style="text-align: left;">Australia</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">d3d944</td>
+<td style="text-align: left;">Enoch</td>
+<td style="text-align: left;">Africa</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">6512bd</td>
+<td style="text-align: left;">Vikram</td>
+<td style="text-align: left;">India</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">c20ad4</td>
+<td style="text-align: left;">Leah</td>
+<td style="text-align: left;">Asia</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">c51ce4</td>
+<td style="text-align: left;">Pavan</td>
+<td style="text-align: left;">Australia</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">aab323</td>
+<td style="text-align: left;">Sonia</td>
+<td style="text-align: left;">Australia</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The <strong><code>trading.prices</code> table</strong> consists of daily price and volume information from January 2017 through to August 2021 for the 2 most popular cryptocurrency tickers: Bitcoin and Ethereum.</p>
+<table class="table">
+<caption><code>trading.prices</code> table</caption>
+<thead>
+<tr class="header">
+<th>Column name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>ticker</code></td>
+<td>one of either BTC or ETH</td>
+</tr>
+<tr class="even">
+<td><code>market_date</code></td>
+<td>the date for each record</td>
+</tr>
+<tr class="odd">
+<td><code>price</code></td>
+<td>closing price at end of day</td>
+</tr>
+<tr class="even">
+<td><code>open</code></td>
+<td>the opening price</td>
+</tr>
+<tr class="odd">
+<td><code>high</code></td>
+<td>the highest price for that day</td>
+</tr>
+<tr class="even">
+<td><code>low</code></td>
+<td>the lowest price for that day</td>
+</tr>
+<tr class="odd">
+<td><code>volume</code></td>
+<td>the total volume traded</td>
+</tr>
+<tr class="even">
+<td><code>change</code></td>
+<td>% change in daily price</td>
+</tr>
+</tbody>
+</table>
+<p>The first 5 rows from this dataset.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb6-1"><span class="kw" style="color: #003B4F;">SELECT</span> <span class="op" style="color: #5E5E5E;">*</span> <span class="kw" style="color: #003B4F;">FROM</span> trading.prices <span class="kw" style="color: #003B4F;">LIMIT</span> <span class="dv" style="color: #AD0000;">5</span></span></code></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>5 records</caption>
+<colgroup>
+<col style="width: 10%">
+<col style="width: 18%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">ticker</th>
+<th style="text-align: left;">market_date</th>
+<th style="text-align: right;">price</th>
+<th style="text-align: right;">open</th>
+<th style="text-align: right;">high</th>
+<th style="text-align: right;">low</th>
+<th style="text-align: left;">volume</th>
+<th style="text-align: left;">change</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-29</td>
+<td style="text-align: right;">3177.84</td>
+<td style="text-align: right;">3243.96</td>
+<td style="text-align: right;">3282.21</td>
+<td style="text-align: right;">3162.79</td>
+<td style="text-align: left;">582.04K</td>
+<td style="text-align: left;">-2.04%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-28</td>
+<td style="text-align: right;">3243.90</td>
+<td style="text-align: right;">3273.78</td>
+<td style="text-align: right;">3284.58</td>
+<td style="text-align: right;">3212.24</td>
+<td style="text-align: left;">466.21K</td>
+<td style="text-align: left;">-0.91%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-27</td>
+<td style="text-align: right;">3273.58</td>
+<td style="text-align: right;">3093.78</td>
+<td style="text-align: right;">3279.93</td>
+<td style="text-align: right;">3063.37</td>
+<td style="text-align: left;">839.54K</td>
+<td style="text-align: left;">5.82%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-26</td>
+<td style="text-align: right;">3093.54</td>
+<td style="text-align: right;">3228.03</td>
+<td style="text-align: right;">3249.62</td>
+<td style="text-align: right;">3057.48</td>
+<td style="text-align: left;">118.44K</td>
+<td style="text-align: left;">-4.17%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-25</td>
+<td style="text-align: right;">3228.15</td>
+<td style="text-align: right;">3172.12</td>
+<td style="text-align: right;">3247.43</td>
+<td style="text-align: right;">3080.70</td>
+<td style="text-align: left;">923.13K</td>
+<td style="text-align: left;">1.73%</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The <strong><code>trading.transactions</code> table</strong> consists of buy and sell transactions data for each trade made by the DWD mentors.</p>
+<table class="table">
+<caption><code>trading.transactions</code> table</caption>
+<thead>
+<tr class="header">
+<th>Column name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>txn_id</code></td>
+<td>unique ID for each transaction</td>
+</tr>
+<tr class="even">
+<td><code>member_id</code></td>
+<td>member identifier for each trade</td>
+</tr>
+<tr class="odd">
+<td><code>ticker</code></td>
+<td>the ticker for each trade</td>
+</tr>
+<tr class="even">
+<td><code>txn_date</code></td>
+<td>the date for each transaction</td>
+</tr>
+<tr class="odd">
+<td><code>txn_type</code></td>
+<td>either BUY or SELL</td>
+</tr>
+<tr class="even">
+<td><code>quantity</code></td>
+<td>the total quantity for each trade</td>
+</tr>
+<tr class="odd">
+<td><code>percentage_fee</code></td>
+<td>% of total amount charged as fees</td>
+</tr>
+<tr class="even">
+<td><code>txn_time</code></td>
+<td>the timestamp for each trade</td>
+</tr>
+</tbody>
+</table>
+<p>The first 5 frows from this transactions table.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb7-1"><span class="kw" style="color: #003B4F;">SELECT</span> <span class="op" style="color: #5E5E5E;">*</span> <span class="kw" style="color: #003B4F;">FROM</span> trading.transactions <span class="kw" style="color: #003B4F;">LIMIT</span> <span class="dv" style="color: #AD0000;">5</span></span></code></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>5 records</caption>
+<colgroup>
+<col style="width: 8%">
+<col style="width: 12%">
+<col style="width: 8%">
+<col style="width: 13%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 18%">
+<col style="width: 13%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">txn_id</th>
+<th style="text-align: left;">member_id</th>
+<th style="text-align: left;">ticker</th>
+<th style="text-align: left;">txn_date</th>
+<th style="text-align: left;">txn_type</th>
+<th style="text-align: right;">quantity</th>
+<th style="text-align: right;">percentage_fee</th>
+<th style="text-align: left;">txn_time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">c81e72</td>
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2017-01-01</td>
+<td style="text-align: left;">BUY</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: left;">2017-01-01</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">eccbc8</td>
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2017-01-01</td>
+<td style="text-align: left;">BUY</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: left;">2017-01-01</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">a87ff6</td>
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2017-01-01</td>
+<td style="text-align: left;">BUY</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: left;">2017-01-01</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">e4da3b</td>
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2017-01-01</td>
+<td style="text-align: left;">BUY</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: left;">2017-01-01</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">167909</td>
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2017-01-01</td>
+<td style="text-align: left;">BUY</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: left;">2017-01-01</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+</section>
+<section id="part-1-basic-data-analysis-techniques" class="level2">
+<h2 class="anchored" data-anchor-id="part-1-basic-data-analysis-techniques">PART 1️⃣: Basic Data Analysis Techniques</h2>
+<section id="question-1.1" class="level3">
+<h3 class="anchored" data-anchor-id="question-1.1">Question 1.1</h3>
+<p>Show only the top 5 rows from the <code>trading.members</code> table.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb8-1"><span class="kw" style="color: #003B4F;">SELECT</span> <span class="op" style="color: #5E5E5E;">*</span> </span>
+<span id="cb8-2"><span class="kw" style="color: #003B4F;">FROM</span> trading.members</span>
+<span id="cb8-3"><span class="kw" style="color: #003B4F;">LIMIT</span> <span class="dv" style="color: #AD0000;">5</span></span></code></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>5 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">member_id</th>
+<th style="text-align: left;">first_name</th>
+<th style="text-align: left;">region</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">c4ca42</td>
+<td style="text-align: left;">Danny</td>
+<td style="text-align: left;">Australia</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">c81e72</td>
+<td style="text-align: left;">Vipul</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">eccbc8</td>
+<td style="text-align: left;">Charlie</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">a87ff6</td>
+<td style="text-align: left;">Nandita</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">e4da3b</td>
+<td style="text-align: left;">Rowan</td>
+<td style="text-align: left;">United States</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="question-1.2" class="level3">
+<h3 class="anchored" data-anchor-id="question-1.2">Question 1.2</h3>
+<p>Sort all the rows in the <code>trading.members</code> table by <code>first_name</code> in alphabetical order and show the top 3 rows with all columns.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb9-1"><span class="kw" style="color: #003B4F;">SELECT</span> <span class="op" style="color: #5E5E5E;">*</span> </span>
+<span id="cb9-2"><span class="kw" style="color: #003B4F;">FROM</span> trading.members</span>
+<span id="cb9-3"><span class="kw" style="color: #003B4F;">ORDER</span> <span class="kw" style="color: #003B4F;">BY</span> first_name</span>
+<span id="cb9-4"><span class="kw" style="color: #003B4F;">LIMIT</span> <span class="dv" style="color: #AD0000;">3</span></span></code></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>3 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">member_id</th>
+<th style="text-align: left;">first_name</th>
+<th style="text-align: left;">region</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">c9f0f8</td>
+<td style="text-align: left;">Abe</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">8f14e4</td>
+<td style="text-align: left;">Alex</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">167909</td>
+<td style="text-align: left;">Ayush</td>
+<td style="text-align: left;">United States</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="question-1.3" class="level3">
+<h3 class="anchored" data-anchor-id="question-1.3">Question 1.3</h3>
+<p>Count the number of records from the <code>trading.members</code> table which have United States as the <code>region</code> value.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb10-1"><span class="kw" style="color: #003B4F;">SELECT</span> </span>
+<span id="cb10-2">  <span class="fu" style="color: #4758AB;">COUNT</span>(<span class="op" style="color: #5E5E5E;">*</span>) <span class="kw" style="color: #003B4F;">AS</span> record_count</span>
+<span id="cb10-3"><span class="kw" style="color: #003B4F;">FROM</span> trading.members</span>
+<span id="cb10-4"><span class="kw" style="color: #003B4F;">WHERE</span> region <span class="op" style="color: #5E5E5E;">=</span> <span class="st" style="color: #20794D;">'United States'</span></span></code></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>1 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">record_count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">7</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="question-1.4" class="level3">
+<h3 class="anchored" data-anchor-id="question-1.4">Question 1.4</h3>
+<p>Select only the <code>first_name</code> and <code>region</code> columns for mentors who are not from Australia.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb11-1"><span class="kw" style="color: #003B4F;">SELECT</span> </span>
+<span id="cb11-2">  first_name, </span>
+<span id="cb11-3">  region</span>
+<span id="cb11-4"><span class="kw" style="color: #003B4F;">FROM</span> trading.members</span>
+<span id="cb11-5"><span class="kw" style="color: #003B4F;">WHERE</span> region <span class="op" style="color: #5E5E5E;">!=</span> <span class="st" style="color: #20794D;">'Australia'</span></span></code></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">first_name</th>
+<th style="text-align: left;">region</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Vipul</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Charlie</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Nandita</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Rowan</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ayush</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Alex</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Abe</td>
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Enoch</td>
+<td style="text-align: left;">Africa</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Vikram</td>
+<td style="text-align: left;">India</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Leah</td>
+<td style="text-align: left;">Asia</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="question-1.5" class="level3">
+<h3 class="anchored" data-anchor-id="question-1.5">Question 1.5</h3>
+<p>Return only the unique <code>region</code> values from the <code>trading.members</code> table and sort the output by reverse alphabetical order.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb12-1"><span class="kw" style="color: #003B4F;">SELECT</span> <span class="kw" style="color: #003B4F;">DISTINCT</span> region</span>
+<span id="cb12-2"><span class="kw" style="color: #003B4F;">FROM</span> trading.members</span>
+<span id="cb12-3"><span class="kw" style="color: #003B4F;">ORDER</span> <span class="kw" style="color: #003B4F;">BY</span> region <span class="kw" style="color: #003B4F;">DESC</span></span></code></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>5 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">region</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">United States</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">India</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Asia</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Africa</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+</section>
+<section id="part-2-aggregate-functions-for-data-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="part-2-aggregate-functions-for-data-analysis">PART 2️⃣: Aggregate Functions for Data Analysis</h2>
+<section id="question-2.1" class="level3">
+<h3 class="anchored" data-anchor-id="question-2.1">Question 2.1</h3>
+<p>How many records are there per <code>ticker</code> value in the <code>trading.prices</code> table?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb13-1"><span class="kw" style="color: #003B4F;">SELECT</span></span>
+<span id="cb13-2">  ticker,</span>
+<span id="cb13-3">  <span class="fu" style="color: #4758AB;">COUNT</span>(<span class="op" style="color: #5E5E5E;">*</span>) <span class="kw" style="color: #003B4F;">AS</span> record_count</span>
+<span id="cb13-4"><span class="kw" style="color: #003B4F;">FROM</span> trading.prices</span>
+<span id="cb13-5"><span class="kw" style="color: #003B4F;">GROUP</span> <span class="kw" style="color: #003B4F;">BY</span> ticker</span></code></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>2 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">ticker</th>
+<th style="text-align: right;">record_count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: right;">1702</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: right;">1702</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="question-2.2" class="level3">
+<h3 class="anchored" data-anchor-id="question-2.2">Question 2.2</h3>
+<p>What is the maximum, minimum values for the <code>price</code> column for both Bitcoin and Ethereum in 2020?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb14-1"><span class="kw" style="color: #003B4F;">SELECT</span> </span>
+<span id="cb14-2">  ticker,</span>
+<span id="cb14-3">  <span class="fu" style="color: #4758AB;">MIN</span>(price) <span class="kw" style="color: #003B4F;">AS</span> min_price,</span>
+<span id="cb14-4">  <span class="fu" style="color: #4758AB;">MAX</span>(price) <span class="kw" style="color: #003B4F;">AS</span> max_price</span>
+<span id="cb14-5"><span class="kw" style="color: #003B4F;">FROM</span> trading.prices</span>
+<span id="cb14-6"><span class="kw" style="color: #003B4F;">WHERE</span> market_date <span class="kw" style="color: #003B4F;">BETWEEN</span> <span class="st" style="color: #20794D;">'2020-01-01'</span> <span class="kw" style="color: #003B4F;">AND</span> <span class="st" style="color: #20794D;">'2020-12-31'</span></span>
+<span id="cb14-7"><span class="kw" style="color: #003B4F;">GROUP</span> <span class="kw" style="color: #003B4F;">BY</span> ticker</span></code></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>2 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">ticker</th>
+<th style="text-align: right;">min_price</th>
+<th style="text-align: right;">max_price</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: right;">4826.0</td>
+<td style="text-align: right;">28949.4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: right;">107.9</td>
+<td style="text-align: right;">751.8</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="question-2.3" class="level3">
+<h3 class="anchored" data-anchor-id="question-2.3">Question 2.3</h3>
+<p>What is the annual minimum, maximum and average price for each ticker?</p>
+<ul>
+<li>Include a calendar_year column with the year from 2017 through to 2021</li>
+<li>Calculate a <code>spread</code> column which calculates the difference between the min and max prices</li>
+<li>Round the average price output to 2 decimal places</li>
+<li>Sort the output in chronological order with Bitcoin records before Ethereum within each year</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb15-1"><span class="kw" style="color: #003B4F;">SELECT</span></span>
+<span id="cb15-2">  <span class="fu" style="color: #4758AB;">EXTRACT</span>(<span class="dt" style="color: #AD0000;">YEAR</span> <span class="kw" style="color: #003B4F;">FROM</span> market_date) <span class="kw" style="color: #003B4F;">AS</span> calendar_year,</span>
+<span id="cb15-3">  ticker,</span>
+<span id="cb15-4">  <span class="fu" style="color: #4758AB;">MIN</span>(price) <span class="kw" style="color: #003B4F;">AS</span> min_price,</span>
+<span id="cb15-5">  <span class="fu" style="color: #4758AB;">MAX</span>(price) <span class="kw" style="color: #003B4F;">AS</span> max_price,</span>
+<span id="cb15-6">  <span class="fu" style="color: #4758AB;">ROUND</span>(<span class="fu" style="color: #4758AB;">AVG</span>(price):<span class="ch" style="color: #20794D;">:NUMERIC</span>, <span class="dv" style="color: #AD0000;">2</span>) <span class="kw" style="color: #003B4F;">AS</span> avg_price,</span>
+<span id="cb15-7">  <span class="fu" style="color: #4758AB;">MAX</span>(price) <span class="op" style="color: #5E5E5E;">-</span> <span class="fu" style="color: #4758AB;">MIN</span>(price) <span class="kw" style="color: #003B4F;">AS</span> spread</span>
+<span id="cb15-8"><span class="kw" style="color: #003B4F;">FROM</span> trading.prices</span>
+<span id="cb15-9"><span class="kw" style="color: #003B4F;">GROUP</span> <span class="kw" style="color: #003B4F;">BY</span> calendar_year, ticker</span>
+<span id="cb15-10"><span class="kw" style="color: #003B4F;">ORDER</span> <span class="kw" style="color: #003B4F;">BY</span> calendar_year, ticker</span></code></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">calendar_year</th>
+<th style="text-align: left;">ticker</th>
+<th style="text-align: right;">min_price</th>
+<th style="text-align: right;">max_price</th>
+<th style="text-align: right;">avg_price</th>
+<th style="text-align: right;">spread</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">2017</td>
+<td style="text-align: left;">BTC</td>
+<td style="text-align: right;">785.40</td>
+<td style="text-align: right;">19345.50</td>
+<td style="text-align: right;">3981.07</td>
+<td style="text-align: right;">18560.10</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2017</td>
+<td style="text-align: left;">ETH</td>
+<td style="text-align: right;">8.20</td>
+<td style="text-align: right;">799.98</td>
+<td style="text-align: right;">220.34</td>
+<td style="text-align: right;">791.78</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2018</td>
+<td style="text-align: left;">BTC</td>
+<td style="text-align: right;">3228.70</td>
+<td style="text-align: right;">17172.30</td>
+<td style="text-align: right;">7552.16</td>
+<td style="text-align: right;">13943.60</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2018</td>
+<td style="text-align: left;">ETH</td>
+<td style="text-align: right;">83.81</td>
+<td style="text-align: right;">1380.00</td>
+<td style="text-align: right;">481.33</td>
+<td style="text-align: right;">1296.19</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2019</td>
+<td style="text-align: left;">BTC</td>
+<td style="text-align: right;">3397.70</td>
+<td style="text-align: right;">13063.80</td>
+<td style="text-align: right;">7371.82</td>
+<td style="text-align: right;">9666.10</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2019</td>
+<td style="text-align: left;">ETH</td>
+<td style="text-align: right;">104.55</td>
+<td style="text-align: right;">338.54</td>
+<td style="text-align: right;">180.99</td>
+<td style="text-align: right;">233.99</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2020</td>
+<td style="text-align: left;">BTC</td>
+<td style="text-align: right;">4826.00</td>
+<td style="text-align: right;">28949.40</td>
+<td style="text-align: right;">11111.63</td>
+<td style="text-align: right;">24123.40</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2020</td>
+<td style="text-align: left;">ETH</td>
+<td style="text-align: right;">107.90</td>
+<td style="text-align: right;">751.80</td>
+<td style="text-align: right;">307.30</td>
+<td style="text-align: right;">643.90</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2021</td>
+<td style="text-align: left;">BTC</td>
+<td style="text-align: right;">29359.90</td>
+<td style="text-align: right;">63540.90</td>
+<td style="text-align: right;">44353.55</td>
+<td style="text-align: right;">34181.00</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2021</td>
+<td style="text-align: left;">ETH</td>
+<td style="text-align: right;">729.12</td>
+<td style="text-align: right;">4167.78</td>
+<td style="text-align: right;">2199.12</td>
+<td style="text-align: right;">3438.66</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="question-2.4" class="level3">
+<h3 class="anchored" data-anchor-id="question-2.4">Question 2.4</h3>
+<p>What is the monthly average of the <code>price</code> column for each ticker from January 2020 and after?</p>
+<ul>
+<li>Create a <code>month_start</code> column with the first day of each month</li>
+<li>Sort the output by ticker in alphabetical order and months in chronological order</li>
+<li>Round the <code>average_price</code> column to 2 decimal places</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb16-1"><span class="kw" style="color: #003B4F;">SELECT</span></span>
+<span id="cb16-2">  ticker,</span>
+<span id="cb16-3">  DATE_TRUNC(<span class="st" style="color: #20794D;">'MON'</span>, market_date):<span class="ch" style="color: #20794D;">:DATE</span> <span class="kw" style="color: #003B4F;">AS</span> month_start,</span>
+<span id="cb16-4">  <span class="fu" style="color: #4758AB;">ROUND</span>(<span class="fu" style="color: #4758AB;">AVG</span>(price):<span class="ch" style="color: #20794D;">:NUMERIC</span>, <span class="dv" style="color: #AD0000;">2</span>) <span class="kw" style="color: #003B4F;">AS</span> average_price</span>
+<span id="cb16-5"><span class="kw" style="color: #003B4F;">FROM</span> trading.prices</span>
+<span id="cb16-6"><span class="kw" style="color: #003B4F;">WHERE</span> market_date <span class="op" style="color: #5E5E5E;">&gt;=</span> <span class="st" style="color: #20794D;">'2020-01-01'</span></span>
+<span id="cb16-7"><span class="kw" style="color: #003B4F;">GROUP</span> <span class="kw" style="color: #003B4F;">BY</span> ticker, month_start</span>
+<span id="cb16-8"><span class="kw" style="color: #003B4F;">ORDER</span> <span class="kw" style="color: #003B4F;">BY</span> ticker, month_start</span></code></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">ticker</th>
+<th style="text-align: left;">month_start</th>
+<th style="text-align: right;">average_price</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-01-01</td>
+<td style="text-align: right;">8378.80</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-02-01</td>
+<td style="text-align: right;">9636.56</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-03-01</td>
+<td style="text-align: right;">6863.11</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-04-01</td>
+<td style="text-align: right;">7211.03</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-05-01</td>
+<td style="text-align: right;">9253.55</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-06-01</td>
+<td style="text-align: right;">9481.85</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-07-01</td>
+<td style="text-align: right;">9592.10</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-08-01</td>
+<td style="text-align: right;">11638.41</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-09-01</td>
+<td style="text-align: right;">10643.33</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-10-01</td>
+<td style="text-align: right;">11888.36</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+</section>
+<section id="part-3-case-when-statements" class="level2">
+<h2 class="anchored" data-anchor-id="part-3-case-when-statements">PART 3️⃣: Case When Statements</h2>
+<section id="question-3.1" class="level3">
+<h3 class="anchored" data-anchor-id="question-3.1">Question 3.1</h3>
+<p>Convert the <code>volume</code> column in the <code>trading.prices</code> table with an adjusted integer value to take into the unit values</p>
+<ul>
+<li>Return only the <code>market_date</code>, <code>price</code>, <code>volume</code> and <code>adjusted_volume</code> columns for the first 10 days of August 2021 for Ethereum only</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb17-1"><span class="kw" style="color: #003B4F;">SELECT</span></span>
+<span id="cb17-2">  market_date,</span>
+<span id="cb17-3">  price,</span>
+<span id="cb17-4">  volume,    </span>
+<span id="cb17-5">  <span class="cf" style="color: #003B4F;">CASE</span></span>
+<span id="cb17-6">    <span class="cf" style="color: #003B4F;">WHEN</span> <span class="kw" style="color: #003B4F;">RIGHT</span>(volume, <span class="dv" style="color: #AD0000;">1</span>) <span class="op" style="color: #5E5E5E;">=</span> <span class="st" style="color: #20794D;">'K'</span> <span class="cf" style="color: #003B4F;">THEN</span> <span class="kw" style="color: #003B4F;">LEFT</span>(volume, <span class="fu" style="color: #4758AB;">LENGTH</span>(volume) <span class="op" style="color: #5E5E5E;">-</span> <span class="dv" style="color: #AD0000;">1</span>):<span class="ch" style="color: #20794D;">:NUMERIC</span> <span class="op" style="color: #5E5E5E;">*</span> <span class="dv" style="color: #AD0000;">1000</span> </span>
+<span id="cb17-7">    <span class="cf" style="color: #003B4F;">WHEN</span> <span class="kw" style="color: #003B4F;">RIGHT</span>(volume, <span class="dv" style="color: #AD0000;">1</span>) <span class="op" style="color: #5E5E5E;">=</span> <span class="st" style="color: #20794D;">'M'</span> <span class="cf" style="color: #003B4F;">THEN</span> <span class="kw" style="color: #003B4F;">LEFT</span>(volume, <span class="fu" style="color: #4758AB;">LENGTH</span>(volume) <span class="op" style="color: #5E5E5E;">-</span> <span class="dv" style="color: #AD0000;">1</span>):<span class="ch" style="color: #20794D;">:NUMERIC</span> <span class="op" style="color: #5E5E5E;">*</span> <span class="dv" style="color: #AD0000;">1000000</span> </span>
+<span id="cb17-8">    <span class="cf" style="color: #003B4F;">WHEN</span> volume <span class="op" style="color: #5E5E5E;">=</span> <span class="st" style="color: #20794D;">'-'</span> <span class="cf" style="color: #003B4F;">THEN</span> <span class="dv" style="color: #AD0000;">0</span></span>
+<span id="cb17-9">    <span class="cf" style="color: #003B4F;">END</span> <span class="kw" style="color: #003B4F;">AS</span> adjusted_volume</span>
+<span id="cb17-10"><span class="kw" style="color: #003B4F;">FROM</span> trading.prices</span>
+<span id="cb17-11"><span class="kw" style="color: #003B4F;">WHERE</span> ticker <span class="op" style="color: #5E5E5E;">=</span> <span class="st" style="color: #20794D;">'ETH'</span></span>
+<span id="cb17-12">  <span class="kw" style="color: #003B4F;">AND</span> market_date <span class="kw" style="color: #003B4F;">BETWEEN</span> <span class="st" style="color: #20794D;">'2021-08-01'</span> <span class="kw" style="color: #003B4F;">AND</span> <span class="st" style="color: #20794D;">'2021-08-10'</span></span>
+<span id="cb17-13"><span class="kw" style="color: #003B4F;">ORDER</span> <span class="kw" style="color: #003B4F;">BY</span> market_date</span></code></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">market_date</th>
+<th style="text-align: right;">price</th>
+<th style="text-align: left;">volume</th>
+<th style="text-align: right;">adjusted_volume</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">2021-08-01</td>
+<td style="text-align: right;">2556.23</td>
+<td style="text-align: left;">1.20M</td>
+<td style="text-align: right;">1200000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2021-08-02</td>
+<td style="text-align: right;">2608.04</td>
+<td style="text-align: left;">970.67K</td>
+<td style="text-align: right;">970670</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2021-08-03</td>
+<td style="text-align: right;">2506.65</td>
+<td style="text-align: left;">158.45K</td>
+<td style="text-align: right;">158450</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2021-08-04</td>
+<td style="text-align: right;">2725.29</td>
+<td style="text-align: left;">1.23M</td>
+<td style="text-align: right;">1230000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2021-08-05</td>
+<td style="text-align: right;">2827.21</td>
+<td style="text-align: left;">1.65M</td>
+<td style="text-align: right;">1650000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2021-08-06</td>
+<td style="text-align: right;">2889.43</td>
+<td style="text-align: left;">1.06M</td>
+<td style="text-align: right;">1060000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2021-08-07</td>
+<td style="text-align: right;">3158.00</td>
+<td style="text-align: left;">64.84K</td>
+<td style="text-align: right;">64840</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2021-08-08</td>
+<td style="text-align: right;">3012.07</td>
+<td style="text-align: left;">1.25M</td>
+<td style="text-align: right;">1250000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2021-08-09</td>
+<td style="text-align: right;">3162.93</td>
+<td style="text-align: left;">1.44M</td>
+<td style="text-align: right;">1440000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2021-08-10</td>
+<td style="text-align: right;">3140.71</td>
+<td style="text-align: left;">1.12M</td>
+<td style="text-align: right;">1120000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="question-3.2" class="level3">
+<h3 class="anchored" data-anchor-id="question-3.2">Question 3.2</h3>
+<p>How many “breakout” days were there in 2020 where the <code>price</code> column is greater than the <code>open</code> column for each <code>ticker</code>? In the same query also calculate the number of “non breakout” days where the <code>price</code> column was lower than or equal to the <code>open</code> column.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb18-1"><span class="kw" style="color: #003B4F;">SELECT</span></span>
+<span id="cb18-2">  ticker,</span>
+<span id="cb18-3">  <span class="fu" style="color: #4758AB;">SUM</span>(<span class="cf" style="color: #003B4F;">CASE</span> <span class="cf" style="color: #003B4F;">WHEN</span> price <span class="op" style="color: #5E5E5E;">&gt;</span> <span class="kw" style="color: #003B4F;">open</span> <span class="cf" style="color: #003B4F;">THEN</span> <span class="dv" style="color: #AD0000;">1</span> <span class="cf" style="color: #003B4F;">ELSE</span> <span class="dv" style="color: #AD0000;">0</span> <span class="cf" style="color: #003B4F;">END</span>) <span class="kw" style="color: #003B4F;">AS</span> breakout_days,</span>
+<span id="cb18-4">  <span class="fu" style="color: #4758AB;">SUM</span>(<span class="cf" style="color: #003B4F;">CASE</span> <span class="cf" style="color: #003B4F;">WHEN</span> price <span class="op" style="color: #5E5E5E;">&lt;=</span> <span class="kw" style="color: #003B4F;">open</span> <span class="cf" style="color: #003B4F;">THEN</span> <span class="dv" style="color: #AD0000;">1</span> <span class="cf" style="color: #003B4F;">ELSE</span> <span class="dv" style="color: #AD0000;">0</span> <span class="cf" style="color: #003B4F;">END</span>) <span class="kw" style="color: #003B4F;">AS</span> non_breakout_days</span>
+<span id="cb18-5"><span class="kw" style="color: #003B4F;">FROM</span> trading.prices</span>
+<span id="cb18-6"><span class="kw" style="color: #003B4F;">WHERE</span> market_date <span class="kw" style="color: #003B4F;">BETWEEN</span> <span class="st" style="color: #20794D;">'2020-01-01'</span> <span class="kw" style="color: #003B4F;">AND</span> <span class="st" style="color: #20794D;">'2020-12-31'</span></span>
+<span id="cb18-7"><span class="kw" style="color: #003B4F;">GROUP</span> <span class="kw" style="color: #003B4F;">BY</span> ticker</span></code></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>2 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">ticker</th>
+<th style="text-align: right;">breakout_days</th>
+<th style="text-align: right;">non_breakout_days</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: right;">207</td>
+<td style="text-align: right;">159</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: right;">200</td>
+<td style="text-align: right;">166</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="question-3.3" class="level3">
+<h3 class="anchored" data-anchor-id="question-3.3">Question 3.3</h3>
+<p>What was the final quantity Bitcoin and Ethereum held by all Data With Danny mentors based off the <code>trading.transactions</code> table?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb19-1"><span class="kw" style="color: #003B4F;">SELECT</span> </span>
+<span id="cb19-2">  ticker,</span>
+<span id="cb19-3">  <span class="fu" style="color: #4758AB;">SUM</span>(<span class="cf" style="color: #003B4F;">CASE</span> <span class="cf" style="color: #003B4F;">WHEN</span> txn_type <span class="op" style="color: #5E5E5E;">=</span> <span class="st" style="color: #20794D;">'SELL'</span> <span class="cf" style="color: #003B4F;">THEN</span> <span class="op" style="color: #5E5E5E;">-</span>quantity <span class="cf" style="color: #003B4F;">ELSE</span> quantity <span class="cf" style="color: #003B4F;">END</span>) <span class="kw" style="color: #003B4F;">AS</span> final_btc_holding</span>
+<span id="cb19-4"><span class="kw" style="color: #003B4F;">FROM</span> trading.transactions</span>
+<span id="cb19-5"><span class="kw" style="color: #003B4F;">GROUP</span> <span class="kw" style="color: #003B4F;">BY</span> ticker</span></code></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>2 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">ticker</th>
+<th style="text-align: right;">final_btc_holding</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: right;">42848.67</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: right;">32801.04</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Divided by quantity bought and quantity sold.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20" style="background: #f1f3f5;"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb20-1"><span class="kw" style="color: #003B4F;">SELECT</span> </span>
+<span id="cb20-2">  ticker,</span>
+<span id="cb20-3">  <span class="fu" style="color: #4758AB;">SUM</span>(<span class="cf" style="color: #003B4F;">CASE</span> <span class="cf" style="color: #003B4F;">WHEN</span> txn_type <span class="op" style="color: #5E5E5E;">=</span> <span class="st" style="color: #20794D;">'BUY'</span> <span class="cf" style="color: #003B4F;">THEN</span> quantity <span class="cf" style="color: #003B4F;">ELSE</span> <span class="dv" style="color: #AD0000;">0</span> <span class="cf" style="color: #003B4F;">END</span>) <span class="kw" style="color: #003B4F;">AS</span> qty_bought,</span>
+<span id="cb20-4">  <span class="fu" style="color: #4758AB;">SUM</span>(<span class="cf" style="color: #003B4F;">CASE</span> <span class="cf" style="color: #003B4F;">WHEN</span> txn_type <span class="op" style="color: #5E5E5E;">=</span> <span class="st" style="color: #20794D;">'SELL'</span> <span class="cf" style="color: #003B4F;">THEN</span> quantity <span class="cf" style="color: #003B4F;">ELSE</span> <span class="dv" style="color: #AD0000;">0</span> <span class="cf" style="color: #003B4F;">END</span>) <span class="kw" style="color: #003B4F;">AS</span> qty_sold</span>
+<span id="cb20-5"><span class="kw" style="color: #003B4F;">FROM</span> trading.transactions</span>
+<span id="cb20-6"><span class="kw" style="color: #003B4F;">GROUP</span> <span class="kw" style="color: #003B4F;">BY</span> ticker</span></code></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>2 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">ticker</th>
+<th style="text-align: right;">qty_bought</th>
+<th style="text-align: right;">qty_sold</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: right;">53250.15</td>
+<td style="text-align: right;">10401.485</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: right;">42599.20</td>
+<td style="text-align: right;">9798.154</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+</section>
+<section id="part-4-window-functions" class="level2">
+<h2 class="anchored" data-anchor-id="part-4-window-functions">PART 4️⃣: Window Functions</h2>
+<section id="question-4.1" class="level3">
+<h3 class="anchored" data-anchor-id="question-4.1">Question 4.1</h3>
+<p>What are the <code>market_date</code>, <code>price</code> and <code>volume</code> and <code>price_rank</code> values for the days with the top 5 highest <code>price</code> values for each tickers in the <code>trading.prices</code> table?</p>
+<ul>
+<li>The <code>price_rank</code> column is the ranking for price values for each ticker with rank = 1 for the highest value.</li>
+<li>Return the output for Bitcoin, followed by Ethereum in price rank order.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21" style="background: #f1f3f5;"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb21-1"><span class="kw" style="color: #003B4F;">WITH</span> cte_rank <span class="kw" style="color: #003B4F;">AS</span> (</span>
+<span id="cb21-2">  <span class="kw" style="color: #003B4F;">SELECT</span></span>
+<span id="cb21-3">    ticker,</span>
+<span id="cb21-4">    market_date,</span>
+<span id="cb21-5">    price, </span>
+<span id="cb21-6">    volume,</span>
+<span id="cb21-7">    <span class="fu" style="color: #4758AB;">RANK</span>() <span class="kw" style="color: #003B4F;">OVER</span> (<span class="kw" style="color: #003B4F;">PARTITION</span> <span class="kw" style="color: #003B4F;">BY</span> ticker <span class="kw" style="color: #003B4F;">ORDER</span> <span class="kw" style="color: #003B4F;">BY</span> price <span class="kw" style="color: #003B4F;">DESC</span>) <span class="kw" style="color: #003B4F;">AS</span> price_rank</span>
+<span id="cb21-8">  <span class="kw" style="color: #003B4F;">FROM</span> trading.prices</span>
+<span id="cb21-9">)</span>
+<span id="cb21-10"></span>
+<span id="cb21-11"><span class="kw" style="color: #003B4F;">SELECT</span> <span class="op" style="color: #5E5E5E;">*</span></span>
+<span id="cb21-12"><span class="kw" style="color: #003B4F;">FROM</span> cte_rank</span>
+<span id="cb21-13"><span class="kw" style="color: #003B4F;">WHERE</span> price_rank <span class="op" style="color: #5E5E5E;">&lt;=</span> <span class="dv" style="color: #AD0000;">5</span></span>
+<span id="cb21-14"><span class="kw" style="color: #003B4F;">ORDER</span> <span class="kw" style="color: #003B4F;">BY</span> ticker, price_rank</span></code></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">ticker</th>
+<th style="text-align: left;">market_date</th>
+<th style="text-align: right;">price</th>
+<th style="text-align: left;">volume</th>
+<th style="text-align: right;">price_rank</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-04-13</td>
+<td style="text-align: right;">63540.90</td>
+<td style="text-align: left;">126.56K</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-04-15</td>
+<td style="text-align: right;">63216.00</td>
+<td style="text-align: left;">76.97K</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-04-14</td>
+<td style="text-align: right;">62980.40</td>
+<td style="text-align: left;">130.43K</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-04-16</td>
+<td style="text-align: right;">61379.70</td>
+<td style="text-align: left;">136.85K</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-03-13</td>
+<td style="text-align: right;">61195.30</td>
+<td style="text-align: left;">134.64K</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-05-11</td>
+<td style="text-align: right;">4167.78</td>
+<td style="text-align: left;">1.27M</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-05-14</td>
+<td style="text-align: right;">4075.38</td>
+<td style="text-align: left;">2.06M</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-05-10</td>
+<td style="text-align: right;">3947.90</td>
+<td style="text-align: left;">2.70M</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-05-09</td>
+<td style="text-align: right;">3922.23</td>
+<td style="text-align: left;">1.94M</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-05-08</td>
+<td style="text-align: right;">3905.55</td>
+<td style="text-align: left;">1.34M</td>
+<td style="text-align: right;">5</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="question-4.1---fa-brands-r-project-solution" class="level4">
+<h4 class="anchored" data-anchor-id="question-4.1---fa-brands-r-project-solution">Question 4.1 - <i class="fa-brands fa-r-project" aria-label="r-project"></i> solution</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1">members <span class="ot" style="color: #003B4F;">&lt;-</span> <span class="fu" style="color: #4758AB;">read_csv</span>(<span class="st" style="color: #20794D;">"data/members_tbl.csv"</span>)</span>
+<span id="cb22-2">prices <span class="ot" style="color: #003B4F;">&lt;-</span> <span class="fu" style="color: #4758AB;">read_csv</span>(<span class="st" style="color: #20794D;">"data/prices_tbl.csv"</span>)</span>
+<span id="cb22-3">transactions <span class="ot" style="color: #003B4F;">&lt;-</span> <span class="fu" style="color: #4758AB;">read_csv</span>(<span class="st" style="color: #20794D;">"data/transactions_tbl.csv"</span>)</span>
+<span id="cb22-4"></span>
+<span id="cb22-5">prices <span class="sc" style="color: #5E5E5E;">%&gt;%</span> <span class="fu" style="color: #4758AB;">head</span>()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 8
+  ticker market_date price  open  high   low volume  change
+  &lt;chr&gt;  &lt;date&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt; 
+1 ETH    2021-08-29  3178. 3244. 3282. 3163. 582.04K -2.04%
+2 ETH    2021-08-28  3244. 3274. 3285. 3212. 466.21K -0.91%
+3 ETH    2021-08-27  3274. 3094. 3280. 3063. 839.54K 5.82% 
+4 ETH    2021-08-26  3094. 3228. 3250. 3057. 118.44K -4.17%
+5 ETH    2021-08-25  3228. 3172. 3247. 3081. 923.13K 1.73% 
+6 ETH    2021-08-24  3173. 3323. 3358. 3151. 988.82K -4.41%</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><span class="co" style="color: #5E5E5E;"># R solution</span></span>
+<span id="cb24-2">prices <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb24-3">  <span class="fu" style="color: #4758AB;">select</span>(ticker, market_date, price, volume) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb24-4">  <span class="fu" style="color: #4758AB;">group_by</span>(ticker) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb24-5">  <span class="fu" style="color: #4758AB;">arrange</span>(ticker, <span class="fu" style="color: #4758AB;">desc</span>(price)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb24-6">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">price_rank =</span> <span class="fu" style="color: #4758AB;">row_number</span>()) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb24-7">  <span class="fu" style="color: #4758AB;">filter</span>(price_rank <span class="sc" style="color: #5E5E5E;">&lt;=</span><span class="dv" style="color: #AD0000;">5</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 5
+# Groups:   ticker [2]
+   ticker market_date  price volume  price_rank
+   &lt;chr&gt;  &lt;date&gt;       &lt;dbl&gt; &lt;chr&gt;        &lt;int&gt;
+ 1 BTC    2021-04-13  63541. 126.56K          1
+ 2 BTC    2021-04-15  63216  76.97K           2
+ 3 BTC    2021-04-14  62980. 130.43K          3
+ 4 BTC    2021-04-16  61380. 136.85K          4
+ 5 BTC    2021-03-13  61195. 134.64K          5
+ 6 ETH    2021-05-11   4168. 1.27M            1
+ 7 ETH    2021-05-14   4075. 2.06M            2
+ 8 ETH    2021-05-10   3948. 2.70M            3
+ 9 ETH    2021-05-09   3922. 1.94M            4
+10 ETH    2021-05-08   3906. 1.34M            5</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="question-4.2" class="level3">
+<h3 class="anchored" data-anchor-id="question-4.2">Question 4.2</h3>
+<p>Calculate a 7 day rolling average for the <code>price</code> and <code>volume</code> columns in the <code>trading.prices</code> table for each ticker.</p>
+<ul>
+<li>Return only the first 10 days of August 2021</li>
+</ul>
+<div class="cell" data-max.print="null">
+<div class="sourceCode cell-code" id="cb26" style="background: #f1f3f5;"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb26-1"><span class="co" style="color: #5E5E5E;">-- Step 1 - Adjusted prices CTE</span></span>
+<span id="cb26-2"><span class="kw" style="color: #003B4F;">WITH</span> cte_adjusted_prices <span class="kw" style="color: #003B4F;">AS</span> (</span>
+<span id="cb26-3">  <span class="kw" style="color: #003B4F;">SELECT</span></span>
+<span id="cb26-4">    ticker,</span>
+<span id="cb26-5">    market_date,</span>
+<span id="cb26-6">    price,</span>
+<span id="cb26-7">    <span class="cf" style="color: #003B4F;">CASE</span></span>
+<span id="cb26-8">      <span class="cf" style="color: #003B4F;">WHEN</span> <span class="kw" style="color: #003B4F;">RIGHT</span>(volume, <span class="dv" style="color: #AD0000;">1</span>) <span class="op" style="color: #5E5E5E;">=</span> <span class="st" style="color: #20794D;">'K'</span> <span class="cf" style="color: #003B4F;">THEN</span> <span class="kw" style="color: #003B4F;">LEFT</span>(volume, <span class="fu" style="color: #4758AB;">LENGTH</span>(volume)<span class="op" style="color: #5E5E5E;">-</span><span class="dv" style="color: #AD0000;">1</span>):<span class="ch" style="color: #20794D;">:NUMERIC</span> <span class="op" style="color: #5E5E5E;">*</span> <span class="dv" style="color: #AD0000;">1000</span></span>
+<span id="cb26-9">      <span class="cf" style="color: #003B4F;">WHEN</span> <span class="kw" style="color: #003B4F;">RIGHT</span>(volume, <span class="dv" style="color: #AD0000;">1</span>) <span class="op" style="color: #5E5E5E;">=</span> <span class="st" style="color: #20794D;">'M'</span> <span class="cf" style="color: #003B4F;">THEN</span> <span class="kw" style="color: #003B4F;">LEFT</span>(volume, <span class="fu" style="color: #4758AB;">LENGTH</span>(volume)<span class="op" style="color: #5E5E5E;">-</span><span class="dv" style="color: #AD0000;">1</span>):<span class="ch" style="color: #20794D;">:NUMERIC</span> <span class="op" style="color: #5E5E5E;">*</span> <span class="dv" style="color: #AD0000;">1000000</span></span>
+<span id="cb26-10">      <span class="cf" style="color: #003B4F;">WHEN</span> volume <span class="op" style="color: #5E5E5E;">=</span> <span class="st" style="color: #20794D;">'-'</span> <span class="cf" style="color: #003B4F;">THEN</span> <span class="dv" style="color: #AD0000;">0</span></span>
+<span id="cb26-11">    <span class="cf" style="color: #003B4F;">END</span> <span class="kw" style="color: #003B4F;">AS</span> volume</span>
+<span id="cb26-12">  <span class="kw" style="color: #003B4F;">FROM</span> trading.prices</span>
+<span id="cb26-13">),</span>
+<span id="cb26-14"></span>
+<span id="cb26-15"><span class="co" style="color: #5E5E5E;">-- Step 2 - Moving Averages CTE</span></span>
+<span id="cb26-16">cte_moving_averages <span class="kw" style="color: #003B4F;">AS</span> (</span>
+<span id="cb26-17">  <span class="kw" style="color: #003B4F;">SELECT</span></span>
+<span id="cb26-18">    ticker,</span>
+<span id="cb26-19">    market_date,</span>
+<span id="cb26-20">    price,</span>
+<span id="cb26-21">    <span class="fu" style="color: #4758AB;">AVG</span>(price) <span class="kw" style="color: #003B4F;">OVER</span> (</span>
+<span id="cb26-22">      <span class="kw" style="color: #003B4F;">PARTITION</span> <span class="kw" style="color: #003B4F;">BY</span> ticker</span>
+<span id="cb26-23">      <span class="kw" style="color: #003B4F;">ORDER</span> <span class="kw" style="color: #003B4F;">BY</span> market_date</span>
+<span id="cb26-24">      <span class="kw" style="color: #003B4F;">RANGE</span> <span class="kw" style="color: #003B4F;">BETWEEN</span> <span class="st" style="color: #20794D;">'6 DAYS'</span> <span class="kw" style="color: #003B4F;">PRECEDING</span> <span class="kw" style="color: #003B4F;">AND</span> <span class="kw" style="color: #003B4F;">CURRENT</span> <span class="kw" style="color: #003B4F;">ROW</span>  </span>
+<span id="cb26-25">    ) <span class="kw" style="color: #003B4F;">AS</span> moving_avg_price,</span>
+<span id="cb26-26">    volume,</span>
+<span id="cb26-27">    <span class="fu" style="color: #4758AB;">AVG</span>(volume) <span class="kw" style="color: #003B4F;">OVER</span> (</span>
+<span id="cb26-28">      <span class="kw" style="color: #003B4F;">PARTITION</span> <span class="kw" style="color: #003B4F;">BY</span> ticker</span>
+<span id="cb26-29">      <span class="kw" style="color: #003B4F;">ORDER</span> <span class="kw" style="color: #003B4F;">BY</span> market_date</span>
+<span id="cb26-30">      <span class="kw" style="color: #003B4F;">RANGE</span> <span class="kw" style="color: #003B4F;">BETWEEN</span> <span class="st" style="color: #20794D;">'6 DAYS'</span> <span class="kw" style="color: #003B4F;">PRECEDING</span> <span class="kw" style="color: #003B4F;">AND</span> <span class="kw" style="color: #003B4F;">CURRENT</span> <span class="kw" style="color: #003B4F;">ROW</span>  </span>
+<span id="cb26-31">    ) <span class="kw" style="color: #003B4F;">AS</span> moving_avg_volume</span>
+<span id="cb26-32">  <span class="kw" style="color: #003B4F;">FROM</span> cte_adjusted_prices</span>
+<span id="cb26-33">)</span>
+<span id="cb26-34"></span>
+<span id="cb26-35"><span class="co" style="color: #5E5E5E;">-- final output</span></span>
+<span id="cb26-36"><span class="kw" style="color: #003B4F;">SELECT</span> <span class="op" style="color: #5E5E5E;">*</span> <span class="kw" style="color: #003B4F;">FROM</span> cte_moving_averages</span>
+<span id="cb26-37"><span class="kw" style="color: #003B4F;">WHERE</span> market_date <span class="kw" style="color: #003B4F;">BETWEEN</span> <span class="st" style="color: #20794D;">'2021-08-01'</span> <span class="kw" style="color: #003B4F;">AND</span> <span class="st" style="color: #20794D;">'2021-08-10'</span></span>
+<span id="cb26-38"><span class="kw" style="color: #003B4F;">ORDER</span> <span class="kw" style="color: #003B4F;">BY</span> ticker, market_date;</span></code></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>20 records</caption>
+<colgroup>
+<col style="width: 9%">
+<col style="width: 16%">
+<col style="width: 12%">
+<col style="width: 23%">
+<col style="width: 11%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">ticker</th>
+<th style="text-align: left;">market_date</th>
+<th style="text-align: right;">price</th>
+<th style="text-align: right;">moving_avg_price</th>
+<th style="text-align: right;">volume</th>
+<th style="text-align: right;">moving_avg_volume</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-01</td>
+<td style="text-align: right;">39878.30</td>
+<td style="text-align: right;">40052.657</td>
+<td style="text-align: right;">80330</td>
+<td style="text-align: right;">103645.71</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-02</td>
+<td style="text-align: right;">39168.40</td>
+<td style="text-align: right;">40322.914</td>
+<td style="text-align: right;">74810</td>
+<td style="text-align: right;">88957.14</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-03</td>
+<td style="text-align: right;">38130.30</td>
+<td style="text-align: right;">40134.100</td>
+<td style="text-align: right;">260</td>
+<td style="text-align: right;">74674.29</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-04</td>
+<td style="text-align: right;">39736.90</td>
+<td style="text-align: right;">40096.057</td>
+<td style="text-align: right;">79220</td>
+<td style="text-align: right;">64717.14</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-05</td>
+<td style="text-align: right;">40867.20</td>
+<td style="text-align: right;">40219.743</td>
+<td style="text-align: right;">130600</td>
+<td style="text-align: right;">72617.14</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-06</td>
+<td style="text-align: right;">42795.40</td>
+<td style="text-align: right;">40304.314</td>
+<td style="text-align: right;">111930</td>
+<td style="text-align: right;">74542.86</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-07</td>
+<td style="text-align: right;">44614.20</td>
+<td style="text-align: right;">40741.529</td>
+<td style="text-align: right;">112840</td>
+<td style="text-align: right;">84284.29</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-08</td>
+<td style="text-align: right;">43792.80</td>
+<td style="text-align: right;">41300.743</td>
+<td style="text-align: right;">105250</td>
+<td style="text-align: right;">87844.29</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-09</td>
+<td style="text-align: right;">46284.30</td>
+<td style="text-align: right;">42317.300</td>
+<td style="text-align: right;">117080</td>
+<td style="text-align: right;">93882.86</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-10</td>
+<td style="text-align: right;">45593.80</td>
+<td style="text-align: right;">43383.514</td>
+<td style="text-align: right;">80550</td>
+<td style="text-align: right;">105352.86</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-01</td>
+<td style="text-align: right;">2556.23</td>
+<td style="text-align: right;">2394.166</td>
+<td style="text-align: right;">1200000</td>
+<td style="text-align: right;">1069824.29</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-02</td>
+<td style="text-align: right;">2608.04</td>
+<td style="text-align: right;">2448.239</td>
+<td style="text-align: right;">970670</td>
+<td style="text-align: right;">938491.43</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-03</td>
+<td style="text-align: right;">2506.65</td>
+<td style="text-align: right;">2477.729</td>
+<td style="text-align: right;">158450</td>
+<td style="text-align: right;">782555.71</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-04</td>
+<td style="text-align: right;">2725.29</td>
+<td style="text-align: right;">2538.611</td>
+<td style="text-align: right;">1230000</td>
+<td style="text-align: right;">819850.00</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-05</td>
+<td style="text-align: right;">2827.21</td>
+<td style="text-align: right;">2602.366</td>
+<td style="text-align: right;">1650000</td>
+<td style="text-align: right;">963742.86</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-06</td>
+<td style="text-align: right;">2889.43</td>
+<td style="text-align: right;">2663.577</td>
+<td style="text-align: right;">1060000</td>
+<td style="text-align: right;">968028.57</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-07</td>
+<td style="text-align: right;">3158.00</td>
+<td style="text-align: right;">2752.979</td>
+<td style="text-align: right;">64840</td>
+<td style="text-align: right;">904851.43</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-08</td>
+<td style="text-align: right;">3012.07</td>
+<td style="text-align: right;">2818.099</td>
+<td style="text-align: right;">1250000</td>
+<td style="text-align: right;">911994.29</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-09</td>
+<td style="text-align: right;">3162.93</td>
+<td style="text-align: right;">2897.369</td>
+<td style="text-align: right;">1440000</td>
+<td style="text-align: right;">979041.43</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-10</td>
+<td style="text-align: right;">3140.71</td>
+<td style="text-align: right;">2987.949</td>
+<td style="text-align: right;">1120000</td>
+<td style="text-align: right;">1116405.71</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="question-4.2---fa-brands-r-project-solution" class="level4">
+<h4 class="anchored" data-anchor-id="question-4.2---fa-brands-r-project-solution">Question 4.2 - <i class="fa-brands fa-r-project" aria-label="r-project"></i> solution</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1">prices <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb27-2">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">volume =</span> <span class="fu" style="color: #4758AB;">case_when</span>(</span>
+<span id="cb27-3">    <span class="fu" style="color: #4758AB;">str_sub</span>(volume, <span class="sc" style="color: #5E5E5E;">-</span><span class="dv" style="color: #AD0000;">1</span>) <span class="sc" style="color: #5E5E5E;">==</span> <span class="st" style="color: #20794D;">"K"</span> <span class="sc" style="color: #5E5E5E;">~</span> <span class="fu" style="color: #4758AB;">as.numeric</span>(<span class="fu" style="color: #4758AB;">str_sub</span>(volume, <span class="dv" style="color: #AD0000;">1</span>, <span class="fu" style="color: #4758AB;">str_length</span>(volume) <span class="sc" style="color: #5E5E5E;">-</span> <span class="dv" style="color: #AD0000;">1</span>)) <span class="sc" style="color: #5E5E5E;">*</span> <span class="dv" style="color: #AD0000;">10</span><span class="sc" style="color: #5E5E5E;">^</span><span class="dv" style="color: #AD0000;">3</span>,</span>
+<span id="cb27-4">    <span class="fu" style="color: #4758AB;">str_sub</span>(volume, <span class="sc" style="color: #5E5E5E;">-</span><span class="dv" style="color: #AD0000;">1</span>) <span class="sc" style="color: #5E5E5E;">==</span> <span class="st" style="color: #20794D;">"M"</span> <span class="sc" style="color: #5E5E5E;">~</span> <span class="fu" style="color: #4758AB;">as.numeric</span>(<span class="fu" style="color: #4758AB;">str_sub</span>(volume, <span class="dv" style="color: #AD0000;">1</span>, <span class="fu" style="color: #4758AB;">str_length</span>(volume) <span class="sc" style="color: #5E5E5E;">-</span> <span class="dv" style="color: #AD0000;">1</span>)) <span class="sc" style="color: #5E5E5E;">*</span> <span class="dv" style="color: #AD0000;">10</span><span class="sc" style="color: #5E5E5E;">^</span><span class="dv" style="color: #AD0000;">6</span>,</span>
+<span id="cb27-5">    <span class="fu" style="color: #4758AB;">str_sub</span>(volume, <span class="sc" style="color: #5E5E5E;">-</span><span class="dv" style="color: #AD0000;">1</span>) <span class="sc" style="color: #5E5E5E;">==</span> <span class="st" style="color: #20794D;">"-"</span> <span class="sc" style="color: #5E5E5E;">~</span> <span class="fu" style="color: #4758AB;">as.numeric</span>(<span class="fu" style="color: #4758AB;">str_sub</span>(volume, <span class="dv" style="color: #AD0000;">1</span>, <span class="fu" style="color: #4758AB;">str_length</span>(volume) <span class="sc" style="color: #5E5E5E;">-</span> <span class="dv" style="color: #AD0000;">1</span>)) <span class="sc" style="color: #5E5E5E;">*</span> <span class="dv" style="color: #AD0000;">0</span>)</span>
+<span id="cb27-6">  ) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb27-7">  <span class="fu" style="color: #4758AB;">group_by</span>(ticker) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb27-8">  <span class="fu" style="color: #4758AB;">arrange</span>(ticker, market_date) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb27-9">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">moving_avg_price =</span> zoo<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">rollmean</span>(price, <span class="at" style="color: #657422;">k =</span> <span class="dv" style="color: #AD0000;">7</span>, <span class="at" style="color: #657422;">align =</span> <span class="st" style="color: #20794D;">"right"</span>, <span class="at" style="color: #657422;">fill =</span> <span class="cn" style="color: #8f5902;">NA</span>),</span>
+<span id="cb27-10">         <span class="at" style="color: #657422;">moving_avg_volume =</span> zoo<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">rollmean</span>(volume, <span class="at" style="color: #657422;">k =</span> <span class="dv" style="color: #AD0000;">7</span>, <span class="at" style="color: #657422;">align =</span> <span class="st" style="color: #20794D;">"right"</span>, <span class="at" style="color: #657422;">fill =</span> <span class="cn" style="color: #8f5902;">NA</span>)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb27-11">  <span class="fu" style="color: #4758AB;">select</span>(ticker, market_date, price, moving_avg_price, volume, moving_avg_volume) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb27-12">  <span class="fu" style="color: #4758AB;">filter</span>(market_date <span class="sc" style="color: #5E5E5E;">&gt;=</span> <span class="st" style="color: #20794D;">"2021-08-01"</span>, market_date <span class="sc" style="color: #5E5E5E;">&lt;=</span> <span class="st" style="color: #20794D;">"2021-08-10"</span>) </span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 20 × 6
+# Groups:   ticker [2]
+   ticker market_date  price moving_avg_price  volume moving_avg_volume
+   &lt;chr&gt;  &lt;date&gt;       &lt;dbl&gt;            &lt;dbl&gt;   &lt;dbl&gt;             &lt;dbl&gt;
+ 1 BTC    2021-08-01  39878.           40053.   80330           103646.
+ 2 BTC    2021-08-02  39168.           40323.   74810            88957.
+ 3 BTC    2021-08-03  38130.           40134.     260            74674.
+ 4 BTC    2021-08-04  39737.           40096.   79220            64717.
+ 5 BTC    2021-08-05  40867.           40220.  130600            72617.
+ 6 BTC    2021-08-06  42795.           40304.  111930            74543.
+ 7 BTC    2021-08-07  44614.           40742.  112840            84284.
+ 8 BTC    2021-08-08  43793.           41301.  105250            87844.
+ 9 BTC    2021-08-09  46284.           42317.  117080            93883.
+10 BTC    2021-08-10  45594.           43384.   80550           105353.
+11 ETH    2021-08-01   2556.            2394. 1200000          1069824.
+12 ETH    2021-08-02   2608.            2448.  970670           938491.
+13 ETH    2021-08-03   2507.            2478.  158450           782556.
+14 ETH    2021-08-04   2725.            2539. 1230000           819850 
+15 ETH    2021-08-05   2827.            2602. 1650000           963743.
+16 ETH    2021-08-06   2889.            2664. 1060000           968029.
+17 ETH    2021-08-07   3158             2753.   64840           904851.
+18 ETH    2021-08-08   3012.            2818. 1250000           911994.
+19 ETH    2021-08-09   3163.            2897. 1440000           979041.
+20 ETH    2021-08-10   3141.            2988. 1120000          1116406.</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="question-4.3" class="level3">
+<h3 class="anchored" data-anchor-id="question-4.3">Question 4.3</h3>
+<p>Calculate the monthly cumulative volume traded for each ticker in 2020</p>
+<ul>
+<li>Sort the output by ticker in chronological order with the <code>month_start</code> as the first day of each month</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29" style="background: #f1f3f5;"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb29-1"><span class="kw" style="color: #003B4F;">WITH</span> cte_monthly_volume <span class="kw" style="color: #003B4F;">AS</span> (</span>
+<span id="cb29-2">  <span class="kw" style="color: #003B4F;">SELECT</span></span>
+<span id="cb29-3">    ticker,</span>
+<span id="cb29-4">    DATE_TRUNC(<span class="st" style="color: #20794D;">'MON'</span>, market_date):<span class="ch" style="color: #20794D;">:DATE</span> <span class="kw" style="color: #003B4F;">AS</span> month_start,</span>
+<span id="cb29-5">    <span class="fu" style="color: #4758AB;">SUM</span>(</span>
+<span id="cb29-6">      <span class="cf" style="color: #003B4F;">CASE</span></span>
+<span id="cb29-7">      <span class="cf" style="color: #003B4F;">WHEN</span> <span class="kw" style="color: #003B4F;">RIGHT</span>(volume, <span class="dv" style="color: #AD0000;">1</span>) <span class="op" style="color: #5E5E5E;">=</span> <span class="st" style="color: #20794D;">'K'</span> <span class="cf" style="color: #003B4F;">THEN</span> <span class="kw" style="color: #003B4F;">LEFT</span>(volume, <span class="fu" style="color: #4758AB;">LENGTH</span>(volume)<span class="op" style="color: #5E5E5E;">-</span><span class="dv" style="color: #AD0000;">1</span>):<span class="ch" style="color: #20794D;">:NUMERIC</span> <span class="op" style="color: #5E5E5E;">*</span> <span class="dv" style="color: #AD0000;">1000</span></span>
+<span id="cb29-8">      <span class="cf" style="color: #003B4F;">WHEN</span> <span class="kw" style="color: #003B4F;">RIGHT</span>(volume, <span class="dv" style="color: #AD0000;">1</span>) <span class="op" style="color: #5E5E5E;">=</span> <span class="st" style="color: #20794D;">'M'</span> <span class="cf" style="color: #003B4F;">THEN</span> <span class="kw" style="color: #003B4F;">LEFT</span>(volume, <span class="fu" style="color: #4758AB;">LENGTH</span>(volume)<span class="op" style="color: #5E5E5E;">-</span><span class="dv" style="color: #AD0000;">1</span>):<span class="ch" style="color: #20794D;">:NUMERIC</span> <span class="op" style="color: #5E5E5E;">*</span> <span class="dv" style="color: #AD0000;">1000000</span></span>
+<span id="cb29-9">      <span class="cf" style="color: #003B4F;">WHEN</span> volume <span class="op" style="color: #5E5E5E;">=</span> <span class="st" style="color: #20794D;">'-'</span> <span class="cf" style="color: #003B4F;">THEN</span> <span class="dv" style="color: #AD0000;">0</span></span>
+<span id="cb29-10">    <span class="cf" style="color: #003B4F;">END</span></span>
+<span id="cb29-11">  ) <span class="kw" style="color: #003B4F;">AS</span> monthly_volume</span>
+<span id="cb29-12">  <span class="kw" style="color: #003B4F;">FROM</span> trading.prices</span>
+<span id="cb29-13">  <span class="kw" style="color: #003B4F;">WHERE</span> market_date <span class="kw" style="color: #003B4F;">BETWEEN</span> <span class="st" style="color: #20794D;">'2020-01-01'</span> <span class="kw" style="color: #003B4F;">AND</span> <span class="st" style="color: #20794D;">'2020-12-31'</span></span>
+<span id="cb29-14">  <span class="kw" style="color: #003B4F;">GROUP</span> <span class="kw" style="color: #003B4F;">BY</span> ticker, month_start</span>
+<span id="cb29-15">)</span>
+<span id="cb29-16"></span>
+<span id="cb29-17"><span class="kw" style="color: #003B4F;">SELECT</span></span>
+<span id="cb29-18">  ticker,</span>
+<span id="cb29-19">  month_start,</span>
+<span id="cb29-20">  <span class="fu" style="color: #4758AB;">SUM</span>(monthly_volume) <span class="kw" style="color: #003B4F;">OVER</span> (</span>
+<span id="cb29-21">    <span class="kw" style="color: #003B4F;">PARTITION</span> <span class="kw" style="color: #003B4F;">BY</span> ticker</span>
+<span id="cb29-22">    <span class="kw" style="color: #003B4F;">ORDER</span> <span class="kw" style="color: #003B4F;">BY</span> month_start</span>
+<span id="cb29-23">    <span class="kw" style="color: #003B4F;">ROWS</span> <span class="kw" style="color: #003B4F;">BETWEEN</span> <span class="kw" style="color: #003B4F;">UNBOUNDED</span> <span class="kw" style="color: #003B4F;">PRECEDING</span> <span class="kw" style="color: #003B4F;">AND</span> <span class="kw" style="color: #003B4F;">CURRENT</span> <span class="kw" style="color: #003B4F;">ROW</span></span>
+<span id="cb29-24">  ) <span class="kw" style="color: #003B4F;">AS</span> cumulative_monthly_volume</span>
+<span id="cb29-25"><span class="kw" style="color: #003B4F;">FROM</span> cte_monthly_volume</span>
+<span id="cb29-26"><span class="kw" style="color: #003B4F;">ORDER</span> <span class="kw" style="color: #003B4F;">BY</span> ticker, month_start</span></code></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">ticker</th>
+<th style="text-align: left;">month_start</th>
+<th style="text-align: right;">cumulative_monthly_volume</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-01-01</td>
+<td style="text-align: right;">23451920</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-02-01</td>
+<td style="text-align: right;">46839130</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-03-01</td>
+<td style="text-align: right;">94680450</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-04-01</td>
+<td style="text-align: right;">134302740</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-05-01</td>
+<td style="text-align: right;">172687010</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-06-01</td>
+<td style="text-align: right;">188026610</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-07-01</td>
+<td style="text-align: right;">201272600</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-08-01</td>
+<td style="text-align: right;">216762630</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-09-01</td>
+<td style="text-align: right;">300641440</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2020-10-01</td>
+<td style="text-align: right;">303060020</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="question-4.3---fa-brands-r-project-solution" class="level4">
+<h4 class="anchored" data-anchor-id="question-4.3---fa-brands-r-project-solution">Question 4.3 - <i class="fa-brands fa-r-project" aria-label="r-project"></i> solution</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1">prices <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb30-2">  <span class="fu" style="color: #4758AB;">select</span>(ticker, market_date, volume) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb30-3">  <span class="fu" style="color: #4758AB;">filter</span>(market_date <span class="sc" style="color: #5E5E5E;">&gt;=</span> <span class="st" style="color: #20794D;">"2020-01-01"</span>, market_date <span class="sc" style="color: #5E5E5E;">&lt;=</span> <span class="st" style="color: #20794D;">"2020-12-31"</span>) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb30-4">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">month_start =</span> lubridate<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">floor_date</span>(market_date, <span class="at" style="color: #657422;">unit =</span> <span class="st" style="color: #20794D;">"month"</span>)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb30-5">  <span class="fu" style="color: #4758AB;">group_by</span>(ticker, month_start) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb30-6">  <span class="fu" style="color: #4758AB;">summarise</span>(<span class="at" style="color: #657422;">monthly_volume =</span> <span class="fu" style="color: #4758AB;">sum</span>(</span>
+<span id="cb30-7">    <span class="fu" style="color: #4758AB;">case_when</span>(</span>
+<span id="cb30-8">      <span class="fu" style="color: #4758AB;">str_sub</span>(volume, <span class="sc" style="color: #5E5E5E;">-</span><span class="dv" style="color: #AD0000;">1</span>) <span class="sc" style="color: #5E5E5E;">==</span> <span class="st" style="color: #20794D;">"K"</span> <span class="sc" style="color: #5E5E5E;">~</span> <span class="fu" style="color: #4758AB;">as.numeric</span>(<span class="fu" style="color: #4758AB;">str_sub</span>(volume, <span class="dv" style="color: #AD0000;">1</span>, <span class="fu" style="color: #4758AB;">str_length</span>(volume) <span class="sc" style="color: #5E5E5E;">-</span> <span class="dv" style="color: #AD0000;">1</span>)) <span class="sc" style="color: #5E5E5E;">*</span> <span class="dv" style="color: #AD0000;">10</span><span class="sc" style="color: #5E5E5E;">^</span><span class="dv" style="color: #AD0000;">3</span>,</span>
+<span id="cb30-9">      <span class="fu" style="color: #4758AB;">str_sub</span>(volume, <span class="sc" style="color: #5E5E5E;">-</span><span class="dv" style="color: #AD0000;">1</span>) <span class="sc" style="color: #5E5E5E;">==</span> <span class="st" style="color: #20794D;">"M"</span> <span class="sc" style="color: #5E5E5E;">~</span> <span class="fu" style="color: #4758AB;">as.numeric</span>(<span class="fu" style="color: #4758AB;">str_sub</span>(volume, <span class="dv" style="color: #AD0000;">1</span>, <span class="fu" style="color: #4758AB;">str_length</span>(volume) <span class="sc" style="color: #5E5E5E;">-</span> <span class="dv" style="color: #AD0000;">1</span>)) <span class="sc" style="color: #5E5E5E;">*</span> <span class="dv" style="color: #AD0000;">10</span><span class="sc" style="color: #5E5E5E;">^</span><span class="dv" style="color: #AD0000;">6</span>,</span>
+<span id="cb30-10">      <span class="fu" style="color: #4758AB;">str_sub</span>(volume, <span class="sc" style="color: #5E5E5E;">-</span><span class="dv" style="color: #AD0000;">1</span>) <span class="sc" style="color: #5E5E5E;">==</span> <span class="st" style="color: #20794D;">"-"</span> <span class="sc" style="color: #5E5E5E;">~</span> <span class="fu" style="color: #4758AB;">as.numeric</span>(<span class="fu" style="color: #4758AB;">str_sub</span>(volume, <span class="dv" style="color: #AD0000;">1</span>, <span class="fu" style="color: #4758AB;">str_length</span>(volume) <span class="sc" style="color: #5E5E5E;">-</span> <span class="dv" style="color: #AD0000;">1</span>)) <span class="sc" style="color: #5E5E5E;">*</span> <span class="dv" style="color: #AD0000;">0</span>)</span>
+<span id="cb30-11">    )</span>
+<span id="cb30-12">  ) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb30-13">  <span class="fu" style="color: #4758AB;">ungroup</span>() <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb30-14">  <span class="fu" style="color: #4758AB;">group_by</span>(ticker) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb30-15">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">cumulative_monthly_volume =</span> <span class="fu" style="color: #4758AB;">cumsum</span>(monthly_volume)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb30-16">  <span class="fu" style="color: #4758AB;">ungroup</span>()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 24 × 4
+   ticker month_start monthly_volume cumulative_monthly_volume
+   &lt;chr&gt;  &lt;date&gt;               &lt;dbl&gt;                     &lt;dbl&gt;
+ 1 BTC    2020-01-01        23451920                  23451920
+ 2 BTC    2020-02-01        23387210                  46839130
+ 3 BTC    2020-03-01        47841320                  94680450
+ 4 BTC    2020-04-01        39622290                 134302740
+ 5 BTC    2020-05-01        38384270                 172687010
+ 6 BTC    2020-06-01        15339600                 188026610
+ 7 BTC    2020-07-01        13245990                 201272600
+ 8 BTC    2020-08-01        15490030                 216762630
+ 9 BTC    2020-09-01        83878810                 300641440
+10 BTC    2020-10-01         2418580                 303060020
+# … with 14 more rows</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="question-4.4" class="level3">
+<h3 class="anchored" data-anchor-id="question-4.4">Question 4.4</h3>
+<p>Calculate the daily percentage change in volume for each ticker in the <code>trading.prices</code> table</p>
+<ul>
+<li>Percentage change can be calculated as (current - previous) / previous</li>
+<li>Multiply the percentage by 100 and round the value to 2 decimal places</li>
+<li>Return data for the first 10 days of August 2021</li>
+</ul>
+<div class="cell" data-max.print="null">
+<div class="sourceCode cell-code" id="cb32" style="background: #f1f3f5;"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb32-1"><span class="kw" style="color: #003B4F;">WITH</span> cte_adjusted_prices <span class="kw" style="color: #003B4F;">AS</span> (</span>
+<span id="cb32-2">  <span class="kw" style="color: #003B4F;">SELECT</span></span>
+<span id="cb32-3">    ticker,</span>
+<span id="cb32-4">    market_date,</span>
+<span id="cb32-5">    <span class="cf" style="color: #003B4F;">CASE</span></span>
+<span id="cb32-6">      <span class="cf" style="color: #003B4F;">WHEN</span> <span class="kw" style="color: #003B4F;">RIGHT</span>(volume, <span class="dv" style="color: #AD0000;">1</span>) <span class="op" style="color: #5E5E5E;">=</span> <span class="st" style="color: #20794D;">'K'</span> <span class="cf" style="color: #003B4F;">THEN</span> <span class="kw" style="color: #003B4F;">LEFT</span>(volume, <span class="fu" style="color: #4758AB;">LENGTH</span>(volume)<span class="op" style="color: #5E5E5E;">-</span><span class="dv" style="color: #AD0000;">1</span>):<span class="ch" style="color: #20794D;">:NUMERIC</span> <span class="op" style="color: #5E5E5E;">*</span> <span class="dv" style="color: #AD0000;">1000</span></span>
+<span id="cb32-7">      <span class="cf" style="color: #003B4F;">WHEN</span> <span class="kw" style="color: #003B4F;">RIGHT</span>(volume, <span class="dv" style="color: #AD0000;">1</span>) <span class="op" style="color: #5E5E5E;">=</span> <span class="st" style="color: #20794D;">'M'</span> <span class="cf" style="color: #003B4F;">THEN</span> <span class="kw" style="color: #003B4F;">LEFT</span>(volume, <span class="fu" style="color: #4758AB;">LENGTH</span>(volume)<span class="op" style="color: #5E5E5E;">-</span><span class="dv" style="color: #AD0000;">1</span>):<span class="ch" style="color: #20794D;">:NUMERIC</span> <span class="op" style="color: #5E5E5E;">*</span> <span class="dv" style="color: #AD0000;">1000000</span></span>
+<span id="cb32-8">      <span class="cf" style="color: #003B4F;">WHEN</span> volume <span class="op" style="color: #5E5E5E;">=</span> <span class="st" style="color: #20794D;">'-'</span> <span class="cf" style="color: #003B4F;">THEN</span> <span class="dv" style="color: #AD0000;">0</span></span>
+<span id="cb32-9">    <span class="cf" style="color: #003B4F;">END</span> <span class="kw" style="color: #003B4F;">AS</span> volume</span>
+<span id="cb32-10">  <span class="kw" style="color: #003B4F;">FROM</span> trading.prices</span>
+<span id="cb32-11">),</span>
+<span id="cb32-12"></span>
+<span id="cb32-13">cte_previous_volume <span class="kw" style="color: #003B4F;">AS</span> (</span>
+<span id="cb32-14">  <span class="kw" style="color: #003B4F;">SELECT</span></span>
+<span id="cb32-15">    ticker,</span>
+<span id="cb32-16">    market_date,</span>
+<span id="cb32-17">    volume,</span>
+<span id="cb32-18">    <span class="fu" style="color: #4758AB;">LAG</span>(volume) <span class="kw" style="color: #003B4F;">OVER</span> (<span class="kw" style="color: #003B4F;">PARTITION</span> <span class="kw" style="color: #003B4F;">BY</span> ticker <span class="kw" style="color: #003B4F;">ORDER</span> <span class="kw" style="color: #003B4F;">BY</span> market_date) <span class="kw" style="color: #003B4F;">AS</span> previous_volume</span>
+<span id="cb32-19">  <span class="kw" style="color: #003B4F;">FROM</span> cte_adjusted_prices</span>
+<span id="cb32-20">  <span class="kw" style="color: #003B4F;">WHERE</span> volume <span class="op" style="color: #5E5E5E;">!=</span> <span class="dv" style="color: #AD0000;">0</span></span>
+<span id="cb32-21">)</span>
+<span id="cb32-22">  </span>
+<span id="cb32-23"><span class="kw" style="color: #003B4F;">SELECT</span></span>
+<span id="cb32-24">  ticker,</span>
+<span id="cb32-25">  market_date,</span>
+<span id="cb32-26">  volume,</span>
+<span id="cb32-27">  previous_volume,</span>
+<span id="cb32-28">  <span class="fu" style="color: #4758AB;">ROUND</span>(<span class="dv" style="color: #AD0000;">100</span> <span class="op" style="color: #5E5E5E;">*</span> (volume <span class="op" style="color: #5E5E5E;">-</span> previous_volume) <span class="op" style="color: #5E5E5E;">/</span> previous_volume, <span class="dv" style="color: #AD0000;">2</span>) <span class="kw" style="color: #003B4F;">AS</span> daily_change</span>
+<span id="cb32-29"><span class="kw" style="color: #003B4F;">FROM</span> cte_previous_volume</span>
+<span id="cb32-30"><span class="kw" style="color: #003B4F;">WHERE</span> market_date <span class="kw" style="color: #003B4F;">BETWEEN</span> <span class="st" style="color: #20794D;">'2021-08-01'</span> <span class="kw" style="color: #003B4F;">AND</span> <span class="st" style="color: #20794D;">'2021-08-10'</span></span>
+<span id="cb32-31"><span class="kw" style="color: #003B4F;">ORDER</span> <span class="kw" style="color: #003B4F;">BY</span> ticker, market_date</span></code></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>20 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">ticker</th>
+<th style="text-align: left;">market_date</th>
+<th style="text-align: right;">volume</th>
+<th style="text-align: right;">previous_volume</th>
+<th style="text-align: right;">daily_change</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-01</td>
+<td style="text-align: right;">80330</td>
+<td style="text-align: right;">44650</td>
+<td style="text-align: right;">79.91</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-02</td>
+<td style="text-align: right;">74810</td>
+<td style="text-align: right;">80330</td>
+<td style="text-align: right;">-6.87</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-03</td>
+<td style="text-align: right;">260</td>
+<td style="text-align: right;">74810</td>
+<td style="text-align: right;">-99.65</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-04</td>
+<td style="text-align: right;">79220</td>
+<td style="text-align: right;">260</td>
+<td style="text-align: right;">30369.23</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-05</td>
+<td style="text-align: right;">130600</td>
+<td style="text-align: right;">79220</td>
+<td style="text-align: right;">64.86</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-06</td>
+<td style="text-align: right;">111930</td>
+<td style="text-align: right;">130600</td>
+<td style="text-align: right;">-14.30</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-07</td>
+<td style="text-align: right;">112840</td>
+<td style="text-align: right;">111930</td>
+<td style="text-align: right;">0.81</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-08</td>
+<td style="text-align: right;">105250</td>
+<td style="text-align: right;">112840</td>
+<td style="text-align: right;">-6.73</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-09</td>
+<td style="text-align: right;">117080</td>
+<td style="text-align: right;">105250</td>
+<td style="text-align: right;">11.24</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BTC</td>
+<td style="text-align: left;">2021-08-10</td>
+<td style="text-align: right;">80550</td>
+<td style="text-align: right;">117080</td>
+<td style="text-align: right;">-31.20</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-01</td>
+<td style="text-align: right;">1200000</td>
+<td style="text-align: right;">507080</td>
+<td style="text-align: right;">136.65</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-02</td>
+<td style="text-align: right;">970670</td>
+<td style="text-align: right;">1200000</td>
+<td style="text-align: right;">-19.11</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-03</td>
+<td style="text-align: right;">158450</td>
+<td style="text-align: right;">970670</td>
+<td style="text-align: right;">-83.68</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-04</td>
+<td style="text-align: right;">1230000</td>
+<td style="text-align: right;">158450</td>
+<td style="text-align: right;">676.27</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-05</td>
+<td style="text-align: right;">1650000</td>
+<td style="text-align: right;">1230000</td>
+<td style="text-align: right;">34.15</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-06</td>
+<td style="text-align: right;">1060000</td>
+<td style="text-align: right;">1650000</td>
+<td style="text-align: right;">-35.76</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-07</td>
+<td style="text-align: right;">64840</td>
+<td style="text-align: right;">1060000</td>
+<td style="text-align: right;">-93.88</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-08</td>
+<td style="text-align: right;">1250000</td>
+<td style="text-align: right;">64840</td>
+<td style="text-align: right;">1827.82</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-09</td>
+<td style="text-align: right;">1440000</td>
+<td style="text-align: right;">1250000</td>
+<td style="text-align: right;">15.20</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">2021-08-10</td>
+<td style="text-align: right;">1120000</td>
+<td style="text-align: right;">1440000</td>
+<td style="text-align: right;">-22.22</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="question-4.4---fa-brands-r-project-solution" class="level4">
+<h4 class="anchored" data-anchor-id="question-4.4---fa-brands-r-project-solution">Question 4.4 - <i class="fa-brands fa-r-project" aria-label="r-project"></i> solution</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1">prices <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb33-2">  <span class="fu" style="color: #4758AB;">select</span>(ticker, market_date, volume) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb33-3">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">volume =</span> <span class="fu" style="color: #4758AB;">case_when</span>(</span>
+<span id="cb33-4">    <span class="fu" style="color: #4758AB;">str_sub</span>(volume, <span class="sc" style="color: #5E5E5E;">-</span><span class="dv" style="color: #AD0000;">1</span>) <span class="sc" style="color: #5E5E5E;">==</span> <span class="st" style="color: #20794D;">"K"</span> <span class="sc" style="color: #5E5E5E;">~</span> <span class="fu" style="color: #4758AB;">as.numeric</span>(<span class="fu" style="color: #4758AB;">str_sub</span>(volume, <span class="dv" style="color: #AD0000;">1</span>, <span class="fu" style="color: #4758AB;">str_length</span>(volume) <span class="sc" style="color: #5E5E5E;">-</span> <span class="dv" style="color: #AD0000;">1</span>)) <span class="sc" style="color: #5E5E5E;">*</span> <span class="dv" style="color: #AD0000;">10</span><span class="sc" style="color: #5E5E5E;">^</span><span class="dv" style="color: #AD0000;">3</span>,</span>
+<span id="cb33-5">    <span class="fu" style="color: #4758AB;">str_sub</span>(volume, <span class="sc" style="color: #5E5E5E;">-</span><span class="dv" style="color: #AD0000;">1</span>) <span class="sc" style="color: #5E5E5E;">==</span> <span class="st" style="color: #20794D;">"M"</span> <span class="sc" style="color: #5E5E5E;">~</span> <span class="fu" style="color: #4758AB;">as.numeric</span>(<span class="fu" style="color: #4758AB;">str_sub</span>(volume, <span class="dv" style="color: #AD0000;">1</span>, <span class="fu" style="color: #4758AB;">str_length</span>(volume) <span class="sc" style="color: #5E5E5E;">-</span> <span class="dv" style="color: #AD0000;">1</span>)) <span class="sc" style="color: #5E5E5E;">*</span> <span class="dv" style="color: #AD0000;">10</span><span class="sc" style="color: #5E5E5E;">^</span><span class="dv" style="color: #AD0000;">6</span>,</span>
+<span id="cb33-6">    <span class="fu" style="color: #4758AB;">str_sub</span>(volume, <span class="sc" style="color: #5E5E5E;">-</span><span class="dv" style="color: #AD0000;">1</span>) <span class="sc" style="color: #5E5E5E;">==</span> <span class="st" style="color: #20794D;">"-"</span> <span class="sc" style="color: #5E5E5E;">~</span> <span class="fu" style="color: #4758AB;">as.numeric</span>(<span class="fu" style="color: #4758AB;">str_sub</span>(volume, <span class="dv" style="color: #AD0000;">1</span>, <span class="fu" style="color: #4758AB;">str_length</span>(volume) <span class="sc" style="color: #5E5E5E;">-</span> <span class="dv" style="color: #AD0000;">1</span>)) <span class="sc" style="color: #5E5E5E;">*</span> <span class="dv" style="color: #AD0000;">0</span>)</span>
+<span id="cb33-7">  ) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb33-8">  <span class="fu" style="color: #4758AB;">arrange</span>(ticker, market_date) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb33-9">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">volume_prev_day =</span> <span class="fu" style="color: #4758AB;">lag</span>(volume)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb33-10">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">daily_change_perc =</span> <span class="fu" style="color: #4758AB;">round</span>(<span class="dv" style="color: #AD0000;">100</span><span class="sc" style="color: #5E5E5E;">*</span>(volume <span class="sc" style="color: #5E5E5E;">-</span> volume_prev_day)<span class="sc" style="color: #5E5E5E;">/</span>volume_prev_day, <span class="dv" style="color: #AD0000;">2</span>)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb33-11">  <span class="fu" style="color: #4758AB;">filter</span>(market_date <span class="sc" style="color: #5E5E5E;">&gt;=</span> <span class="st" style="color: #20794D;">"2021-08-01"</span>, market_date <span class="sc" style="color: #5E5E5E;">&lt;=</span> <span class="st" style="color: #20794D;">"2021-08-10"</span>) </span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 20 × 5
+   ticker market_date  volume volume_prev_day daily_change_perc
+   &lt;chr&gt;  &lt;date&gt;        &lt;dbl&gt;           &lt;dbl&gt;             &lt;dbl&gt;
+ 1 BTC    2021-08-01    80330           44650             79.9 
+ 2 BTC    2021-08-02    74810           80330             -6.87
+ 3 BTC    2021-08-03      260           74810            -99.6 
+ 4 BTC    2021-08-04    79220             260          30369.  
+ 5 BTC    2021-08-05   130600           79220             64.9 
+ 6 BTC    2021-08-06   111930          130600            -14.3 
+ 7 BTC    2021-08-07   112840          111930              0.81
+ 8 BTC    2021-08-08   105250          112840             -6.73
+ 9 BTC    2021-08-09   117080          105250             11.2 
+10 BTC    2021-08-10    80550          117080            -31.2 
+11 ETH    2021-08-01  1200000          507080            137.  
+12 ETH    2021-08-02   970670         1200000            -19.1 
+13 ETH    2021-08-03   158450          970670            -83.7 
+14 ETH    2021-08-04  1230000          158450            676.  
+15 ETH    2021-08-05  1650000         1230000             34.2 
+16 ETH    2021-08-06  1060000         1650000            -35.8 
+17 ETH    2021-08-07    64840         1060000            -93.9 
+18 ETH    2021-08-08  1250000           64840           1828.  
+19 ETH    2021-08-09  1440000         1250000             15.2 
+20 ETH    2021-08-10  1120000         1440000            -22.2 </code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="part-5-table-joins" class="level2">
+<h2 class="anchored" data-anchor-id="part-5-table-joins">PART 5️⃣: Table Joins</h2>
+<section id="question-5.1---inner-joins" class="level3">
+<h3 class="anchored" data-anchor-id="question-5.1---inner-joins">Question 5.1 - Inner Joins</h3>
+<p>Which top 3 mentors have the most Bitcoin quantity? Return the f<code>irst_name</code> of the mentors and sort the output from highest to lowest <code>total_quantity</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35" style="background: #f1f3f5;"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb35-1"><span class="kw" style="color: #003B4F;">SELECT</span></span>
+<span id="cb35-2">  m.first_name,</span>
+<span id="cb35-3">  <span class="fu" style="color: #4758AB;">SUM</span>(</span>
+<span id="cb35-4">    <span class="cf" style="color: #003B4F;">CASE</span></span>
+<span id="cb35-5">      <span class="cf" style="color: #003B4F;">WHEN</span> t.txn_type <span class="op" style="color: #5E5E5E;">=</span> <span class="st" style="color: #20794D;">'BUY'</span> <span class="cf" style="color: #003B4F;">THEN</span> t.quantity </span>
+<span id="cb35-6">      <span class="cf" style="color: #003B4F;">WHEN</span> t.txn_type <span class="op" style="color: #5E5E5E;">=</span> <span class="st" style="color: #20794D;">'SELL'</span> <span class="cf" style="color: #003B4F;">THEN</span> <span class="op" style="color: #5E5E5E;">-</span>t.quantity </span>
+<span id="cb35-7">      <span class="cf" style="color: #003B4F;">END</span></span>
+<span id="cb35-8">  ) <span class="kw" style="color: #003B4F;">AS</span> total_quantity</span>
+<span id="cb35-9"><span class="kw" style="color: #003B4F;">FROM</span> trading.transactions t</span>
+<span id="cb35-10"><span class="kw" style="color: #003B4F;">INNER</span> <span class="kw" style="color: #003B4F;">JOIN</span> trading.members m</span>
+<span id="cb35-11">  <span class="kw" style="color: #003B4F;">ON</span> t.member_id <span class="op" style="color: #5E5E5E;">=</span> m.member_id</span>
+<span id="cb35-12"><span class="kw" style="color: #003B4F;">WHERE</span> ticker <span class="op" style="color: #5E5E5E;">=</span> <span class="st" style="color: #20794D;">'BTC'</span> </span>
+<span id="cb35-13"><span class="kw" style="color: #003B4F;">GROUP</span> <span class="kw" style="color: #003B4F;">By</span> m.first_name</span>
+<span id="cb35-14"><span class="kw" style="color: #003B4F;">ORDER</span> <span class="kw" style="color: #003B4F;">BY</span> total_quantity <span class="kw" style="color: #003B4F;">DESC</span></span>
+<span id="cb35-15"><span class="kw" style="color: #003B4F;">LIMIT</span> <span class="dv" style="color: #AD0000;">3</span></span></code></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>3 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">first_name</th>
+<th style="text-align: right;">total_quantity</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Nandita</td>
+<td style="text-align: right;">4160.220</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Leah</td>
+<td style="text-align: right;">4046.091</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ayush</td>
+<td style="text-align: right;">3945.198</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="question-5.2---left-joins" class="level3">
+<h3 class="anchored" data-anchor-id="question-5.2---left-joins">Question 5.2 - Left Joins</h3>
+<p>Show the <code>market_date</code> values which have less than 5 transactions? Sort the output in reverse chronological order.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36" style="background: #f1f3f5;"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb36-1"><span class="kw" style="color: #003B4F;">SELECT</span> </span>
+<span id="cb36-2">  p.market_date,</span>
+<span id="cb36-3">  <span class="fu" style="color: #4758AB;">COUNT</span>(t.txn_id) <span class="kw" style="color: #003B4F;">AS</span> transaction_count</span>
+<span id="cb36-4"><span class="kw" style="color: #003B4F;">FROM</span> trading.prices p</span>
+<span id="cb36-5"><span class="kw" style="color: #003B4F;">LEFT</span> <span class="kw" style="color: #003B4F;">JOIN</span> trading.transactions t</span>
+<span id="cb36-6">  <span class="kw" style="color: #003B4F;">ON</span> p.market_date <span class="op" style="color: #5E5E5E;">=</span> t.txn_date</span>
+<span id="cb36-7">  <span class="kw" style="color: #003B4F;">AND</span> p.ticker <span class="op" style="color: #5E5E5E;">=</span> t.ticker</span>
+<span id="cb36-8"><span class="kw" style="color: #003B4F;">GROUP</span> <span class="kw" style="color: #003B4F;">BY</span> p.market_date</span>
+<span id="cb36-9"><span class="kw" style="color: #003B4F;">HAVING</span> <span class="fu" style="color: #4758AB;">COUNT</span>(t.txn_id) <span class="op" style="color: #5E5E5E;">&lt;</span> <span class="dv" style="color: #AD0000;">5</span></span>
+<span id="cb36-10"><span class="kw" style="color: #003B4F;">ORDER</span> <span class="kw" style="color: #003B4F;">BY</span> p.market_date <span class="kw" style="color: #003B4F;">DESC</span></span></code></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>8 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">market_date</th>
+<th style="text-align: right;">transaction_count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">2021-08-29</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2021-08-28</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2021-07-17</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2021-01-06</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2020-01-17</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2019-07-15</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2019-06-14</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2018-10-20</td>
+<td style="text-align: right;">4</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="question-5.3---multiple-table-joins" class="level3">
+<h3 class="anchored" data-anchor-id="question-5.3---multiple-table-joins">Question 5.3 - Multiple Table Joins</h3>
+<p><strong>Part 1:</strong> Calculate the Dollar Cost Average</p>
+<p>What is the dollar cost average (<code>btc_dca</code>) for all Bitcoin purchases by region for each calendar year?</p>
+<ul>
+<li>Create a column called <code>year_start</code> and use the start of the calendar year</li>
+<li>The dollar cost average calculation is <code>btc_dca</code> = SUM(<code>quantit</code>y x <code>price</code>) / SUM(<code>quantity</code>)</li>
+</ul>
+<p><strong>Part 2:</strong> Yearly Dollar Cost Average Ranking</p>
+<p>Use this <code>btc_dca</code> value to generate a <code>dca_ranking</code> column for each year</p>
+<ul>
+<li>The region with the lowest <code>btc_dca</code> each year has a rank of 1</li>
+</ul>
+<p><strong>Part 3:</strong> Dollar Cost Average Yearly Percentage Change</p>
+<p>Calculate the yearly percentage change in DCA for each region to 2 decimal places</p>
+<ul>
+<li>This calculation is (current - previous) / previous</li>
+</ul>
+<p>Finally order the output by <code>region</code> and <code>year_start</code> columns.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37" style="background: #f1f3f5;"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb37-1"><span class="kw" style="color: #003B4F;">WITH</span> cte_dollar_cost_average <span class="kw" style="color: #003B4F;">AS</span> (</span>
+<span id="cb37-2">  <span class="kw" style="color: #003B4F;">SELECT</span></span>
+<span id="cb37-3">    DATE_TRUNC(<span class="st" style="color: #20794D;">'YEAR'</span>, transactions.txn_date):<span class="ch" style="color: #20794D;">:DATE</span> <span class="kw" style="color: #003B4F;">AS</span> year_start,</span>
+<span id="cb37-4">    members.region,</span>
+<span id="cb37-5">    <span class="fu" style="color: #4758AB;">SUM</span>(transactions.quantity <span class="op" style="color: #5E5E5E;">*</span> prices.price) <span class="op" style="color: #5E5E5E;">/</span> <span class="fu" style="color: #4758AB;">SUM</span>(transactions.quantity) <span class="kw" style="color: #003B4F;">AS</span> btc_dca</span>
+<span id="cb37-6">  <span class="kw" style="color: #003B4F;">FROM</span> trading.transactions</span>
+<span id="cb37-7">  <span class="kw" style="color: #003B4F;">INNER</span> <span class="kw" style="color: #003B4F;">JOIN</span> trading.prices</span>
+<span id="cb37-8">    <span class="kw" style="color: #003B4F;">ON</span> transactions.ticker <span class="op" style="color: #5E5E5E;">=</span> prices.ticker</span>
+<span id="cb37-9">    <span class="kw" style="color: #003B4F;">AND</span> transactions.txn_date <span class="op" style="color: #5E5E5E;">=</span> prices.market_date</span>
+<span id="cb37-10">  <span class="kw" style="color: #003B4F;">INNER</span> <span class="kw" style="color: #003B4F;">JOIN</span> trading.members</span>
+<span id="cb37-11">    <span class="kw" style="color: #003B4F;">ON</span> transactions.member_id <span class="op" style="color: #5E5E5E;">=</span> members.member_id</span>
+<span id="cb37-12">  <span class="kw" style="color: #003B4F;">WHERE</span> transactions.ticker <span class="op" style="color: #5E5E5E;">=</span> <span class="st" style="color: #20794D;">'BTC'</span></span>
+<span id="cb37-13">    <span class="kw" style="color: #003B4F;">AND</span> transactions.txn_type <span class="op" style="color: #5E5E5E;">=</span> <span class="st" style="color: #20794D;">'BUY'</span></span>
+<span id="cb37-14">  <span class="kw" style="color: #003B4F;">GROUP</span> <span class="kw" style="color: #003B4F;">BY</span> year_start, members.region</span>
+<span id="cb37-15">),</span>
+<span id="cb37-16">  </span>
+<span id="cb37-17">cte_window_functions <span class="kw" style="color: #003B4F;">AS</span> (</span>
+<span id="cb37-18">  <span class="kw" style="color: #003B4F;">SELECT</span></span>
+<span id="cb37-19">    year_start,</span>
+<span id="cb37-20">    region,</span>
+<span id="cb37-21">    btc_dca,</span>
+<span id="cb37-22">    <span class="fu" style="color: #4758AB;">RANK</span>() <span class="kw" style="color: #003B4F;">OVER</span> (<span class="kw" style="color: #003B4F;">PARTITION</span> <span class="kw" style="color: #003B4F;">BY</span> year_start <span class="kw" style="color: #003B4F;">ORDER</span> <span class="kw" style="color: #003B4F;">BY</span> btc_dca) <span class="kw" style="color: #003B4F;">AS</span> dca_ranking,</span>
+<span id="cb37-23">    <span class="fu" style="color: #4758AB;">LAG</span>(btc_dca) <span class="kw" style="color: #003B4F;">OVER</span> (<span class="kw" style="color: #003B4F;">PARTITION</span> <span class="kw" style="color: #003B4F;">BY</span> region <span class="kw" style="color: #003B4F;">ORDER</span> <span class="kw" style="color: #003B4F;">BY</span> year_start) <span class="kw" style="color: #003B4F;">AS</span> previous_btc_dca</span>
+<span id="cb37-24">  <span class="kw" style="color: #003B4F;">FROM</span> cte_dollar_cost_average</span>
+<span id="cb37-25">)</span>
+<span id="cb37-26">  </span>
+<span id="cb37-27"><span class="kw" style="color: #003B4F;">SELECT</span></span>
+<span id="cb37-28">  year_start,</span>
+<span id="cb37-29">  region,</span>
+<span id="cb37-30">  btc_dca,</span>
+<span id="cb37-31">  dca_ranking,</span>
+<span id="cb37-32">  <span class="fu" style="color: #4758AB;">ROUND</span>(</span>
+<span id="cb37-33">    (<span class="dv" style="color: #AD0000;">100</span> <span class="op" style="color: #5E5E5E;">*</span> (btc_dca <span class="op" style="color: #5E5E5E;">-</span> previous_btc_dca) <span class="op" style="color: #5E5E5E;">/</span> previous_btc_dca):<span class="ch" style="color: #20794D;">:NUMERIC</span>,</span>
+<span id="cb37-34">    <span class="dv" style="color: #AD0000;">2</span></span>
+<span id="cb37-35">  ) <span class="kw" style="color: #003B4F;">AS</span> dca_percentage_change</span>
+<span id="cb37-36"><span class="kw" style="color: #003B4F;">FROM</span> cte_window_functions</span>
+<span id="cb37-37"><span class="kw" style="color: #003B4F;">ORDER</span> <span class="kw" style="color: #003B4F;">BY</span> region, year_start</span></code></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">year_start</th>
+<th style="text-align: left;">region</th>
+<th style="text-align: right;">btc_dca</th>
+<th style="text-align: right;">dca_ranking</th>
+<th style="text-align: right;">dca_percentage_change</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">2017-01-01</td>
+<td style="text-align: left;">Africa</td>
+<td style="text-align: right;">3987.626</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2018-01-01</td>
+<td style="text-align: left;">Africa</td>
+<td style="text-align: right;">7690.713</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">92.86</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2019-01-01</td>
+<td style="text-align: left;">Africa</td>
+<td style="text-align: right;">7368.820</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">-4.19</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2020-01-01</td>
+<td style="text-align: left;">Africa</td>
+<td style="text-align: right;">11114.125</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">50.83</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2021-01-01</td>
+<td style="text-align: left;">Africa</td>
+<td style="text-align: right;">44247.215</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">298.12</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2017-01-01</td>
+<td style="text-align: left;">Asia</td>
+<td style="text-align: right;">4002.939</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2018-01-01</td>
+<td style="text-align: left;">Asia</td>
+<td style="text-align: right;">7829.999</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">95.61</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2019-01-01</td>
+<td style="text-align: left;">Asia</td>
+<td style="text-align: right;">7267.679</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">-7.18</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2020-01-01</td>
+<td style="text-align: left;">Asia</td>
+<td style="text-align: right;">10759.621</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">48.05</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2021-01-01</td>
+<td style="text-align: left;">Asia</td>
+<td style="text-align: right;">44570.901</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">314.24</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><br></p>
+<p>Thanks for reading!</p>
+
+
+</section>
+</section>
+
+ ]]></description>
+  <category>SQL</category>
+  <category>PostgreSQL</category>
+  <category>EDA</category>
+  <guid>https://sandrajurela.com/posts/cryptocurrency-sql-case-study/cryptocurrency.html</guid>
+  <pubDate>Thu, 24 Nov 2022 23:00:00 GMT</pubDate>
+  <media:content url="https://sandrajurela.com/posts/cryptocurrency-sql-case-study/images/erd_trading.png" medium="image" type="image/png" height="104" width="144"/>
+</item>
+<item>
   <title>Scraping 200 Best Movies of 2010s from Rotten Tomatoes</title>
   <dc:creator>Sandra Jurela</dc:creator>
   <link>https://sandrajurela.com/posts/web-scraping-rotten-tomatoes/rotten-tomatoes.html</link>

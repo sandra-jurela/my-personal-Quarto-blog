@@ -1,0 +1,645 @@
+---
+title: "Cryptocurrency SQL Case Study"
+description: "Data with Danny - SQL masterclass - O’Reilly. With R solutions for Part 4: Window functions."
+date: 2022-11-25
+categories:
+  - SQL
+  - PostgreSQL
+  - EDA
+---
+
+## Foreword
+
+On November 18, 2022 I attended the SQL masterclass "SQL and PostgreSQL for Data Analytics", presented live by Danny Ma on O'Reilly platform.
+
+This [Github repository](https://github.com/DataWithDanny/sql-masterclass) contains all the necessary data, sql scripts, and other materials.
+
+I'm posting some parts of it here for my own reference, but I strongly recommend that you register for that event that takes place every once in a while. It's free and worth it. Danny Ma is an excellent teacher and his explanations are outstanding.
+
+### Setting up the programming environment
+
+For the purposes of this project, I created the local `trading` Postgres database on my machine and ran the sql script to create and populate the tables.
+
+```{r}
+# loading packages
+library(DBI)
+library(RPostgres)  
+library(tidyverse)
+```
+
+The `sql` engine uses the `DBI` package to execute SQL queries, print their results, and optionally assign the results to a data frame. To use the `sql` engine, we first need to establish a DBI connection to a database (typically via the `DBI::dbConnect()` function).
+
+### Creating a connection to the `trading` database
+
+```{r}
+mycon <- DBI::dbConnect(RPostgres::Postgres(), 
+                        dbname = "trading", 
+                        host = "localhost",  
+                        port = "5432",  
+                        user = rstudioapi::askForPassword("Database username"),
+                        password = rstudioapi::askForPassword("Database password"))
+```
+
+There are several options to [secure your credentials](https://solutions.posit.co/connections/db/best-practices/managing-credentials/index.html) in R. Here I use prompting for credentials via `rstudioapi`.
+
+```{r}
+mycon
+```
+
+## Introduction
+
+In this fictitious case study - Danny's data mentors from the Data With Danny team have been busy trading cryptocurrency markets since 2017.
+
+The main purpose for this case study is to analyze the performance of the DWD mentors over time. We will accomplish this by writing SQL queries to utilize all available datasets to answer a series of realistic business questions.
+
+### Available Datasets
+
+All of our data for this case study exists within the `trading` schema in the **PostgreSQL database**.
+
+There are 3 data tables available in this schema:
+
+-   `members`
+-   `prices`
+-   `transactions`
+
+### Entity Relationship Diagram
+
+I drew the ERD [here](https://dbdiagram.io/home).
+
+![](images/erd_trading.png){.preview-image}
+
+### Data Dictionary and Overview
+
+The **`trading.members` table** consists of information about the mentors from the Data With Danny team.
+
+| Column name  | Description                      |
+|--------------|----------------------------------|
+| `member_id`  | unique id for each mentor        |
+| `first_name` | first name for each mentor       |
+| `region`     | region where each mentor is from |
+
+: `trading.members` table
+
+```{sql connection=mycon, max.print=NA}
+SELECT * FROM trading.members
+```
+
+The **`trading.prices` table** consists of daily price and volume information from January 2017 through to August 2021 for the 2 most popular cryptocurrency tickers: Bitcoin and Ethereum.
+
+| Column name   | Description                    |
+|---------------|--------------------------------|
+| `ticker`      | one of either BTC or ETH       |
+| `market_date` | the date for each record       |
+| `price`       | closing price at end of day    |
+| `open`        | the opening price              |
+| `high`        | the highest price for that day |
+| `low`         | the lowest price for that day  |
+| `volume`      | the total volume traded        |
+| `change`      | \% change in daily price       |
+
+: `trading.prices` table
+
+The first 5 rows from this dataset.
+
+```{sql connection=mycon}
+SELECT * FROM trading.prices LIMIT 5
+```
+
+The **`trading.transactions` table** consists of buy and sell transactions data for each trade made by the DWD mentors.
+
+| Column name      | Description                        |
+|------------------|------------------------------------|
+| `txn_id`         | unique ID for each transaction     |
+| `member_id`      | member identifier for each trade   |
+| `ticker`         | the ticker for each trade          |
+| `txn_date`       | the date for each transaction      |
+| `txn_type`       | either BUY or SELL                 |
+| `quantity`       | the total quantity for each trade  |
+| `percentage_fee` | \% of total amount charged as fees |
+| `txn_time`       | the timestamp for each trade       |
+
+: `trading.transactions` table
+
+The first 5 frows from this transactions table.
+
+```{sql connection=mycon}
+SELECT * FROM trading.transactions LIMIT 5
+```
+
+## PART 1️⃣: Basic Data Analysis Techniques
+
+### Question 1.1
+
+Show only the top 5 rows from the `trading.members` table.
+
+```{sql connection=mycon}
+SELECT * 
+FROM trading.members
+LIMIT 5
+```
+
+### Question 1.2
+
+Sort all the rows in the `trading.members` table by `first_name` in alphabetical order and show the top 3 rows with all columns.
+
+```{sql connection=mycon}
+SELECT * 
+FROM trading.members
+ORDER BY first_name
+LIMIT 3
+```
+
+### Question 1.3
+
+Count the number of records from the `trading.members` table which have United States as the `region` value.
+
+```{sql connection=mycon}
+SELECT 
+  COUNT(*) AS record_count
+FROM trading.members
+WHERE region = 'United States'
+```
+
+### Question 1.4
+
+Select only the `first_name` and `region` columns for mentors who are not from Australia.
+
+```{sql connection=mycon}
+SELECT 
+  first_name, 
+  region
+FROM trading.members
+WHERE region != 'Australia'
+```
+
+### Question 1.5
+
+Return only the unique `region` values from the `trading.members` table and sort the output by reverse alphabetical order.
+
+```{sql connection=mycon}
+SELECT DISTINCT region
+FROM trading.members
+ORDER BY region DESC
+```
+
+## PART 2️⃣: Aggregate Functions for Data Analysis
+
+### Question 2.1
+
+How many records are there per `ticker` value in the `trading.prices` table?
+
+```{sql connection=mycon}
+SELECT
+  ticker,
+  COUNT(*) AS record_count
+FROM trading.prices
+GROUP BY ticker
+```
+
+### Question 2.2
+
+What is the maximum, minimum values for the `price` column for both Bitcoin and Ethereum in 2020?
+
+```{sql connection=mycon}
+SELECT 
+  ticker,
+  MIN(price) AS min_price,
+  MAX(price) AS max_price
+FROM trading.prices
+WHERE market_date BETWEEN '2020-01-01' AND '2020-12-31'
+GROUP BY ticker
+```
+
+### Question 2.3
+
+What is the annual minimum, maximum and average price for each ticker?
+
+-   Include a calendar_year column with the year from 2017 through to 2021
+-   Calculate a `spread` column which calculates the difference between the min and max prices
+-   Round the average price output to 2 decimal places
+-   Sort the output in chronological order with Bitcoin records before Ethereum within each year
+
+```{sql connection=mycon}
+SELECT
+  EXTRACT(YEAR FROM market_date) AS calendar_year,
+  ticker,
+  MIN(price) AS min_price,
+  MAX(price) AS max_price,
+  ROUND(AVG(price)::NUMERIC, 2) AS avg_price,
+  MAX(price) - MIN(price) AS spread
+FROM trading.prices
+GROUP BY calendar_year, ticker
+ORDER BY calendar_year, ticker
+```
+
+### Question 2.4
+
+What is the monthly average of the `price` column for each ticker from January 2020 and after?
+
+-   Create a `month_start` column with the first day of each month
+-   Sort the output by ticker in alphabetical order and months in chronological order
+-   Round the `average_price` column to 2 decimal places
+
+```{sql connection=mycon}
+SELECT
+  ticker,
+  DATE_TRUNC('MON', market_date)::DATE AS month_start,
+  ROUND(AVG(price)::NUMERIC, 2) AS average_price
+FROM trading.prices
+WHERE market_date >= '2020-01-01'
+GROUP BY ticker, month_start
+ORDER BY ticker, month_start
+```
+
+## PART 3️⃣: Case When Statements
+
+### Question 3.1
+
+Convert the `volume` column in the `trading.prices` table with an adjusted integer value to take into the unit values
+
+-   Return only the `market_date`, `price`, `volume` and `adjusted_volume` columns for the first 10 days of August 2021 for Ethereum only
+
+```{sql connection=mycon}
+SELECT
+  market_date,
+  price,
+  volume,    
+  CASE
+    WHEN RIGHT(volume, 1) = 'K' THEN LEFT(volume, LENGTH(volume) - 1)::NUMERIC * 1000 
+    WHEN RIGHT(volume, 1) = 'M' THEN LEFT(volume, LENGTH(volume) - 1)::NUMERIC * 1000000 
+    WHEN volume = '-' THEN 0
+    END AS adjusted_volume
+FROM trading.prices
+WHERE ticker = 'ETH'
+  AND market_date BETWEEN '2021-08-01' AND '2021-08-10'
+ORDER BY market_date
+```
+
+### Question 3.2
+
+How many "breakout" days were there in 2020 where the `price` column is greater than the `open` column for each `ticker`? In the same query also calculate the number of "non breakout" days where the `price` column was lower than or equal to the `open` column.
+
+```{sql connection=mycon}
+SELECT
+  ticker,
+  SUM(CASE WHEN price > open THEN 1 ELSE 0 END) AS breakout_days,
+  SUM(CASE WHEN price <= open THEN 1 ELSE 0 END) AS non_breakout_days
+FROM trading.prices
+WHERE market_date BETWEEN '2020-01-01' AND '2020-12-31'
+GROUP BY ticker
+```
+
+### Question 3.3
+
+What was the final quantity Bitcoin and Ethereum held by all Data With Danny mentors based off the `trading.transactions` table?
+
+```{sql connection=mycon}
+SELECT 
+  ticker,
+  SUM(CASE WHEN txn_type = 'SELL' THEN -quantity ELSE quantity END) AS final_btc_holding
+FROM trading.transactions
+GROUP BY ticker
+```
+
+Divided by quantity bought and quantity sold.
+
+```{sql connection=mycon}
+SELECT 
+  ticker,
+  SUM(CASE WHEN txn_type = 'BUY' THEN quantity ELSE 0 END) AS qty_bought,
+  SUM(CASE WHEN txn_type = 'SELL' THEN quantity ELSE 0 END) AS qty_sold
+FROM trading.transactions
+GROUP BY ticker
+```
+
+## PART 4️⃣: Window Functions
+
+### Question 4.1
+
+What are the `market_date`, `price` and `volume` and `price_rank` values for the days with the top 5 highest `price` values for each tickers in the `trading.prices` table?
+
+-   The `price_rank` column is the ranking for price values for each ticker with rank = 1 for the highest value.
+-   Return the output for Bitcoin, followed by Ethereum in price rank order.
+
+```{sql connection=mycon}
+WITH cte_rank AS (
+  SELECT
+    ticker,
+    market_date,
+    price, 
+    volume,
+    RANK() OVER (PARTITION BY ticker ORDER BY price DESC) AS price_rank
+  FROM trading.prices
+)
+
+SELECT *
+FROM cte_rank
+WHERE price_rank <= 5
+ORDER BY ticker, price_rank
+```
+
+#### Question 4.1 - {{< fa brands r-project >}} solution
+
+```{r}
+members <- read_csv("data/members_tbl.csv")
+prices <- read_csv("data/prices_tbl.csv")
+transactions <- read_csv("data/transactions_tbl.csv")
+
+prices %>% head()
+```
+
+```{r}
+# R solution
+prices %>% 
+  select(ticker, market_date, price, volume) %>% 
+  group_by(ticker) %>% 
+  arrange(ticker, desc(price)) %>% 
+  mutate(price_rank = row_number()) %>% 
+  filter(price_rank <=5)
+```
+
+### Question 4.2
+
+Calculate a 7 day rolling average for the `price` and `volume` columns in the `trading.prices` table for each ticker.
+
+-   Return only the first 10 days of August 2021
+
+```{sql connection=mycon, max.print=NA}
+-- Step 1 - Adjusted prices CTE
+WITH cte_adjusted_prices AS (
+  SELECT
+    ticker,
+    market_date,
+    price,
+    CASE
+      WHEN RIGHT(volume, 1) = 'K' THEN LEFT(volume, LENGTH(volume)-1)::NUMERIC * 1000
+      WHEN RIGHT(volume, 1) = 'M' THEN LEFT(volume, LENGTH(volume)-1)::NUMERIC * 1000000
+      WHEN volume = '-' THEN 0
+    END AS volume
+  FROM trading.prices
+),
+
+-- Step 2 - Moving Averages CTE
+cte_moving_averages AS (
+  SELECT
+    ticker,
+    market_date,
+    price,
+    AVG(price) OVER (
+      PARTITION BY ticker
+      ORDER BY market_date
+      RANGE BETWEEN '6 DAYS' PRECEDING AND CURRENT ROW  
+    ) AS moving_avg_price,
+    volume,
+    AVG(volume) OVER (
+      PARTITION BY ticker
+      ORDER BY market_date
+      RANGE BETWEEN '6 DAYS' PRECEDING AND CURRENT ROW  
+    ) AS moving_avg_volume
+  FROM cte_adjusted_prices
+)
+
+-- final output
+SELECT * FROM cte_moving_averages
+WHERE market_date BETWEEN '2021-08-01' AND '2021-08-10'
+ORDER BY ticker, market_date;
+```
+
+#### Question 4.2 - {{< fa brands r-project >}} solution
+
+```{r}
+prices %>% 
+  mutate(volume = case_when(
+    str_sub(volume, -1) == "K" ~ as.numeric(str_sub(volume, 1, str_length(volume) - 1)) * 10^3,
+    str_sub(volume, -1) == "M" ~ as.numeric(str_sub(volume, 1, str_length(volume) - 1)) * 10^6,
+    str_sub(volume, -1) == "-" ~ as.numeric(str_sub(volume, 1, str_length(volume) - 1)) * 0)
+  ) %>% 
+  group_by(ticker) %>% 
+  arrange(ticker, market_date) %>% 
+  mutate(moving_avg_price = zoo::rollmean(price, k = 7, align = "right", fill = NA),
+         moving_avg_volume = zoo::rollmean(volume, k = 7, align = "right", fill = NA)) %>% 
+  select(ticker, market_date, price, moving_avg_price, volume, moving_avg_volume) %>% 
+  filter(market_date >= "2021-08-01", market_date <= "2021-08-10") 
+```
+
+### Question 4.3
+
+Calculate the monthly cumulative volume traded for each ticker in 2020
+
+-   Sort the output by ticker in chronological order with the `month_start` as the first day of each month
+
+```{sql connection=mycon}
+WITH cte_monthly_volume AS (
+  SELECT
+    ticker,
+    DATE_TRUNC('MON', market_date)::DATE AS month_start,
+    SUM(
+      CASE
+      WHEN RIGHT(volume, 1) = 'K' THEN LEFT(volume, LENGTH(volume)-1)::NUMERIC * 1000
+      WHEN RIGHT(volume, 1) = 'M' THEN LEFT(volume, LENGTH(volume)-1)::NUMERIC * 1000000
+      WHEN volume = '-' THEN 0
+    END
+  ) AS monthly_volume
+  FROM trading.prices
+  WHERE market_date BETWEEN '2020-01-01' AND '2020-12-31'
+  GROUP BY ticker, month_start
+)
+
+SELECT
+  ticker,
+  month_start,
+  SUM(monthly_volume) OVER (
+    PARTITION BY ticker
+    ORDER BY month_start
+    ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+  ) AS cumulative_monthly_volume
+FROM cte_monthly_volume
+ORDER BY ticker, month_start
+```
+
+#### Question 4.3 - {{< fa brands r-project >}} solution
+
+```{r}
+prices %>% 
+  select(ticker, market_date, volume) %>% 
+  filter(market_date >= "2020-01-01", market_date <= "2020-12-31") %>% 
+  mutate(month_start = lubridate::floor_date(market_date, unit = "month")) %>% 
+  group_by(ticker, month_start) %>% 
+  summarise(monthly_volume = sum(
+    case_when(
+      str_sub(volume, -1) == "K" ~ as.numeric(str_sub(volume, 1, str_length(volume) - 1)) * 10^3,
+      str_sub(volume, -1) == "M" ~ as.numeric(str_sub(volume, 1, str_length(volume) - 1)) * 10^6,
+      str_sub(volume, -1) == "-" ~ as.numeric(str_sub(volume, 1, str_length(volume) - 1)) * 0)
+    )
+  ) %>% 
+  ungroup() %>% 
+  group_by(ticker) %>% 
+  mutate(cumulative_monthly_volume = cumsum(monthly_volume)) %>% 
+  ungroup()
+```
+
+### Question 4.4
+
+Calculate the daily percentage change in volume for each ticker in the `trading.prices` table
+
+-   Percentage change can be calculated as (current - previous) / previous
+-   Multiply the percentage by 100 and round the value to 2 decimal places
+-   Return data for the first 10 days of August 2021
+
+```{sql connection=mycon, max.print=NA}
+WITH cte_adjusted_prices AS (
+  SELECT
+    ticker,
+    market_date,
+    CASE
+      WHEN RIGHT(volume, 1) = 'K' THEN LEFT(volume, LENGTH(volume)-1)::NUMERIC * 1000
+      WHEN RIGHT(volume, 1) = 'M' THEN LEFT(volume, LENGTH(volume)-1)::NUMERIC * 1000000
+      WHEN volume = '-' THEN 0
+    END AS volume
+  FROM trading.prices
+),
+
+cte_previous_volume AS (
+  SELECT
+    ticker,
+    market_date,
+    volume,
+    LAG(volume) OVER (PARTITION BY ticker ORDER BY market_date) AS previous_volume
+  FROM cte_adjusted_prices
+  WHERE volume != 0
+)
+  
+SELECT
+  ticker,
+  market_date,
+  volume,
+  previous_volume,
+  ROUND(100 * (volume - previous_volume) / previous_volume, 2) AS daily_change
+FROM cte_previous_volume
+WHERE market_date BETWEEN '2021-08-01' AND '2021-08-10'
+ORDER BY ticker, market_date
+```
+
+#### Question 4.4 - {{< fa brands r-project >}} solution
+
+```{r}
+prices %>% 
+  select(ticker, market_date, volume) %>% 
+  mutate(volume = case_when(
+    str_sub(volume, -1) == "K" ~ as.numeric(str_sub(volume, 1, str_length(volume) - 1)) * 10^3,
+    str_sub(volume, -1) == "M" ~ as.numeric(str_sub(volume, 1, str_length(volume) - 1)) * 10^6,
+    str_sub(volume, -1) == "-" ~ as.numeric(str_sub(volume, 1, str_length(volume) - 1)) * 0)
+  ) %>% 
+  arrange(ticker, market_date) %>% 
+  mutate(volume_prev_day = lag(volume)) %>% 
+  mutate(daily_change_perc = round(100*(volume - volume_prev_day)/volume_prev_day, 2)) %>% 
+  filter(market_date >= "2021-08-01", market_date <= "2021-08-10") 
+```
+
+## PART 5️⃣: Table Joins
+
+### Question 5.1 - Inner Joins
+
+Which top 3 mentors have the most Bitcoin quantity? Return the f`irst_name` of the mentors and sort the output from highest to lowest `total_quantity`.
+
+```{sql connection=mycon}
+SELECT
+  m.first_name,
+  SUM(
+    CASE
+      WHEN t.txn_type = 'BUY' THEN t.quantity 
+      WHEN t.txn_type = 'SELL' THEN -t.quantity 
+      END
+  ) AS total_quantity
+FROM trading.transactions t
+INNER JOIN trading.members m
+  ON t.member_id = m.member_id
+WHERE ticker = 'BTC' 
+GROUP By m.first_name
+ORDER BY total_quantity DESC
+LIMIT 3
+```
+
+### Question 5.2 - Left Joins
+
+Show the `market_date` values which have less than 5 transactions? Sort the output in reverse chronological order.
+
+```{sql connection=mycon}
+SELECT 
+  p.market_date,
+  COUNT(t.txn_id) AS transaction_count
+FROM trading.prices p
+LEFT JOIN trading.transactions t
+  ON p.market_date = t.txn_date
+  AND p.ticker = t.ticker
+GROUP BY p.market_date
+HAVING COUNT(t.txn_id) < 5
+ORDER BY p.market_date DESC
+```
+
+### Question 5.3 - Multiple Table Joins
+
+**Part 1:** Calculate the Dollar Cost Average
+
+What is the dollar cost average (`btc_dca`) for all Bitcoin purchases by region for each calendar year?
+
+-   Create a column called `year_start` and use the start of the calendar year
+-   The dollar cost average calculation is `btc_dca` = SUM(`quantit`y x `price`) / SUM(`quantity`)
+
+**Part 2:** Yearly Dollar Cost Average Ranking
+
+Use this `btc_dca` value to generate a `dca_ranking` column for each year
+
+-   The region with the lowest `btc_dca` each year has a rank of 1
+
+**Part 3:** Dollar Cost Average Yearly Percentage Change
+
+Calculate the yearly percentage change in DCA for each region to 2 decimal places
+
+-   This calculation is (current - previous) / previous
+
+Finally order the output by `region` and `year_start` columns.
+
+```{sql connection=mycon}
+WITH cte_dollar_cost_average AS (
+  SELECT
+    DATE_TRUNC('YEAR', transactions.txn_date)::DATE AS year_start,
+    members.region,
+    SUM(transactions.quantity * prices.price) / SUM(transactions.quantity) AS btc_dca
+  FROM trading.transactions
+  INNER JOIN trading.prices
+    ON transactions.ticker = prices.ticker
+    AND transactions.txn_date = prices.market_date
+  INNER JOIN trading.members
+    ON transactions.member_id = members.member_id
+  WHERE transactions.ticker = 'BTC'
+    AND transactions.txn_type = 'BUY'
+  GROUP BY year_start, members.region
+),
+  
+cte_window_functions AS (
+  SELECT
+    year_start,
+    region,
+    btc_dca,
+    RANK() OVER (PARTITION BY year_start ORDER BY btc_dca) AS dca_ranking,
+    LAG(btc_dca) OVER (PARTITION BY region ORDER BY year_start) AS previous_btc_dca
+  FROM cte_dollar_cost_average
+)
+  
+SELECT
+  year_start,
+  region,
+  btc_dca,
+  dca_ranking,
+  ROUND(
+    (100 * (btc_dca - previous_btc_dca) / previous_btc_dca)::NUMERIC,
+    2
+  ) AS dca_percentage_change
+FROM cte_window_functions
+ORDER BY region, year_start
+```
+
+<br/>
+
+Thanks for reading!
