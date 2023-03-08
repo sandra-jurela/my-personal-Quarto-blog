@@ -24,10 +24,6 @@ execute:
   echo: true
   message: false
   warning: false
-  # out.width: "80%"   # doesn't work
-  
-# knitr:
-#   opts_chunk: 
-#     collapse: true
-    
+
 page-layout: article
+

@@ -12,7 +12,7 @@ categories:
 
 On November 18, 2022 I attended the SQL masterclass "SQL and PostgreSQL for Data Analytics", presented live by Danny Ma on O'Reilly platform.
 
-This [Github repository](https://github.com/DataWithDanny/sql-masterclass) contains all the necessary data, sql scripts, and other materials.
+This [GitHub repository](https://github.com/DataWithDanny/sql-masterclass) contains all the necessary data, sql scripts, and other materials.
 
 I'm posting some parts of it here for my own reference, but I strongly recommend that you register for that event that takes place every once in a while. It's free and worth it. Danny Ma is an excellent teacher and his explanations are outstanding.
 
