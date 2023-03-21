@@ -6,7 +6,6 @@ date: 2022-02-15
 categories:
   - SQL
   - SQLite
-  - Dataquest
   - data visualization
   - R
 image: images/media_type.png

@@ -1,0 +1,343 @@
+---
+title: "What Do We Die From?"
+description: |
+  An exploratory data analysis of the Our World in Data dataset.
+date: 2022-04-21
+categories:
+  - EDA
+  - data cleaning
+  - data manipulation
+  - data visualization
+  - R
+draft: true
+---
+
+## Introduction
+
+56 million people died in 2019. What did they die from?
+
+The *Global Burden of Disease* is a major global study on the causes of death and disease published in the medical journal *The Lancet*. These estimates of the annual number of deaths by cause are shown here.
+
+In the epidemiological framework of the Global Burden of Disease study each death has one specific cause. In their own words: "each death is attributed to a single underlying cause --- the cause that initiated the series of events leading to death".
+
+About the Global Burden of Disease
+
+The GBD study offers a powerful resource to understand the changing health challenges facing people across the world in the 21st century. Led by the Institute for Health Metrics and Evaluation (IHME), the GBD study is the most comprehensive worldwide observational epidemiological study to date. By tracking progress within and between countries GBD provides an important tool to inform clinicians, researchers, and policy makers, promote accountability, and improve lives worldwide.
+
+#### Data
+
+You can download the data on Number of deaths by cause from 1990 to 2019 from here [Our World in Data](https://ourworldindata.org/causes-of-death#) or from the original source [IHME, Global Burden of Disease](https://vizhub.healthdata.org/gbd-results/).
+
+## 🧹 Data cleaning and manipulation
+
+### Setting up the programming environment
+
+```{r}
+library(tidyverse)
+library(visdat)
+```
+
+### Reading the data
+
+```{r}
+deaths <- read_csv("data/annual-number-of-deaths-by-cause.csv")
+
+glimpse(deaths)
+```
+
+```{r}
+unique(deaths$`Number of executions (Amnesty International)`)
+```
+
+### Data wrangling
+
+Keeping in mind that the data applies to both sexes and all ages, I will clean up the column names. I will also remove 2 columns which \*seem\*\* to be subsequently inserted into the dataser:
+
+-   `Number of executions (Amnesty International)` - most countries don't have death penalty and it's of character data type (e.g., \>1000)
+
+-   `Terrorism (deaths)` - there is already a column `Deaths - Conflict and terrorism - Sex: Both - Age: All Ages (Number)` !
+
+```{r}
+deaths_clean <- deaths %>% 
+  select(-c('Number of executions (Amnesty International)', 'Terrorism (deaths)')) %>% 
+  set_names(names(.) %>% str_remove_all("Deaths - | - Sex: Both - Age: All Ages \\(Number\\)")) 
+  
+glimpse(deaths_clean)
+```
+
+Renaming certain columns for better readability and clarity.
+
+```{r}
+deaths_clean <- deaths_clean %>% 
+  rename("Alzheimer's and other dementias" = "Alzheimer's disease and other dementias",
+         "Chronic liver diseases" = "Cirrhosis and other chronic liver diseases",
+         "Diabetes" = "Diabetes mellitus", 
+         "Envir. heat and cold exposure" = "Environmental heat and cold exposure",
+         "Natural disasters" = "Exposure to forces of nature",
+         "Cancers" = "Neoplasms")
+
+```
+
+### Visualizing missing values
+
+```{r, fig.height=5}
+deaths_clean %>% vis_miss()
+```
+
+```{r, fig.height=5}
+deaths_clean %>% arrange(Code) %>% vis_miss()
+```
+
+What is *an **Entity and why each*** (every) entity\*\* doesn't have a Code?
+
+Entities with missing Code
+
+<details>
+
+<summary>Show code and output</summary>
+
+```{r}
+deaths_clean %>% 
+  filter(is.na(Code)) %>% 
+  pull(Entity) %>% 
+  unique()
+```
+
+</details>
+
+Entities without Code are aggregates. I am looking for the entity "World" and it's not **here**!
+
+Entities without missing Code
+
+<details>
+
+<summary>Show code and output</summary>
+
+```{r}
+deaths_clean %>% 
+  filter(!is.na(Code)) %>%   # Be aware: "World" entity has a code!! It's here!
+  pull(Entity) %>% 
+  unique()
+```
+
+</details>
+
+We have countries here. This subset also includes "World". Be careful to filter out "World" entity if you explore countries!
+
+Some rows have Code but missing data on all Deaths.
+
+```{r}
+deaths_clean %>% 
+  filter(!is.na(Code), is.na(Cancers)) %>% pull(Entity) %>% unique()
+```
+
+Some entities doesn't exist anymore. I'll leave it as it is.
+
+Defining cause of death categories
+
+```{r}
+disease <- c("Acute hepatitis",
+             "Alzheimer's and other dementias", 
+             "Cancers",
+             "Cardiovascular diseases",
+             "Chronic kidney disease",
+             "Chronic respiratory diseases", 
+             "Chronic liver diseases",
+             "Diabetes", 
+             "Diarrheal diseases",
+             "Digestive diseases",
+             "HIV/AIDS",
+             "Lower respiratory infections",
+             "Malaria",
+             "Maternal disorders",
+             "Meningitis",
+             "Neonatal disorders",
+             "Nutritional deficiencies",
+             "Parkinson's disease",
+             "Protein-energy malnutrition",
+             "Tuberculosis")
+
+human_natur <- c("Alcohol use disorders",
+                 "Conflict and terrorism", 
+                 "Drug use disorders",
+                 "Interpersonal violence",
+                 "Self-harm")
+
+accident <- c("Drowning",
+              "Envir. heat and cold exposure",
+              "Fire, heat, and hot substances",
+              "Natural disasters",
+              "Poisonings",
+              "Road injuries")
+```
+
+Some more data manipulation to get the dataset ready for analysis. (?)
+
+```{r}
+deaths_clean <- deaths_clean %>% 
+  pivot_longer(cols = -c(Entity, Code, Year), names_to = "Cause", values_to = "Deaths") %>% 
+  mutate(Category = case_when(
+    Cause %in% disease ~ "Disease",
+    Cause %in% human_natur ~ "Human natur" ,
+    Cause %in% accident ~ "Accident" )) %>% 
+  select(1:4, 6, 5)
+
+deaths_clean 
+```
+
+## 📊 Trends in Death rate by Cause, World, 1990-2019
+
+Our metric for this visualization will be death rate per year, measured as the annual number of deaths per 100,000 individuals, Therefore, we need a dataset with world's total populations from 1990 - 2019. It is obtained from [The World Bank](https://databank.worldbank.org/source/world-development-indicators##) and prepared in Excel.
+
+```{r}
+world_pop <- read_csv("data/world_pop_1990-2019.csv")
+
+world_pop
+```
+
+### Data manipulation
+
+```{r}
+trends_world <- deaths_clean %>% 
+  filter(Entity == "World") %>% 
+  left_join(world_pop, by = c("Entity" = "Entity", "Year" = "Year")) %>%
+  mutate(`Death rate` = round(Deaths / Population * 1e+05, 2))
+
+trends_world
+```
+
+### Data visualization
+
+```{r, fig.width=8, fig.height=15}
+trends_world %>% 
+  ggplot(aes(Year, `Death rate`, color = Category)) +
+  geom_line(size = 0.7) + 
+  facet_wrap(~ Cause, scales = "free_y", ncol = 3) + 
+  labs(title = "Trends in Death rate by Cause, World, 1990-2019", 
+       subtitle = "Death rate (per 100,000 individuals per year)",
+       caption = "Data Source: Our World in Data") +
+  theme_classic() + 
+  theme(legend.position = "top")
+```
+
+## 📊 Total Deaths by Cause, World, 2019
+
+We will now see how many people died from a particular cause in 2019.
+
+Our metric for this visualization will be number of deaths.
+
+### Data manipulation
+
+```{r}
+world_2019 <- deaths_clean %>% 
+  filter(Year == 2019 & Entity == "World") %>% 
+  mutate(Percent = scales::percent(Deaths / sum(Deaths), accuracy = 0.1),
+         Cause = as_factor(Cause) %>% fct_reorder(Deaths)) %>% 
+  arrange(desc(Deaths))
+
+world_2019 %>% 
+  mutate(Deaths = scales::comma(Deaths, scale = 1e-06, suffix = "M", accuracy = 0.01)) %>% 
+  print(n=Inf)
+```
+
+### Data visualization
+
+```{r, fig.width=8, fig.height=8, preview = TRUE}
+world_2019 %>% 
+  ggplot(aes(Deaths, Cause, fill = Category)) +
+  geom_col(width = 0.7) +
+  geom_text(aes(label = scales::comma(Deaths, scale = 1e-06, suffix = "M", accuracy = 0.01), 
+                hjust = -0.2), size = 3) +
+  scale_x_continuous(sec.axis = sec_axis(trans = ~./sum(world_2019$Deaths), 
+                                         name="Proportion", 
+                                         labels = scales::percent),
+                     labels = scales::comma_format(scale = 1e-06, suffix = "M")) +
+  labs(title = "Total Deaths by Cause, World, 2019", 
+       caption = "Data Source: Our World in Data") +
+  expand_limits(x = 2.1e+07) + 
+  theme_bw() +
+  theme(legend.position = "top",
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) 
+```
+
+### Key facts
+
+> Cardiovascular diseases are the leading cause of death globally. An estimated 18.6 million people died from CVDs in 2019, representing 34,1% of all global deaths. Of these deaths, 85% were due to heart attack and stroke. Over three quarters of CVD deaths take place in low- and middle-income countries. Most cardiovascular diseases can be prevented by addressing behavioural risk factors such as tobacco use, unhealthy diet and obesity, physical inactivity and harmful use of alcohol. (or nearly one in three deaths.)
+
+(https://www.who.int/news-room/fact-sheets/detail/cardiovascular-diseases-(cvds))
+
+> The second biggest cause are cancers.
+
+## 📊 Breakdown by WHO regions, 2019
+
+### Data manipulation
+
+```{r}
+deaths_WHO_regions <- deaths_clean %>% 
+  filter(str_detect(Entity, "\\(WHO\\)") & Year == 2019) %>% 
+  select(-c(Code, Category)) %>% 
+  group_by(Entity) %>% 
+  arrange(Entity, desc(Deaths)) %>% 
+  mutate(Rank = row_number()) %>% 
+  filter(Rank <= 5)
+  
+DT::datatable(deaths_WHO_regions)
+```
+
+### Data visualization
+
+```{r, fig.width=8, fig.height=6}
+deaths_WHO_regions %>% 
+  ggplot(aes(Cause, Deaths, fill = Cause)) +
+  geom_col(width = 0.7) +
+  facet_wrap(~Entity) +
+  scale_fill_viridis_d() +
+  scale_y_continuous(labels = scales::comma_format(scale = 1e-06, suffix = "M")) +
+  expand_limits(y = 6e+06) +
+  labs(title = "Top 5 causes of death by WHO regions, 2019") +
+  theme_bw() +
+  theme(legend.position = "none",
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_rect(fill = "white"),
+        axis.text.x = element_text(angle = 45, hjust = 1))
+        
+
+```
+
+## 📊 Breakdown by income level, 2019
+
+### Data manipulation
+
+```{r}
+deaths_income_level <- deaths_clean %>% 
+  filter(str_detect(Entity, "Income") & Year == 2019) %>% 
+  select(-c(Code, Category)) %>% 
+  mutate(Entity = Entity %>% as_factor() %>% fct_relevel("World Bank High Income", after = 3)) %>% 
+  group_by(Entity) %>% 
+  arrange(Entity, desc(Deaths)) %>% 
+  mutate(Rank = row_number()) %>% 
+  ungroup() %>% 
+  filter(Rank <= 5)
+  
+DT::datatable(deaths_income_level)
+```
+
+### Data visualization
+
+```{r, fig.width=7, fig.height=7}
+deaths_income_level %>% 
+  ggplot(aes(Cause, Deaths, fill = Cause)) +
+  geom_col(width = 0.7) +
+  facet_wrap(~Entity) +
+  scale_fill_viridis_d() +
+  scale_y_continuous(labels = scales::comma_format(scale = 1e-06, suffix = "M")) +
+  labs(title = "Top 5 causes of death by income level, 2019") +
+  theme_bw() +
+  theme(legend.position = "none",
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_rect(fill = "white"),
+        axis.text.x = element_text(angle = 45, hjust = 1))
+```

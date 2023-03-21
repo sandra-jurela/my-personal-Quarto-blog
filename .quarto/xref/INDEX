@@ -46,5 +46,11 @@
   },
   "posts/cryptocurrency-sql-case-study/cryptocurrency.qmd": {
     "cryptocurrency.html": "f705bcd9"
+  },
+  "posts/what-do-we-die-from/deaths-by-causes.qmd": {
+    "deaths-by-causes.html": "59000ab6"
+  },
+  "posts/k-nearest-neighbors/knn.qmd": {
+    "knn.html": "9f3d5a5f"
   }
 }
