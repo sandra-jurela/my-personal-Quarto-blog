@@ -49,6 +49,7 @@ The first cleaning step includes:
 
 -   selecting columns of interest,
 -   replacing the character value`"-"` with `NA` in all columns with character data type,
+-   converting `date` column from character to date data type,
 -   renaming location columns,
 -   converting character data type to numeric for specific columns.
 
@@ -56,6 +57,7 @@ The first cleaning step includes:
 mass_shootings_cln <- mass_shootings %>% 
   select(1:6, 8:10, 12, 16, 17, 21:24) %>% 
   mutate(across(where(is.character), ~na_if(., "-"))) %>% 
+  mutate(date = lubridate::mdy(date)) %>% 
   rename(location = location...2, location_2 = location...8) %>% 
   mutate_at(c("injured", "age_of_shooter", "latitude", "longitude"), as.numeric)
   
@@ -320,6 +322,15 @@ summary(mass_shootings_cln$fatalities)
 summary(mass_shootings_cln$injured)
 ```
 
+```{r}
+#| include: false
+# write csv file for shiny app
+mass_shootings_shiny <- mass_shootings_cln %>% 
+  select(location, date, year, latitude, longitude, fatalities, summary) %>% 
+  write_csv("data/mass_shootings_shiny.csv")
+```
+
+
 ## Shiny app
 
 The app you can see below is embedded in this `quarto` document since my website is static. It was originally published on [shinyapps.io](https://www.shinyapps.io/) and you can also interact with it [here](https://sandra-jurela.shinyapps.io/shiny-mass-shootings-usa/).
@@ -335,3 +346,4 @@ The app you can see below is embedded in this `quarto` document since my website
 
 </iframe>
 :::
+
