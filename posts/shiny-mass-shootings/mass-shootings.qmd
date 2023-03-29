@@ -1,6 +1,6 @@
 ---
 title: "Shiny App - Mass Shootings in the USA"
-description: "EDA with Shiny app on mass shootings between August 20th, 1982 and February 13th, 2023."
+description: "EDA with Shiny app on mass shootings between August 20th, 1982 and March 27th, 2023."
 date: "2023-03-01"
 categories: 
   - R
@@ -9,6 +9,14 @@ categories:
   - data cleaning
 image: images/preview.png
 ---
+
+::: {.callout-note appearance="simple"}
+This post will be regularly updated with each new case.
+
+Last update on March 29, 2023.
+:::
+
+<br/>
 
 ## Introduction
 
@@ -31,7 +39,7 @@ mass_shootings <- read_csv("data/mass_shootings_usa_1982-2023.csv")
 mass_shootings %>% glimpse()
 ```
 
-We have 140 cases, described with 24 variables. At first glance, this dataset clearly needs extensive cleaning.
+We have 141 cases, described with 24 variables. At first glance, this dataset clearly needs extensive cleaning.
 
 ## Data cleaning
 
@@ -69,7 +77,7 @@ mass_shootings_cln %>%
   pivot_longer(cols = everything(), names_to = "column", values_to = "n_missing")
 ```
 
-14 of the most recent cases don't have location coordinates at all. We'll address this in the final cleanup step.
+15 of the most recent cases don't have location coordinates at all. We'll address this in the final cleanup step.
 
 ### 🧹 Step 2. Fixing unique values of categorical variables
 
@@ -88,6 +96,7 @@ To make a long story short, I'll correct them all in one step using `case_when` 
 mass_shootings_cln <- mass_shootings_cln %>% 
   mutate(gender = case_when(gender == "F" ~ "Female",
                             gender == "M" ~ "Male", 
+                            gender %>% str_detect("transgender")~"Female (transgender)",
                             TRUE ~ gender),
          race = case_when(race == "white" ~ "White",
                           race == "black" ~ "Black",
@@ -112,11 +121,11 @@ mass_shootings_cln <- mass_shootings_cln %>%
 
 ### 🧹 Step 3. Geocoding locations with missing coordinates
 
-There are 14 cases with missing location coordinates. In this step we'll convert locations to coordinates with geocoding. and use them later to create a `leaflet` map for a `shiny app`.
+There are 15 cases with missing location coordinates. In this step we'll convert locations to coordinates with geocoding. and use them later to create a `leaflet` map for a `shiny app`.
 
 The `tidygeocoder` package provides geocoding services. It's designed to work easily with the `tidyverse.` It also provides access to several different geocoding services, including [LocationIQ](https://locationiq.com/) which I'm going to use here. LocationIQ is a freemium service that provides a free tier, which doesn't require you to give them your billing details. When you sign up to LocationIQ, they'll take you to the Manage Your API Access Tokens page, which is where we obtain our API token. Next, you need to provide the `tidygeocoder` package with your API key.
 
-You can also use the [Nominatim (\"osm\")](https://nominatim.org/) geocoding service (OpenStreetMap) which can be specified with the method argument (`method = "osm"`). I found LocationIQ to be faster.
+You can also use the [Nominatim ("osm")](https://nominatim.org/) geocoding service (OpenStreetMap) which can be specified with the method argument (`method = "osm"`). I found LocationIQ to be faster.
 
 The first step is to select only locations with missing coordinates and geocode them.
 
@@ -211,18 +220,46 @@ Note: Spree shootings here have three or more victims in a short time in multipl
 ### 📊 Age of shooter distribution
 
 ```{r}
-p1 <- mass_shootings_cln %>% 
-  ggplot(aes(age_of_shooter)) +
-  geom_histogram(fill = "indianred", color = "white", binwidth = 5) +
-  labs(title = "Age Distribution", x = "age of shooter")
+#| code-fold: true
+# create age group column
+mass_shootings_cln <-  mass_shootings_cln %>% 
+  mutate(age_group = case_when(
+    age_of_shooter >= 10 & age_of_shooter <= 14 ~ "10-15",
+    age_of_shooter <= 19 ~ "15-20",
+    age_of_shooter <= 24 ~ "20-25",
+    age_of_shooter <= 29 ~ "25-30",
+    age_of_shooter <= 34 ~ "30-35",
+    age_of_shooter <= 39 ~ "35-40",
+    age_of_shooter <= 44 ~ "40-45",
+    age_of_shooter <= 49 ~ "45-50",
+    age_of_shooter <= 54 ~ "50-55",
+    age_of_shooter <= 59 ~ "55-60",
+    age_of_shooter <= 64 ~ "60-65",
+    age_of_shooter <= 69 ~ "65-70",
+    age_of_shooter <= 74 ~ "70-75"))
+```
 
-ggplotly(p1)
+```{r}
+p1 <- mass_shootings_cln %>% 
+  filter(!is.na(age_group)) %>% 
+  group_by(age_group) %>% 
+  summarise(count = n(), .groups = "drop") %>% 
+  mutate(percent = scales::percent(count/sum(count), accuracy = 0.1)) %>% 
+  mutate(label_text = str_glue("Age group: {age_group}
+                               Count: {count}
+                               Percent: {percent}")) %>%
+  ggplot(aes(x = age_group, y = count, text = label_text)) +
+  geom_col(width = 0.7, fill = "indianred") +
+  labs(title = "Age Distribution", x = "age group") 
+
+ggplotly(p1, tooltip = "text")
+           
 ```
 
 <br/>
 
--   The vast majority of shooters were between 20 and 50 years old.
--   Most shooters were in the 20-25 age group.
+-   The vast majority of shooters were between 15 and 50 years old.
+-   Most shooters were in the 20-25 age group (18.7 %), followed by 40-45 (16.5 %) and 25-30 (15.8 %).
 
 🔎 Who was the youngest shooter?
 
@@ -253,7 +290,7 @@ ggplotly(p2)
 
 -   We can see an increase in mass shootings in the last 12 years.
 -   2020 has a smaller number of cases probably due to Covid restrictions.
--   The data for 2023 is incomplete, but 3 cases in the first two months seems a lot.
+-   The data for 2023 is incomplete, but 4 cases in the first three months seems a lot.
 
 ### 📊 Fatalities-Injured relationship
 
