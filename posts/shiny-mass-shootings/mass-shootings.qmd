@@ -322,14 +322,70 @@ summary(mass_shootings_cln$fatalities)
 summary(mass_shootings_cln$injured)
 ```
 
+### 📊 Total fatalities by state
+
+#### 🛠️ Data manipulation
+
+```{r}
+# create us states with abbreviations tibble
+states_with_abbr <- 
+  tibble(state = state.name, abbr = state.abb) %>% 
+  bind_rows(tibble(state = "District of Columbia", abbr = "DC"))
+
+# data manipulation
+by_state <- mass_shootings_cln %>% 
+  # recode some location values
+  mutate(location = case_when(
+    location == "Nashville, TN" ~ "Nashville, Tennessee",
+    location == "Washington, D.C." ~ "Washington, District of Columbia", 
+    TRUE ~ location)) %>% 
+  # separate location into city and state
+  separate(location, c("city", "state"), sep = ", ") %>% 
+  # group and summarize
+  group_by(state) %>% 
+  summarise(total_cases = n(),
+            total_fatalities = sum(fatalities), .groups = "drop") %>% 
+  # add us states abbreviations
+  left_join(states_with_abbr, by = "state") %>% 
+  # rearrange columns
+  select(state, abbr, everything())
+```
+
+#### 📈 Top ten states regarding number of cases and fatalities
+
+```{r}
+by_state %>% 
+  arrange(-total_cases, -total_fatalities) %>% 
+  head(10)
+```
+
+#### 📊 Total fatalities by state visualization
+
+```{r}
+by_state %>% 
+  plot_geo(locationmode = 'USA-states') %>% 
+  add_trace(z = ~total_fatalities,
+            locations = ~abbr,
+            color = ~total_fatalities,
+            colors = ~"Reds") %>% 
+  layout(
+    geo = list(
+      scope = "usa",
+      projection = list(type = "albers usa"),
+      lakecolor = toRGB("white")
+    )
+  )
+```
+
+
 ```{r}
 #| include: false
 # write csv file for shiny app
 mass_shootings_shiny <- mass_shootings_cln %>% 
   select(location, date, year, latitude, longitude, fatalities, summary) %>% 
   write_csv("data/mass_shootings_shiny.csv")
+  
 ```
-
 
 ## Shiny app
 
@@ -346,4 +402,3 @@ The app you can see below is embedded in this `quarto` document since my website
 
 </iframe>
 :::
-
