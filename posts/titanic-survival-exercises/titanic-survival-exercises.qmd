@@ -196,13 +196,17 @@ It's hard to tell from the previews plot I'll have to make a new column `Age gro
 titanic2 <- titanic %>%
   filter(!is.na(Age)) %>% 
   mutate(`Age group` = case_when(
-    Age >0 & Age <=8 ~ "0-8",
-    Age >=10 & Age <=18 ~ "10-18",
-    Age >=18 & Age <=30 ~ "18-30",
-    Age >=30 & Age <=50 ~ "30-50",
-    Age >=50 & Age <=70 ~ "50-70",
-    Age >=70 & Age <=80 ~ "70-80"))
+    Age > 0 & Age <= 8 ~ "0-8",
+    Age > 10 & Age <= 18 ~ "10-18",
+    Age > 18 & Age <= 30 ~ "18-30",
+    Age > 30 & Age <= 50 ~ "30-50",
+    Age > 50 & Age <= 70 ~ "50-70",
+    Age > 70 & Age <= 80 ~ "70-80"
+    )
+  )
 ```
+
+
 
 ```{r, fig.width=5, fig.height=4}
 titanic2 %>% 
