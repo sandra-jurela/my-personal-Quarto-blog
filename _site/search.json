@@ -11,7 +11,7 @@
     "href": "index.html",
     "title": "Sandra Jurela",
     "section": "",
-    "text": "Shiny App - Mass Shootings in the USA\n\n\n\n\n\n\n\nR\n\n\nshiny\n\n\nEDA\n\n\ndata cleaning\n\n\n\n\nEDA with Shiny app on mass shootings between August 20th, 1982 and March 27th, 2023.\n\n\n\n\n\n\nMar 1, 2023\n\n\nSandra Jurela\n\n\n\n\n\n\n  \n\n\n\n\nCryptocurrency SQL Case Study\n\n\n\n\n\n\n\nSQL\n\n\nPostgreSQL\n\n\nEDA\n\n\n\n\nData with Danny - SQL masterclass - O’Reilly. With R solutions for Part 4: Window functions.\n\n\n\n\n\n\nNov 25, 2022\n\n\nSandra Jurela\n\n\n\n\n\n\n  \n\n\n\n\nScraping 200 Best Movies of 2010s from Rotten Tomatoes\n\n\n\n\n\n\n\nweb scraping\n\n\ndata wrangling\n\n\nrvest\n\n\nR\n\n\nTableau\n\n\n\n\nScraping data on movies from Rotten Tomatoes and finally creating a dashboard in Tableau\n\n\n\n\n\n\nSep 1, 2022\n\n\nSandra Jurela\n\n\n\n\n\n\n  \n\n\n\n\nTitanic Survival Exercises\n\n\n\n\n\n\n\nR\n\n\nggplot2\n\n\ndata visualization\n\n\n\n\nAssessment of visualization skills acquired in the HarvardX’s Data Science: Visualization course.\n\n\n\n\n\n\nJun 9, 2022\n\n\nSandra Jurela\n\n\n\n\n\n\n  \n\n\n\n\nCustomer Analysis – Advanced Plots With {ggplot2}\n\n\n\n\n\n\n\ndata wrangling\n\n\ndata visualization\n\n\nSQL\n\n\nPostgreSQL\n\n\nR\n\n\n\n\nQuerying database in R code chunk and making some useful plots with ggplot2.\n\n\n\n\n\n\nMay 20, 2022\n\n\nSandra Jurela\n\n\n\n\n\n\n  \n\n\n\n\nAnswering Business Questions Using SQL\n\n\n\n\n\n\n\nSQL\n\n\nSQLite\n\n\ndata visualization\n\n\nR\n\n\n\n\nMy SQL project for the “Intermediate SQL for Data Analysis” course at Dataquest.\n\n\n\n\n\n\nFeb 15, 2022\n\n\nSandra Jurela\n\n\n\n\n\n\nNo matching items"
+    "text": "Shiny App - Mass Shootings in the USA\n\n\n\n\n\n\n\nR\n\n\nshiny\n\n\nEDA\n\n\ndata cleaning\n\n\n\n\nEDA with Shiny app on mass shootings between August 20th, 1982 and March 27th, 2023.\n\n\n\n\n\n\nMar 1, 2023\n\n\nSandra Jurela\n\n\n\n\n\n\n  \n\n\n\n\nCustomer Segmentation With K-Means and UMAP\n\n\n\n\n\n\n\nR\n\n\nk-means\n\n\nUMAP\n\n\n\n\nA report for the non-technical marketing team.\n\n\n\n\n\n\nDec 15, 2022\n\n\nSandra Jurela\n\n\n\n\n\n\n  \n\n\n\n\nCryptocurrency SQL Case Study\n\n\n\n\n\n\n\nSQL\n\n\nPostgreSQL\n\n\nEDA\n\n\n\n\nData with Danny - SQL masterclass - O’Reilly. With R solutions for Part 4: Window functions.\n\n\n\n\n\n\nNov 25, 2022\n\n\nSandra Jurela\n\n\n\n\n\n\n  \n\n\n\n\nScraping 200 Best Movies of 2010s from Rotten Tomatoes\n\n\n\n\n\n\n\nweb scraping\n\n\ndata wrangling\n\n\nrvest\n\n\nR\n\n\nTableau\n\n\n\n\nScraping data on movies from Rotten Tomatoes and finally creating a dashboard in Tableau\n\n\n\n\n\n\nSep 1, 2022\n\n\nSandra Jurela\n\n\n\n\n\n\n  \n\n\n\n\nTitanic Survival Exercises\n\n\n\n\n\n\n\nR\n\n\nggplot2\n\n\ndata visualization\n\n\n\n\nAssessment of visualization skills acquired in the HarvardX’s Data Science: Visualization course.\n\n\n\n\n\n\nJun 9, 2022\n\n\nSandra Jurela\n\n\n\n\n\n\n  \n\n\n\n\nCustomer Analysis – Advanced Plots With {ggplot2}\n\n\n\n\n\n\n\ndata wrangling\n\n\ndata visualization\n\n\nSQL\n\n\nPostgreSQL\n\n\nR\n\n\n\n\nQuerying database in R code chunk and making some useful plots with ggplot2.\n\n\n\n\n\n\nMay 20, 2022\n\n\nSandra Jurela\n\n\n\n\n\n\n  \n\n\n\n\nAnswering Business Questions Using SQL\n\n\n\n\n\n\n\nSQL\n\n\nSQLite\n\n\ndata visualization\n\n\nR\n\n\n\n\nMy SQL project for the “Intermediate SQL for Data Analysis” course at Dataquest.\n\n\n\n\n\n\nFeb 15, 2022\n\n\nSandra Jurela\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/answering-business-questions-using-sql/chinook.html",
@@ -327,5 +327,33 @@
     "title": "Shiny App - Mass Shootings in the USA",
     "section": "Introduction",
     "text": "Introduction\nMass shootings have been a topic of intense discussion in the United States. A public “database” of mass shootings since 1982 has been made available by the Mother Jones, a non-profit organization. This “database” is stored in a Google spreadsheet. You can view it here and download as a CSV file.\nThere are many definitions of mass shooting. Here is what Britannica has to say:\n\nMass shooting, also called active shooter incident, as defined by the U.S. Federal Bureau of Investigation (FBI), an event in which one or more individuals are “actively engaged in killing or attempting to kill people in a populated area. Implicit in this definition is the shooter’s use of a firearm.” The FBI has not set a minimum number of casualties to qualify an event as a mass shooting, but U.S. statute (the Investigative Assistance for Violent Crimes Act of 2012) defines a “mass killing” as “3 or more killings in a single incident”."
+  },
+  {
+    "objectID": "posts/customer-segmentation/cust-segm-report.html",
+    "href": "posts/customer-segmentation/cust-segm-report.html",
+    "title": "Customer Segmentation With K-Means and UMAP",
+    "section": "",
+    "text": "Marketing would like to increase email campaign engagement by segmenting the customer-base using their buying habbits."
+  },
+  {
+    "objectID": "posts/customer-segmentation/cust-segm-report.html#problem-statement",
+    "href": "posts/customer-segmentation/cust-segm-report.html#problem-statement",
+    "title": "Customer Segmentation With K-Means and UMAP",
+    "section": "Problem Statement",
+    "text": "Problem Statement\nMarketing would like to increase email campaign engagement by segmenting the customer-base using their buying habbits."
+  },
+  {
+    "objectID": "posts/customer-segmentation/cust-segm-report.html#solution-summary",
+    "href": "posts/customer-segmentation/cust-segm-report.html#solution-summary",
+    "title": "Customer Segmentation With K-Means and UMAP",
+    "section": "Solution Summary",
+    "text": "Solution Summary\nThe data science team has identified 4 customer segments. The 4 customer segments were given descriptions based on the customer’s top product purchases.\n\nSegment 1 Preferences: Road Bikes, Below $3200 (Economical Models)\nSegment 2 Preferences: Mountain Bikes, Above $3200 (Premium Models)\nSegment 3 Preferences: Road Bikes, Above $3200 (Premium Models)\nSegment 4 Preferences: Both Road and Mountain, Below $3200 (Economical Models)"
+  },
+  {
+    "objectID": "posts/customer-segmentation/cust-segm-report.html#customer-preferences",
+    "href": "posts/customer-segmentation/cust-segm-report.html#customer-preferences",
+    "title": "Customer Segmentation With K-Means and UMAP",
+    "section": "Customer Preferences",
+    "text": "Customer Preferences\n\nHeat Map\nOur customer-base consists of 30 bike shops. Several customers have purchasing preferences for Road or Mountain Bikes based on the proportion of bikes purchased by category_1 and category_2.\n\n\n\n\n\n\n\n\nCustomer Segmentation\nThis is a 2D Projection based on customer similarity that exposes 4 clusters, which are key segments in the customer base.\n\n\n\n\n\n\n\n\nCustomer Preferences By Segment\nThe 4 customer segments were given descriptions based on the customer’s top product purchases.\n\n\n\n\n\nSegment\nPreferences\nPrice Range\nDescription\n\n\n\n\n1\nRoad Bikes\nBelow $3200\nEconomical Models\n\n\n2\nMountain Bikes\nAbove $3200\nPremium Models\n\n\n3\nRoad Bikes\nAbove $3200\nPremium Models\n\n\n4\nRoad and Mountain Bikes\nBelow $3200\nEconomical Models"
   }
 ]

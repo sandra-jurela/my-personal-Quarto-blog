@@ -1,0 +1,87 @@
+---
+title: "Customer Segmentation With K-Means and UMAP"
+description: |
+  A report for the non-technical marketing team.
+date: 2022-12-15
+categories:
+  - R
+  - k-means
+  - UMAP
+image: images/preview.png
+execute: 
+  echo: false
+---
+
+```{r}
+library(tidyverse)
+library(tidyquant)
+library(broom)
+library(umap)
+library(ggrepel)
+library(plotly)
+```
+
+```{r}
+#| include: false
+bike_orderlines_tbl <- read_rds("data_scripts//bike_orderlines.rds")
+
+source("data_scripts/plot_customer_segmentation.R")
+```
+
+## Problem Statement
+
+Marketing would like to increase email campaign engagement by segmenting the customer-base using their buying habbits.
+
+## Solution Summary
+
+The data science team has identified 4 customer segments. The 4 customer segments were given descriptions based on the customer's top product purchases.
+
+1.  **Segment 1 Preferences:** Road Bikes, Below \$3200 (Economical Models)
+
+2.  **Segment 2 Preferences:** Mountain Bikes, Above \$3200 (Premium Models)
+
+3.  **Segment 3 Preferences:** Road Bikes, Above \$3200 (Premium Models)
+
+4.  **Segment 4 Preferences:** Both Road and Mountain, Below \$3200 (Economical Models)
+
+## Customer Preferences
+
+### Heat Map
+
+Our customer-base consists of 30 bike shops. Several customers have purchasing preferences for Road or Mountain Bikes based on the proportion of bikes purchased by category_1 and category_2.
+
+```{r, fig.height=12}
+# PLOT CUSTOMER HEAT MAP
+plot_customer_heatmap()
+```
+
+### Customer Segmentation
+
+This is a 2D Projection based on customer similarity that exposes 4 clusters, which are key segments in the customer base.
+
+```{r, fig.height=6, fig.width=7}
+# PLOT CUSTOMER SEGMENTS
+plot_customer_segments(k =4, seed = 123)
+```
+
+### Customer Preferences By Segment
+
+The 4 customer segments were given descriptions based on the customer's top product purchases.
+
+```{r}
+segm_table <- tibble(
+  Segment = c(1,2,3,4), 
+  Preferences = c("Road Bikes", "Mountain Bikes", "Road Bikes", "Road and Mountain Bikes"),
+  `Price Range` = c("Below $3200", "Above $3200","Above $3200", "Below $3200"), 
+  Description = c("Economical Models", "Premium Models", "Premium Models", "Economical Models")
+  )
+
+segm_table %>% knitr::kable()
+```
+
+```{r, fig.height=8}
+# PLOT CUSTOMER BEHAVIOR
+plot_customer_behavior_by_cluster(top_n_products = 5, k= 4, seed = 123)
+```
+
+

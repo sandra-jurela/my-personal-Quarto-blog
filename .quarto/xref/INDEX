@@ -52,5 +52,8 @@
   },
   "posts/k-nearest-neighbors/knn.qmd": {
     "knn.html": "9f3d5a5f"
+  },
+  "posts/customer-segmentation/cust-segm-report.qmd": {
+    "cust-segm-report.html": "d25b24a2"
   }
 }

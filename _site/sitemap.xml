@@ -6,7 +6,7 @@
   </url>
   <url>
     <loc>https://sandrajurela.com/index.html</loc>
-    <lastmod>2023-04-05T10:05:06.268Z</lastmod>
+    <lastmod>2023-04-07T14:43:18.280Z</lastmod>
   </url>
   <url>
     <loc>https://sandrajurela.com/posts/answering-business-questions-using-sql/chinook.html</loc>
@@ -31,5 +31,9 @@
   <url>
     <loc>https://sandrajurela.com/posts/web-scraping-rotten-tomatoes/rotten-tomatoes.html</loc>
     <lastmod>2023-03-21T16:12:51.323Z</lastmod>
+  </url>
+  <url>
+    <loc>https://sandrajurela.com/posts/customer-segmentation/cust-segm-report.html</loc>
+    <lastmod>2023-04-07T14:43:23.783Z</lastmod>
   </url>
 </urlset>
