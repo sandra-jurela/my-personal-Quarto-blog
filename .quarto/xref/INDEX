@@ -55,5 +55,8 @@
   },
   "posts/customer-segmentation/cust-segm-report.qmd": {
     "cust-segm-report.html": "d25b24a2"
+  },
+  "posts/customer-segmentation/tabs_badges.qmd": {
+    "tabs_badges.html": "5876ae1f"
   }
 }

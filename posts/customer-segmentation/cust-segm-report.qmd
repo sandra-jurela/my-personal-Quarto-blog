@@ -7,7 +7,7 @@ categories:
   - R
   - k-means
   - UMAP
-image: images/preview.png
+image: images/clusters.png
 execute: 
   echo: false
 ---
@@ -19,10 +19,11 @@ library(broom)
 library(umap)
 library(ggrepel)
 library(plotly)
+library(reactable)
+library(htmltools)
 ```
 
 ```{r}
-#| include: false
 bike_orderlines_tbl <- read_rds("data_scripts//bike_orderlines.rds")
 
 source("data_scripts/plot_customer_segmentation.R")
@@ -30,25 +31,25 @@ source("data_scripts/plot_customer_segmentation.R")
 
 ## Problem Statement
 
-Marketing would like to increase email campaign engagement by segmenting the customer-base using their buying habbits.
+Marketing team would like to increase email campaign engagement by segmenting the customer-base using their buying habits.
 
 ## Solution Summary
 
-The data science team has identified 4 customer segments. The 4 customer segments were given descriptions based on the customer's top product purchases.
+The 4 customer segments were identified and given descriptions based on the customer’s top product purchases.
 
-1.  **Segment 1 Preferences:** Road Bikes, Below \$3200 (Economical Models)
+1.  **Segment 1 Preferences:** Road Bikes, Below \$3200 (Economical Models) - 27%
 
-2.  **Segment 2 Preferences:** Mountain Bikes, Above \$3200 (Premium Models)
+2.  **Segment 2 Preferences:** Mountain Bikes, Above \$3200 (Premium Models) - 10%
 
-3.  **Segment 3 Preferences:** Road Bikes, Above \$3200 (Premium Models)
+3.  **Segment 3 Preferences:** Road Bikes, Above \$3200 (Premium Models) - 20%
 
-4.  **Segment 4 Preferences:** Both Road and Mountain, Below \$3200 (Economical Models)
+4.  **Segment 4 Preferences:** Both Road and Mountain, Below \$3200 (Economical Models) - 43%
 
 ## Customer Preferences
 
 ### Heat Map
 
-Our customer-base consists of 30 bike shops. Several customers have purchasing preferences for Road or Mountain Bikes based on the proportion of bikes purchased by category_1 and category_2.
+Our customer-base consists of 30 bike shops. Several customers have purchasing preferences for Road or Mountain Bikes based on the proportion of bikes purchased by category (mountain or road) and sub-category (Over Mountain, Trail, Elite Road, etc).
 
 ```{r, fig.height=12}
 # PLOT CUSTOMER HEAT MAP
@@ -61,7 +62,7 @@ This is a 2D Projection based on customer similarity that exposes 4 clusters, wh
 
 ```{r, fig.height=6, fig.width=7}
 # PLOT CUSTOMER SEGMENTS
-plot_customer_segments(k =4, seed = 123)
+plot_customer_segments(k = 4, seed = 123)
 ```
 
 ### Customer Preferences By Segment
@@ -74,14 +75,97 @@ segm_table <- tibble(
   Preferences = c("Road Bikes", "Mountain Bikes", "Road Bikes", "Road and Mountain Bikes"),
   `Price Range` = c("Below $3200", "Above $3200","Above $3200", "Below $3200"), 
   Description = c("Economical Models", "Premium Models", "Premium Models", "Economical Models")
-  )
+  ) %>% 
+  mutate(Segment = factor(Segment))
 
-segm_table %>% knitr::kable()
+reactable(
+  segm_table,
+  columns = list(
+    Segment = colDef(cell = function(value) {
+      class <- paste0("tag segment-", tolower(value))
+      div(class = class, value)
+    },
+    minWidth = 120
+    ),
+    Preferences = colDef(minWidth = 200),
+    `Price Range` = colDef(minWidth = 150),
+    Description = colDef(minWidth = 150)
+  )
+)
 ```
+
+
+```{css}
+.tag {
+  display: inline-block;
+  padding: 0.125rem 0.75rem;
+  border-radius: 15px;
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+.segment-1 {
+  background: hsl(350, 70%, 90%);
+  color: hsl(350, 45%, 30%);
+}
+
+.segment-2 {
+  background: hsl(205, 70%, 87%);
+  color: hsl(205, 45%, 25%);
+}
+
+.segment-3 {
+  background: hsl(116, 60%, 90%);
+  color: hsl(116, 30%, 25%);
+}
+
+.segment-4 {
+  background: hsl(281, 60%, 90%);
+  color: hsl(116, 30%, 25%);
+}
+```
+
+<br/>
 
 ```{r, fig.height=8}
 # PLOT CUSTOMER BEHAVIOR
-plot_customer_behavior_by_cluster(top_n_products = 5, k= 4, seed = 123)
+plot_customer_behavior_by_cluster(top_n_products = 5, k = 4, seed = 123)
 ```
+
+
+```{r}
+segments_tbl <- get_customer_segments(k=4, seed = 123) %>% 
+  select(.cluster, bikeshop_name) %>% 
+  rename(segment = .cluster) %>% 
+  arrange(segment, bikeshop_name) %>% 
+  inner_join(bike_orderlines_tbl %>% distinct(bikeshop_name, city, state)) %>% 
+  rename_all(funs(str_to_title(.))) %>% 
+  rename(Customer = Bikeshop_name) 
+```
+
+<br/>
+
+**Note:** The table below is sortable. You can sort a column by clicking on its header.
+
+```{r}
+reactable(
+  segments_tbl,
+  showPageSizeOptions = TRUE,
+  pageSizeOptions = c(10, 20, 30),
+  defaultPageSize = 10,
+  columns = list(
+    Segment = colDef(cell = function(value) {
+      class <- paste0("tag segment-", tolower(value))
+      div(class = class, value)
+      },
+      minWidth = 150
+    ),
+    Customer = colDef(minWidth = 320),
+    City = colDef(minWidth = 200)
+  )
+)
+```
+
+
 
 

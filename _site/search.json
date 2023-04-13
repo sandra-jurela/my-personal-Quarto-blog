@@ -340,20 +340,27 @@
     "href": "posts/customer-segmentation/cust-segm-report.html#problem-statement",
     "title": "Customer Segmentation With K-Means and UMAP",
     "section": "Problem Statement",
-    "text": "Problem Statement\nMarketing would like to increase email campaign engagement by segmenting the customer-base using their buying habbits."
+    "text": "Problem Statement\nMarketing team would like to increase email campaign engagement by segmenting the customer-base using their buying habits."
   },
   {
     "objectID": "posts/customer-segmentation/cust-segm-report.html#solution-summary",
     "href": "posts/customer-segmentation/cust-segm-report.html#solution-summary",
     "title": "Customer Segmentation With K-Means and UMAP",
     "section": "Solution Summary",
-    "text": "Solution Summary\nThe data science team has identified 4 customer segments. The 4 customer segments were given descriptions based on the customer’s top product purchases.\n\nSegment 1 Preferences: Road Bikes, Below $3200 (Economical Models)\nSegment 2 Preferences: Mountain Bikes, Above $3200 (Premium Models)\nSegment 3 Preferences: Road Bikes, Above $3200 (Premium Models)\nSegment 4 Preferences: Both Road and Mountain, Below $3200 (Economical Models)"
+    "text": "Solution Summary\nThe 4 customer segments were identified and given descriptions based on the customer’s top product purchases.\n\nSegment 1 Preferences: Road Bikes, Below $3200 (Economical Models) - 27%\nSegment 2 Preferences: Mountain Bikes, Above $3200 (Premium Models) - 10%\nSegment 3 Preferences: Road Bikes, Above $3200 (Premium Models) - 20%\nSegment 4 Preferences: Both Road and Mountain, Below $3200 (Economical Models) - 43%"
   },
   {
     "objectID": "posts/customer-segmentation/cust-segm-report.html#customer-preferences",
     "href": "posts/customer-segmentation/cust-segm-report.html#customer-preferences",
     "title": "Customer Segmentation With K-Means and UMAP",
     "section": "Customer Preferences",
-    "text": "Customer Preferences\n\nHeat Map\nOur customer-base consists of 30 bike shops. Several customers have purchasing preferences for Road or Mountain Bikes based on the proportion of bikes purchased by category_1 and category_2.\n\n\n\n\n\n\n\n\nCustomer Segmentation\nThis is a 2D Projection based on customer similarity that exposes 4 clusters, which are key segments in the customer base.\n\n\n\n\n\n\n\n\nCustomer Preferences By Segment\nThe 4 customer segments were given descriptions based on the customer’s top product purchases.\n\n\n\n\n\nSegment\nPreferences\nPrice Range\nDescription\n\n\n\n\n1\nRoad Bikes\nBelow $3200\nEconomical Models\n\n\n2\nMountain Bikes\nAbove $3200\nPremium Models\n\n\n3\nRoad Bikes\nAbove $3200\nPremium Models\n\n\n4\nRoad and Mountain Bikes\nBelow $3200\nEconomical Models"
+    "text": "Customer Preferences\n\nHeat Map\nOur customer-base consists of 30 bike shops. Several customers have purchasing preferences for Road or Mountain Bikes based on the proportion of bikes purchased by category (mountain or road) and sub-category (Over Mountain, Trail, Elite Road, etc).\n\n\n\n\n\n\n\n\nCustomer Segmentation\nThis is a 2D Projection based on customer similarity that exposes 4 clusters, which are key segments in the customer base.\n\n\n\n\n\n\n\n\nCustomer Preferences By Segment\nThe 4 customer segments were given descriptions based on the customer’s top product purchases.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNote: The table below is sortable. You can sort a column by clicking on its header."
+  },
+  {
+    "objectID": "posts/customer-segmentation/tabs_badges.html",
+    "href": "posts/customer-segmentation/tabs_badges.html",
+    "title": "tabs_badges",
+    "section": "",
+    "text": "library(reactable)\nlibrary(htmltools)\n\norders <- data.frame(\n  Order = 2300:2304,\n  Created = seq(as.Date(\"2019-04-01\"), by = \"day\", length.out = 5),\n  Customer = sample(rownames(MASS::painters), 5),\n  Status = sample(c(\"Pending\", \"Paid\", \"Canceled\"), 5, replace = TRUE),\n  stringsAsFactors = FALSE\n)\n\nreactable(\n  orders,\n  columns = list(\n    Status = colDef(cell = function(value) {\n      class <- paste0(\"tag status-\", tolower(value))\n      div(class = class, value)\n    })\n  )\n)\n\n\n\n\n\n\n\n.tag {\n  display: inline-block;\n  padding: 0.125rem 0.75rem;\n  border-radius: 15px;\n  font-weight: 600;\n  font-size: 0.75rem;\n}\n\n.status-paid {\n  background: hsl(116, 60%, 90%);\n  color: hsl(116, 30%, 25%);\n}\n\n.status-pending {\n  background: hsl(230, 70%, 90%);\n  color: hsl(230, 45%, 30%);\n}\n\n.status-canceled {\n  background: hsl(350, 70%, 90%);\n  color: hsl(350, 45%, 30%);\n}"
   }
 ]
