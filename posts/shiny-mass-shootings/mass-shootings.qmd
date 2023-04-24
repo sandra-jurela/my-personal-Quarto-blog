@@ -1,6 +1,6 @@
 ---
 title: "Shiny App - Mass Shootings in the USA"
-description: "EDA with Shiny app on mass shootings between August 20th, 1982 and March 27th, 2023."
+description: "EDA with Shiny app on mass shootings between August 20th, 1982 and April 10th, 2023."
 date: "2023-03-01"
 categories: 
   - R
@@ -13,14 +13,14 @@ image: images/preview.png
 ::: {.callout-note appearance="simple"}
 This post will be regularly updated with each new case.
 
-Last update on March 29, 2023.
+Last update on April 24, 2023.
 :::
 
 <br/>
 
 ## Introduction
 
-Mass shootings have been a topic of intense discussion in the United States. A public "database" of mass shootings since 1982 has been made available by the [Mother Jones](https://www.motherjones.com/politics/2012/12/mass-shootings-mother-jones-full-data/), a non-profit organization. This "database" is stored in a Google spreadsheet. You can view it [here](https://docs.google.com/spreadsheets/d/1b9o6uDO18sLxBqPwl_Gh9bnhW-ev_dABH83M5Vb5L8o/edit#gid=0) and download as a CSV file.
+Mass shootings have been a topic of intense discussion in the United States. A public "database" of mass shootings since 1982 has been made available by the [Mother Jones](https://www.motherjones.com/politics/2012/12/mass-shootings-mother-jones-full-data/), a non-profit organization. This "database" is stored in a Google spreadsheet. You can access it [here](https://docs.google.com/spreadsheets/d/1b9o6uDO18sLxBqPwl_Gh9bnhW-ev_dABH83M5Vb5L8o/edit#gid=0) and download as a CSV file.
 
 There are many definitions of mass shooting. Here is what [Britannica](https://www.britannica.com/topic/mass-shooting) has to say:
 
@@ -39,7 +39,7 @@ mass_shootings <- read_csv("data/mass_shootings_usa_1982-2023.csv")
 mass_shootings %>% glimpse()
 ```
 
-We have 141 cases, described with 24 variables. At first glance, this dataset clearly needs extensive cleaning.
+We have 142 cases, described with 24 variables. At first glance, this dataset clearly needs extensive cleaning.
 
 ## Data cleaning
 
@@ -48,7 +48,7 @@ We have 141 cases, described with 24 variables. At first glance, this dataset cl
 The first cleaning step includes:
 
 -   selecting columns of interest,
--   replacing the character value`"-"` with `NA` in all columns with character data type,
+-   replacing the character value `"-"` with `NA` in all columns with character data type,
 -   converting `date` column from character to date data type,
 -   renaming location columns,
 -   converting character data type to numeric for specific columns.
@@ -79,7 +79,7 @@ mass_shootings_cln %>%
   pivot_longer(cols = everything(), names_to = "column", values_to = "n_missing")
 ```
 
-15 of the most recent cases don't have location coordinates at all. We'll address this in the final cleanup step.
+16 of the most recent cases don't have location coordinates at all. We'll address this in the final cleanup step.
 
 ### 🧹 Step 2. Fixing unique values of categorical variables
 
@@ -261,7 +261,9 @@ ggplotly(p1, tooltip = "text")
 <br/>
 
 -   The vast majority of shooters were between 15 and 50 years old.
+-   The age distribution is bimodal, with one mode around 23 years of age and a second mode around 41 years of age.
 -   Most shooters were in the 20-25 age group (18.7 %), followed by 40-45 (16.5 %) and 25-30 (15.8 %).
+
 
 🔎 Who was the youngest shooter?
 
@@ -292,7 +294,7 @@ ggplotly(p2)
 
 -   We can see an increase in mass shootings in the last 12 years.
 -   2020 has a smaller number of cases probably due to Covid restrictions.
--   The data for 2023 is incomplete, but 4 cases in the first three months seems a lot.
+-   The data for 2023 is incomplete, but 5 cases in the first four months seems a lot.
 
 ### 📊 Fatalities-Injured relationship
 
@@ -337,6 +339,7 @@ by_state <- mass_shootings_cln %>%
   # recode some location values
   mutate(location = case_when(
     location == "Nashville, TN" ~ "Nashville, Tennessee",
+    location == "Louisville, KY" ~ "Louisville, Kentucky",
     location == "Washington, D.C." ~ "Washington, District of Columbia", 
     TRUE ~ location)) %>% 
   # separate location into city and state
@@ -377,14 +380,12 @@ by_state %>%
   )
 ```
 
-
 ```{r}
 #| include: false
 # write csv file for shiny app
 mass_shootings_shiny <- mass_shootings_cln %>% 
   select(location, date, year, latitude, longitude, fatalities, summary) %>% 
   write_csv("data/mass_shootings_shiny.csv")
-  
 ```
 
 ## Shiny app
