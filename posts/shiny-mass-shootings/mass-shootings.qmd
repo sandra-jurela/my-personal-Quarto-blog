@@ -123,7 +123,7 @@ mass_shootings_cln <- mass_shootings_cln %>%
 
 ### 🧹 Step 3. Geocoding locations with missing coordinates
 
-There are 15 cases with missing location coordinates. In this step we'll convert locations to coordinates with geocoding. and use them later to create a `leaflet` map for a `shiny app`.
+There are 16 cases with missing location coordinates. In this step we'll convert locations to coordinates with geocoding. and use them later to create a `leaflet` map for a `shiny app`.
 
 The `tidygeocoder` package provides geocoding services. It's designed to work easily with the `tidyverse.` It also provides access to several different geocoding services, including [LocationIQ](https://locationiq.com/) which I'm going to use here. LocationIQ is a freemium service that provides a free tier, which doesn't require you to give them your billing details. When you sign up to LocationIQ, they'll take you to the Manage Your API Access Tokens page, which is where we obtain our API token. Next, you need to provide the `tidygeocoder` package with your API key.
 
@@ -165,7 +165,7 @@ OK, this looks fine.
 
 To count unique values for all categorical variables separately, I'll write a function, `count_unique`, to avoid copying and pasting a block of code several times.
 
-This is the case when have the data-variable (column name) in a function argument. We need to embrace the argument by surrounding it in doubled braces, like `group_by({{ var }})`.
+Here we have a special case where we have to pass a dataframe column name (variable) to a function argument. The solution is to embrace the argument by surrounding it in doubled braces, like `group_by({{ var }})`.
 
 ```{r}
 count_unique <- function(data, var) {
@@ -223,7 +223,7 @@ Note: Spree shootings here have three or more victims in a short time in multipl
 
 ```{r}
 #| code-fold: true
-# create age group column
+# create "age group" column
 mass_shootings_cln <-  mass_shootings_cln %>% 
   mutate(age_group = case_when(
     age_of_shooter >= 10 & age_of_shooter <= 14 ~ "10-15",
@@ -262,8 +262,7 @@ ggplotly(p1, tooltip = "text")
 
 -   The vast majority of shooters were between 15 and 50 years old.
 -   The age distribution is bimodal, with one mode around 23 years of age and a second mode around 41 years of age.
--   Most shooters were in the 20-25 age group (18.7 %), followed by 40-45 (16.5 %) and 25-30 (15.8 %).
-
+-   Most shooters were in the 20-25 age group (18.6 %), followed by 40-45 (16.4 %) and 25-30 (16.4 %).
 
 🔎 Who was the youngest shooter?
 
