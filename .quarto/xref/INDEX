@@ -58,5 +58,11 @@
   },
   "posts/customer-segmentation/tabs_badges.qmd": {
     "tabs_badges.html": "5876ae1f"
+  },
+  "posts/streamlit-app/amsterdam-listings.qmd": {
+    "amsterdam-listings.html": "49121aba"
+  },
+  "posts/airbnb-amsterdam/amsterdam-listings.qmd": {
+    "amsterdam-listings.html": "5a09f562"
   }
 }

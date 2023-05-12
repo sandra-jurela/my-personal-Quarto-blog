@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.313">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Sandra Jurela">
+<meta name="dcterms.date" content="2023-05-05">
+<meta name="description" content="Cleaning data with Pandas and creating a streamlit app.">
+
+<title>Sandra Jurela - Streamlit app - Airbnb Amsterdam Listings</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../img/logo.png" rel="icon" type="image/png">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JH321LBKZY"></script>
+
+<script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-JH321LBKZY', { 'anonymize_ip': true});
+</script>
+<style>html{ scroll-behavior: smooth; }</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="Sandra Jurela - Streamlit app - Airbnb Amsterdam Listings">
+<meta property="og:description" content="Cleaning data with Pandas and creating a streamlit app.">
+<meta property="og:image" content="https://sandrajurela.com/posts\airbnb-amsterdam\preview.png">
+<meta property="og:site-name" content="Sandra Jurela">
+<meta property="og:image:height" content="945">
+<meta property="og:image:width" content="1432">
+<meta name="twitter:title" content="Sandra Jurela - Streamlit app - Airbnb Amsterdam Listings">
+<meta name="twitter:description" content="Cleaning data with Pandas and creating a streamlit app.">
+<meta name="twitter:image" content="https://sandrajurela.com/posts\airbnb-amsterdam\preview.png">
+<meta name="twitter:image-height" content="945">
+<meta name="twitter:image-width" content="1432">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../img/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Sandra Jurela</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html">
+ <span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/sandra-jurela"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/sandra-jurela-a95985211/"><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../index.xml"><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Streamlit app - Airbnb Amsterdam Listings</h1>
+                  <div>
+        <div class="description">
+          Cleaning data with Pandas and creating a streamlit app.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">python</div>
+                <div class="quarto-category">sreamlit</div>
+                <div class="quarto-category">data cleaning</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Sandra Jurela </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">May 5, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of Contents</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#data-overview" id="toc-data-overview" class="nav-link" data-scroll-target="#data-overview">Data overview</a>
+  <ul class="collapse">
+  <li><a href="#data-dictionary-for-listings-data" id="toc-data-dictionary-for-listings-data" class="nav-link" data-scroll-target="#data-dictionary-for-listings-data">Data dictionary for listings data</a></li>
+  <li><a href="#data-dictionary-for-calendar-data" id="toc-data-dictionary-for-calendar-data" class="nav-link" data-scroll-target="#data-dictionary-for-calendar-data">Data dictionary for calendar data</a></li>
+  </ul></li>
+  <li><a href="#cleaning-the-data" id="toc-cleaning-the-data" class="nav-link" data-scroll-target="#cleaning-the-data">Cleaning the data</a></li>
+  <li><a href="#streamlit-application" id="toc-streamlit-application" class="nav-link" data-scroll-target="#streamlit-application">Streamlit application</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content">
+
+
+
+
+<pre class="{css}"><code>pre.SourceCode {
+  border-left-color: #008000;
+}
+</code></pre>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+</section>
+<section id="data-overview" class="level2">
+<h2 class="anchored" data-anchor-id="data-overview">Data overview</h2>
+<p>Setting up the programming environment</p>
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># load libraries</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># show all columns (instead of cascading columns in the middle)</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>pd.set_option(<span class="st">"display.max_columns"</span>, <span class="va">None</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># don't show numbers in scientific notation</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>pd.set_option(<span class="st">"display.float_format"</span>, <span class="st">"</span><span class="sc">{:.2f}</span><span class="st">"</span>.<span class="bu">format</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Reading the datasets</p>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># read the Python Pickle and PyArrow Parquet files</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>df_list <span class="op">=</span> pd.read_pickle(<span class="st">"data/airbnb_amsterdam_listings.pkl"</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>df_cal <span class="op">=</span> pd.read_parquet(<span class="st">"data/airbnb_amsterdam_calendar.parquet"</span>, engine<span class="op">=</span><span class="st">"pyarrow"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Datasets overview</p>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df_list.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>id</th>
+      <th>host_acceptance_rate</th>
+      <th>host_is_superhost</th>
+      <th>host_listings_count</th>
+      <th>host_total_listings_count</th>
+      <th>neighbourhood_cleansed</th>
+      <th>latitude</th>
+      <th>longitude</th>
+      <th>room_type</th>
+      <th>accommodates</th>
+      <th>bedrooms</th>
+      <th>beds</th>
+      <th>amenities</th>
+      <th>price</th>
+      <th>minimum_nights</th>
+      <th>maximum_nights</th>
+      <th>has_availability</th>
+      <th>availability_30</th>
+      <th>availability_60</th>
+      <th>availability_90</th>
+      <th>availability_365</th>
+      <th>number_of_reviews</th>
+      <th>number_of_reviews_ltm</th>
+      <th>number_of_reviews_l30d</th>
+      <th>review_scores_rating</th>
+      <th>instant_bookable</th>
+      <th>reviews_per_month</th>
+      <th>price_in_euros</th>
+      <th>price_per_person</th>
+      <th>minimum_price</th>
+      <th>discount_per_5_days_booked</th>
+      <th>discount_per_10_days_booked</th>
+      <th>discount_per_30_and_more_days_booked</th>
+      <th>service_cost</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>23726706</td>
+      <td>0.95</td>
+      <td>f</td>
+      <td>1</td>
+      <td>1</td>
+      <td>IJburg - Zeeburgereiland</td>
+      <td>52.35</td>
+      <td>4.98</td>
+      <td>Private room</td>
+      <td>2</td>
+      <td>1.00</td>
+      <td>1.00</td>
+      <td>6</td>
+      <td>$88.00</td>
+      <td>2</td>
+      <td>14</td>
+      <td>t</td>
+      <td>0</td>
+      <td>6</td>
+      <td>20</td>
+      <td>66</td>
+      <td>78</td>
+      <td>11</td>
+      <td>3</td>
+      <td>4.99</td>
+      <td>t</td>
+      <td>1.53</td>
+      <td>None</td>
+      <td>$44</td>
+      <td>$176</td>
+      <td>5%</td>
+      <td>11%</td>
+      <td>16%</td>
+      <td>$4.99</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>35815036</td>
+      <td>1.00</td>
+      <td>t</td>
+      <td>1</td>
+      <td>1</td>
+      <td>Noord-Oost</td>
+      <td>52.42</td>
+      <td>4.96</td>
+      <td>Entire home/apt</td>
+      <td>2</td>
+      <td>NaN</td>
+      <td>1.00</td>
+      <td>5</td>
+      <td>$105.00</td>
+      <td>3</td>
+      <td>100</td>
+      <td>t</td>
+      <td>4</td>
+      <td>6</td>
+      <td>12</td>
+      <td>243</td>
+      <td>95</td>
+      <td>36</td>
+      <td>6</td>
+      <td>4.96</td>
+      <td>f</td>
+      <td>2.65</td>
+      <td>None</td>
+      <td>$52.5</td>
+      <td>$315</td>
+      <td>5%</td>
+      <td>12%</td>
+      <td>16%</td>
+      <td>$4.99</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>31553121</td>
+      <td>1.00</td>
+      <td>f</td>
+      <td>1</td>
+      <td>1</td>
+      <td>Noord-West</td>
+      <td>52.43</td>
+      <td>4.92</td>
+      <td>Entire home/apt</td>
+      <td>4</td>
+      <td>1.00</td>
+      <td>3.00</td>
+      <td>3</td>
+      <td>$152.00</td>
+      <td>2</td>
+      <td>60</td>
+      <td>t</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>3</td>
+      <td>82</td>
+      <td>26</td>
+      <td>1</td>
+      <td>4.74</td>
+      <td>f</td>
+      <td>2.02</td>
+      <td>None</td>
+      <td>$38</td>
+      <td>$304</td>
+      <td>7%</td>
+      <td>11%</td>
+      <td>22%</td>
+      <td>$4.99</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>34745823</td>
+      <td>0.94</td>
+      <td>f</td>
+      <td>3</td>
+      <td>3</td>
+      <td>Gaasperdam - Driemond</td>
+      <td>52.30</td>
+      <td>5.01</td>
+      <td>Entire home/apt</td>
+      <td>2</td>
+      <td>1.00</td>
+      <td>2.00</td>
+      <td>8</td>
+      <td>$87.00</td>
+      <td>2</td>
+      <td>1125</td>
+      <td>t</td>
+      <td>5</td>
+      <td>20</td>
+      <td>26</td>
+      <td>290</td>
+      <td>39</td>
+      <td>4</td>
+      <td>0</td>
+      <td>4.87</td>
+      <td>f</td>
+      <td>1.08</td>
+      <td>None</td>
+      <td>$43.5</td>
+      <td>$174</td>
+      <td>6%</td>
+      <td>10%</td>
+      <td>15%</td>
+      <td>$4.99</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>44586947</td>
+      <td>0.88</td>
+      <td>t</td>
+      <td>0</td>
+      <td>0</td>
+      <td>Gaasperdam - Driemond</td>
+      <td>52.31</td>
+      <td>5.03</td>
+      <td>Private room</td>
+      <td>4</td>
+      <td>2.00</td>
+      <td>3.00</td>
+      <td>4</td>
+      <td>$160.00</td>
+      <td>2</td>
+      <td>31</td>
+      <td>t</td>
+      <td>9</td>
+      <td>32</td>
+      <td>62</td>
+      <td>152</td>
+      <td>15</td>
+      <td>12</td>
+      <td>3</td>
+      <td>5.00</td>
+      <td>f</td>
+      <td>0.68</td>
+      <td>None</td>
+      <td>$40</td>
+      <td>$320</td>
+      <td>9%</td>
+      <td>22%</td>
+      <td>20%</td>
+      <td>$4.99</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p><br></p>
+<section id="data-dictionary-for-listings-data" class="level3">
+<h3 class="anchored" data-anchor-id="data-dictionary-for-listings-data">Data dictionary for listings data</h3>
+<p>Here is the definition of the listings data columns:</p>
+<ul>
+<li><code>id</code> - Airbnb’s unique identifier for the listing</li>
+<li><code>host_acceptance_rate</code> - Rate at which a host accepts booking request</li>
+<li><code>host_is_superhost</code> - Some Airbnb hosts are considered better than others, which this feature displays</li>
+<li><code>host_listings_count</code> - The number of listings the host has (per Airbnb calculations)</li>
+<li><code>host_total_listings_count</code> - The number of listings the host has (per Airbnb calculations)</li>
+<li><code>neighborhood_cleansed</code> - All neighborhoods present in Amsterdam</li>
+<li><code>latitude</code> - Geographical coordinate going from North to South</li>
+<li><code>longitude</code> - Geographical coordinate going from East to West</li>
+<li><code>room_type</code> - All room types available in Amsterdam on Airbnb</li>
+<li><code>accommodates</code> - Maximum number of people that can fit in the Airbnb listing</li>
+<li><code>bedrooms</code> - Number of bedrooms</li>
+<li><code>beds</code> - Number of beds (does not reveal if they are two-person or one-person beds)</li>
+<li><code>amenities</code> - Number of amenities present in the Airbnb listing</li>
+<li><code>price</code> - Price per day in US dollars</li>
+<li><code>minimum_nights</code> - Minimum number of nights you need to book for this listing</li>
+<li><code>maximum_nights</code> - Maximum number of nights you are allowed to book this listing</li>
+<li><code>has_availability</code> - Displays if this listing can be booked</li>
+<li><code>availability_30</code> - Number of available spots in the next 30 days</li>
+<li><code>number_of_reviews_l30d</code> - Number of reviews created in the last 30 days</li>
+<li><code>review_scores_rating</code> - Average rating given to the Airbnb listing</li>
+<li><code>instant_bookable</code> - Whether the guest can automatically book the listing without the host requiring to accept their booking request. An indicator of a commercial listing.</li>
+<li><code>price_per_person</code> - Price per person per night in US dollars</li>
+<li><code>minimum_price</code> - Price in US dollars times minimum nights</li>
+<li><code>discount_per_…</code> - Displays the discount when 5, 10, or 30+ days are booked</li>
+<li><code>service_cost</code> - Total service cost paid at booking</li>
+</ul>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df_cal.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>listing_id</th>
+      <th>date</th>
+      <th>available</th>
+      <th>price_in_dollar</th>
+      <th>minimum_nights</th>
+      <th>maximum_nights</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>23726706</td>
+      <td>2022-06-05</td>
+      <td>False</td>
+      <td>90.00</td>
+      <td>2</td>
+      <td>1125</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>23726706</td>
+      <td>2022-06-06</td>
+      <td>False</td>
+      <td>90.00</td>
+      <td>2</td>
+      <td>1125</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>23726706</td>
+      <td>2022-06-07</td>
+      <td>False</td>
+      <td>90.00</td>
+      <td>2</td>
+      <td>1125</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>23726706</td>
+      <td>2022-06-08</td>
+      <td>False</td>
+      <td>90.00</td>
+      <td>2</td>
+      <td>1125</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>23726706</td>
+      <td>2022-06-09</td>
+      <td>False</td>
+      <td>85.00</td>
+      <td>2</td>
+      <td>1125</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="data-dictionary-for-calendar-data" class="level3">
+<h3 class="anchored" data-anchor-id="data-dictionary-for-calendar-data">Data dictionary for calendar data</h3>
+<table class="table">
+<colgroup>
+<col style="width: 26%">
+<col style="width: 26%">
+<col style="width: 47%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Column name</th>
+<th>Data type</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>listing_id</td>
+<td>integer</td>
+<td>Airbnb’s unique identifier for the listing</td>
+</tr>
+<tr class="even">
+<td>date</td>
+<td>datetime</td>
+<td>The date in the listing’s calendar</td>
+</tr>
+<tr class="odd">
+<td>available</td>
+<td>boolean</td>
+<td>Whether the date is available for a booking</td>
+</tr>
+<tr class="even">
+<td>price_in_dollar</td>
+<td>float</td>
+<td>The price listed for the day</td>
+</tr>
+<tr class="odd">
+<td>minimum_nights</td>
+<td>integer</td>
+<td>Minimum nights for a booking made on this day</td>
+</tr>
+<tr class="even">
+<td>maximum_nights</td>
+<td>integer</td>
+<td>Maximum nights for a booking made on this day</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="cleaning-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="cleaning-the-data">Cleaning the data</h2>
+</section>
+<section id="streamlit-application" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="streamlit-application">Streamlit application</h2>
+<div class="column-body">
+<iframe height="1450" width="100%" frameborder="no" src="https://sandra-jurela-airbnb-amsterdam-streamlit-app-app-zls5nw.streamlit.app/?embedded=true">
+</iframe>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp(/https:\/\/sandrajurela\.com/);
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script>
+<script src="https://giscus.app/client.js" data-repo="sandra-jurela/my-personal-Quarto-blog" data-repo-id="R_kgDOI6JBDg" data-category="General" data-category-id="DIC_kwDOI6JBDs4CUB2R" data-mapping="title" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="top" data-theme="light" data-lang="en" crossorigin="anonymous" async="">
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+      <div class="nav-footer-center">© 2023 Sandra Jurela. All Rights Reserved<br>
+Built with 🧠 and <a href="https://quarto.org">Quarto</a> in RStudio.</div>
+  </div>
+</footer>
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

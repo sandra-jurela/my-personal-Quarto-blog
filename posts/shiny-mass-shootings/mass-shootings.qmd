@@ -1,6 +1,6 @@
 ---
 title: "Shiny App - Mass Shootings in the USA"
-description: "EDA with Shiny app on mass shootings between August 20th, 1982 and April 10th, 2023."
+description: "EDA with Shiny app on mass shootings between August 20th, 1982 and May 6th, 2023."
 date: "2023-03-01"
 categories: 
   - R
@@ -13,7 +13,7 @@ image: images/preview.png
 ::: {.callout-note appearance="simple"}
 This post will be regularly updated with each new case.
 
-Last update on April 24, 2023.
+Last update on May 12, 2023.
 :::
 
 <br/>
@@ -24,7 +24,7 @@ Mass shootings have been a topic of intense discussion in the United States. A p
 
 There are many definitions of mass shooting. Here is what [Britannica](https://www.britannica.com/topic/mass-shooting) has to say:
 
-> ***Mass shooting**, also called **active shooter incident**, as defined by the U.S. [Federal Bureau of Investigation](https://www.britannica.com/topic/Federal-Bureau-of-Investigation) (FBI), an event in which one or more individuals are "actively engaged in killing or attempting to kill people in a populated area. Implicit in this definition is the shooter's use of a firearm." The FBI has not set a minimum number of casualties to qualify an event as a mass shooting, but U.S. statute (the Investigative Assistance for Violent Crimes Act of 2012) defines a "mass killing" as **"3 or more killings in a single incident".***
+> ***Mass shooting**, also called **active shooter incident**, as defined by the U.S. [Federal Bureau of Investigation](https://www.britannica.com/topic/Federal-Bureau-of-Investigation) (FBI), an event in which one or more individuals are "**actively engaged in killing or attempting to kill people in a populated area.** Implicit in this definition is the shooter's use of a firearm." The FBI has not set a minimum number of casualties to qualify an event as a mass shooting, but U.S. statute (the Investigative Assistance for Violent Crimes Act of 2012) defines a "mass killing" as **"3 or more killings in a single incident".***
 
 ## Data overview
 
@@ -39,7 +39,7 @@ mass_shootings <- read_csv("data/mass_shootings_usa_1982-2023.csv")
 mass_shootings %>% glimpse()
 ```
 
-We have 142 cases, described with 24 variables. At first glance, this dataset clearly needs extensive cleaning.
+We have 143 cases, described with 24 variables. At first glance, this dataset clearly needs extensive cleaning.
 
 ## Data cleaning
 
@@ -79,7 +79,7 @@ mass_shootings_cln %>%
   pivot_longer(cols = everything(), names_to = "column", values_to = "n_missing")
 ```
 
-16 of the most recent cases don't have location coordinates at all. We'll address this in the final cleanup step.
+17 of the most recent cases don't have location coordinates at all. We'll address this in the final cleanup step.
 
 ### 🧹 Step 2. Fixing unique values of categorical variables
 
@@ -123,7 +123,7 @@ mass_shootings_cln <- mass_shootings_cln %>%
 
 ### 🧹 Step 3. Geocoding locations with missing coordinates
 
-There are 16 cases with missing location coordinates. In this step we'll convert locations to coordinates with geocoding. and use them later to create a `leaflet` map for a `shiny app`.
+There are 17 cases with missing location coordinates. In this step we'll convert locations to coordinates with geocoding. and use them later to create a `leaflet` map for a `shiny app`.
 
 The `tidygeocoder` package provides geocoding services. It's designed to work easily with the `tidyverse.` It also provides access to several different geocoding services, including [LocationIQ](https://locationiq.com/) which I'm going to use here. LocationIQ is a freemium service that provides a free tier, which doesn't require you to give them your billing details. When you sign up to LocationIQ, they'll take you to the Manage Your API Access Tokens page, which is where we obtain our API token. Next, you need to provide the `tidygeocoder` package with your API key.
 
@@ -184,37 +184,37 @@ count_unique <- function(data, var) {
 #### Gender
 
 ```{r}
-mass_shootings_cln %>% count_unique(gender)
+count_unique(mass_shootings_cln, gender)
 ```
 
 #### Race
 
 ```{r}
-mass_shootings_cln %>% count_unique(race)
+count_unique(mass_shootings_cln, race) 
 ```
 
 #### Specific location
 
 ```{r}
-mass_shootings_cln %>% count_unique(location_2)
+count_unique(mass_shootings_cln, location_2)
 ```
 
 #### Prior signs of mental health issues
 
 ```{r}
-mass_shootings_cln %>% count_unique(prior_signs_mental_health_issues)
+count_unique(mass_shootings_cln, prior_signs_mental_health_issues)
 ```
 
 #### Weapons obtained legally
 
 ```{r}
-mass_shootings_cln %>% count_unique(weapons_obtained_legally)
+count_unique(mass_shootings_cln, weapons_obtained_legally)
 ```
 
 #### Type
 
 ```{r}
-mass_shootings_cln %>% count_unique(type)
+count_unique(mass_shootings_cln, type)
 ```
 
 Note: Spree shootings here have three or more victims in a short time in multiple locations.
@@ -223,6 +223,7 @@ Note: Spree shootings here have three or more victims in a short time in multipl
 
 ```{r}
 #| code-fold: true
+#| code-summary: "Code for creating the age_group column"
 # create "age group" column
 mass_shootings_cln <-  mass_shootings_cln %>% 
   mutate(age_group = case_when(
@@ -258,11 +259,20 @@ ggplotly(p1, tooltip = "text")
            
 ```
 
+```{r}
+#| include: false
+mass_shootings_cln %>% 
+  ggplot(aes(age_of_shooter)) +
+  geom_density() + 
+  scale_x_continuous(breaks = seq(0, 70, 5))
+```
+
+
 <br/>
 
 -   The vast majority of shooters were between 15 and 50 years old.
 -   The age distribution is bimodal, with one mode around 23 years of age and a second mode around 41 years of age.
--   Most shooters were in the 20-25 age group (18.6 %), followed by 40-45 (16.4 %) and 25-30 (16.4 %).
+-   Most shooters were in the 20-25 age group (18.4 %), followed by 40-45 (16.3 %) and 25-30 (16.3 %).
 
 🔎 Who was the youngest shooter?
 
@@ -293,7 +303,7 @@ ggplotly(p2)
 
 -   We can see an increase in mass shootings in the last 12 years.
 -   2020 has a smaller number of cases probably due to Covid restrictions.
--   The data for 2023 is incomplete, but 5 cases in the first four months seems a lot.
+-   The data for 2023 is incomplete, but 6 cases in the first five months seems a lot.
 
 ### 📊 Fatalities-Injured relationship
 
@@ -335,12 +345,10 @@ states_with_abbr <-
 
 # data manipulation
 by_state <- mass_shootings_cln %>% 
-  # recode some location values
-  mutate(location = case_when(
-    location == "Nashville, TN" ~ "Nashville, Tennessee",
-    location == "Louisville, KY" ~ "Louisville, Kentucky",
-    location == "Washington, D.C." ~ "Washington, District of Columbia", 
-    TRUE ~ location)) %>% 
+  # recode D.d. to District of Columbia
+  mutate(location = ifelse(location == "Washington, D.C.", 
+                           "Washington, District of Columbia", 
+                           location)) %>% 
   # separate location into city and state
   separate(location, c("city", "state"), sep = ", ") %>% 
   # group and summarize
@@ -379,6 +387,7 @@ by_state %>%
   )
 ```
 
+
 ```{r}
 #| include: false
 # write csv file for shiny app
@@ -397,8 +406,10 @@ The app you can see below is embedded in this `quarto` document since my website
 
 <br>
 
-::: column-page
+::: column-screen
 <iframe height="800" width="100%" frameborder="no" src="https://sandra-jurela.shinyapps.io/shiny-mass-shootings-usa/">
 
 </iframe>
 :::
+
+Thanks for reading!

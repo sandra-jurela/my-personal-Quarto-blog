@@ -35,7 +35,7 @@ Marketing team would like to increase email campaign engagement by segmenting th
 
 ## Solution Summary
 
-The 4 customer segments were identified and given descriptions based on the customer’s top product purchases.
+The 4 customer segments were identified and given descriptions based on the customer's top product purchases.
 
 1.  **Segment 1 Preferences:** Road Bikes, Below \$3200 (Economical Models) - 27%
 
@@ -94,7 +94,6 @@ reactable(
 )
 ```
 
-
 ```{css}
 .tag {
   display: inline-block;
@@ -132,7 +131,6 @@ reactable(
 plot_customer_behavior_by_cluster(top_n_products = 5, k = 4, seed = 123)
 ```
 
-
 ```{r}
 segments_tbl <- get_customer_segments(k=4, seed = 123) %>% 
   select(.cluster, bikeshop_name) %>% 
@@ -165,7 +163,3 @@ reactable(
   )
 )
 ```
-
-
-
-
