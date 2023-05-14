@@ -147,8 +147,8 @@ h5.quarto-listing-category-title {
 }
 
 #quarto-margin-sidebar .quarto-listing-category {
-  font-size: 16px;
-  line-height: 28px;
+  font-size: 16px;  
+  line-height: 26px;
 }
 
 // Logo padding - keep
@@ -172,12 +172,13 @@ nav.navbar.navbar-expand-lg.navbar-dark {
 } 
 
 .sidebar nav[role=doc-toc]>h2, .sidebar nav[role=doc-toc]>.h2 {
-    font-weight: 600;    
+  font-weight: 600;    
 }
 
 .sidebar nav[role=doc-toc]>ul li a {
-    font-size: 14px;
+  font-size: 14px;
 }
+
 #quarto-margin-sidebar {
   margin-left: 20px; 
 }
