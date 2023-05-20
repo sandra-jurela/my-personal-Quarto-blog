@@ -1,6 +1,6 @@
 ---
 title: "Test - Altair Viz"
-description: "Testing Altair Viz rendering."
+description: "Testing Altair rendering."
 date: "2023-05-20"
 categories: 
   - python
@@ -14,8 +14,7 @@ format:
 image: images/tree.png
 ---
 
-
-### Data imports
+### Imports
 
 ```{python}
 # Import libraries 
@@ -24,11 +23,12 @@ import pandas as pd
 import json
 
 alt.data_transformers.enable("data_server")
+alt.renderers.enable("html")
 
-trees_df_original = pd.read_csv('data/vancouver_trees.csv')
+trees_df = pd.read_csv('data/vancouver_trees.csv')
 
 # Glance at the original df
-trees_df_original
+trees_df
 ```
 
 <br>
@@ -37,7 +37,7 @@ trees_df_original
 
 ```{python}
 # Check columns of the original df
-trees_df_original.info()
+trees_df.info()
 ```
 
 Based on the above data information and the dataset schema from <a href="https://opendata.vancouver.ca/explore/dataset/street-trees/information/?disjunctive.species_name&disjunctive.common_name&disjunctive.height_range_id" target="_blank">City of Vancouver Open Data Portal - Street Trees</a>, the **columns** can be preliminarily identified as four **groups**:
@@ -109,7 +109,7 @@ The cleaned target dataframe **trees_df** is composed of 5 columns. There are 68
 
 `date_planted`: The date of planting.
 
-### Q1 
+### Q1
 
 > Based on distribution of street trees planted in Vancouver by genus, which genus is the most popular one?
 
@@ -136,7 +136,7 @@ plot_1_genus
 
 From Figure 1, it has been confirmed that Acer is the most popular genus of trees based on the dataframe. The number of Acer trees is more than double of Prunus trees that have the second largest number in the Vancouver street trees. All the rest of the genera have less than 1,000 trees shown in the dataframe, and 47 out of the total 68 genera have less than 100 trees.
 
-### Q2 
+### Q2
 
 > In the past 30 years, how many trees have been planted every single year? And what is the number of trees planted by genus each year?
 
