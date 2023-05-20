@@ -267,7 +267,6 @@ mass_shootings_cln %>%
   scale_x_continuous(breaks = seq(0, 70, 5))
 ```
 
-
 <br/>
 
 -   The vast majority of shooters were between 15 and 50 years old.
@@ -386,7 +385,6 @@ by_state %>%
     )
   )
 ```
-
 
 ```{r}
 #| include: false

@@ -64,5 +64,17 @@
   },
   "posts/airbnb-amsterdam/amsterdam-listings.qmd": {
     "amsterdam-listings.html": "5a09f562"
+  },
+  "posts/vancouver-street-trees/trees-analysis.qmd": {
+    "trees-analysis.html": "c40aeb3d"
+  },
+  "posts/vancouver-street-trees/final_project_analysis_report.ipynb": {
+    "final_project_analysis_report.html": "35991641"
+  },
+  "posts/vancouver-street-trees/trees-analysis_delete.qmd": {
+    "trees-analysis_delete.html": "9f9c9e72"
+  },
+  "posts/test/trees-analysis.qmd": {
+    "trees-analysis.html": "45836d60"
   }
 }

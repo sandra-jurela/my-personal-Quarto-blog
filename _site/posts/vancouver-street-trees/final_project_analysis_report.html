@@ -1,0 +1,2055 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.313">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Sandra Jurela">
+
+<title>Sandra Jurela – final_project_analysis_report</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../img/logo.png" rel="icon" type="image/png">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JH321LBKZY"></script>
+
+<script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-JH321LBKZY', { 'anonymize_ip': true});
+</script>
+<style>html{ scroll-behavior: smooth; }</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../img/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Sandra Jurela</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html">
+ <span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/sandra-jurela"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/sandra-jurela-a95985211/"><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../index.xml"><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of Contents</h2>
+   
+  <ul>
+  <li><a href="#analysis-report-of-vancouver-street-trees-dataset" id="toc-analysis-report-of-vancouver-street-trees-dataset" class="nav-link active" data-scroll-target="#analysis-report-of-vancouver-street-trees-dataset">Analysis Report of Vancouver Street Trees Dataset</a>
+  <ul class="collapse">
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">INTRODUCTION</a>
+  <ul class="collapse">
+  <li><a href="#questions-of-interest" id="toc-questions-of-interest" class="nav-link" data-scroll-target="#questions-of-interest">Questions of Interest</a></li>
+  </ul></li>
+  <li><a href="#data-imports-and-wrangling" id="toc-data-imports-and-wrangling" class="nav-link" data-scroll-target="#data-imports-and-wrangling">DATA IMPORTS AND WRANGLING</a>
+  <ul class="collapse">
+  <li><a href="#data-imports" id="toc-data-imports" class="nav-link" data-scroll-target="#data-imports">Data imports</a></li>
+  <li><a href="#identify-and-drop-irrelevant-columns" id="toc-identify-and-drop-irrelevant-columns" class="nav-link" data-scroll-target="#identify-and-drop-irrelevant-columns">Identify and drop irrelevant columns</a></li>
+  <li><a href="#exam-null-values" id="toc-exam-null-values" class="nav-link" data-scroll-target="#exam-null-values">Exam null values</a></li>
+  <li><a href="#further-exam-for-error-data" id="toc-further-exam-for-error-data" class="nav-link" data-scroll-target="#further-exam-for-error-data">Further exam for error data</a></li>
+  </ul></li>
+  <li><a href="#analysis" id="toc-analysis" class="nav-link" data-scroll-target="#analysis">ANALYSIS</a>
+  <ul class="collapse">
+  <li><a href="#dataset-description" id="toc-dataset-description" class="nav-link" data-scroll-target="#dataset-description">Dataset Description</a></li>
+  </ul></li>
+  <li><a href="#discussions" id="toc-discussions" class="nav-link" data-scroll-target="#discussions">DISCUSSIONS</a></li>
+  <li><a href="#dashboard-1" id="toc-dashboard-1" class="nav-link" data-scroll-target="#dashboard-1">DASHBOARD 1</a></li>
+  <li><a href="#dashboard-2" id="toc-dashboard-2" class="nav-link" data-scroll-target="#dashboard-2">DASHBOARD 2</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">REFERENCES</a>
+  <ul class="collapse">
+  <li><a href="#resources-used" id="toc-resources-used" class="nav-link" data-scroll-target="#resources-used">Resources Used</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+<section id="analysis-report-of-vancouver-street-trees-dataset" class="level1">
+<h1>Analysis Report of Vancouver Street Trees Dataset</h1>
+<div style="text-align: right">
+November 7, 2021
+</div>
+<div style="text-align: right">
+Final Project Analysis Report by Peng Zhang
+</div>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">INTRODUCTION</h2>
+<p>The City of Vancouver is one of the leading cities in Canada to advocate Open Data in the public sector. It has developed and maintained a robust public street trees database that is freely available to the public under the terms of the <a href="https://opendata.vancouver.ca/pages/licence/" target="_blank">Open Government Licence – Vancouver</a>.</p>
+<p>As a Data Science practitioner and also a Data Liberation believer, it is my pleasure to explore a <a href="https://raw.githubusercontent.com/UBC-MDS/exploratory-data-viz/main/data/vancouver_trees.csv" target="_blank">subset</a> of the Vancouver Street Trees dataset that is introduced by the Data Visualization course at UBC. From this dataset, <strong>the intention of the analysis is to have an overall view of Vancouver street trees for their biological diversity, growth and distributions within neighbourhoods</strong>. The findings would provide reference and insights for the residents of Vancouver, botanists, urban greening project workers, and potential house buyers who are interested with the street trees in the city.</p>
+<section id="questions-of-interest" class="level3">
+<h3 class="anchored" data-anchor-id="questions-of-interest">Questions of Interest</h3>
+<p>Through a completed Exploratory Data Analysis (EDA) on the above noted Vancouver Street Trees subset, the following questions have been defined according to the intention of the analysis.</p>
+<ol type="1">
+<li>Based on the distribution of street trees planted in Vancouver by genus, which genus is the most popular one?</li>
+<li>In the past 30 years, how many trees have been planted every single year? And what is the number of trees planted by genus each year?</li>
+<li>Based on the growth rates of each genus, which genus is the fastest one within the Vancouver street trees dataset?</li>
+<li>How many street trees are growing in each neighbourhood and what are the average age and average diameter of trees in each neighbourhood?</li>
+</ol>
+</section>
+</section>
+<section id="data-imports-and-wrangling" class="level2">
+<h2 class="anchored" data-anchor-id="data-imports-and-wrangling">DATA IMPORTS AND WRANGLING</h2>
+<section id="data-imports" class="level3">
+<h3 class="anchored" data-anchor-id="data-imports">Data imports</h3>
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import libraries needed for this assignment</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> altair <span class="im">as</span> alt</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>alt.data_transformers.enable(<span class="st">"data_server"</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Use data sever url method to read data</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>URL <span class="op">=</span> <span class="st">"https://raw.githubusercontent.com/UBC-MDS/exploratory-data-viz/main/data/vancouver_trees.csv"</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>trees_df_original <span class="op">=</span> pd.read_csv(URL)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Glance at the original df</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>trees_df_original</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>std_street</th>
+      <th>on_street</th>
+      <th>species_name</th>
+      <th>neighbourhood_name</th>
+      <th>date_planted</th>
+      <th>diameter</th>
+      <th>street_side_name</th>
+      <th>genus_name</th>
+      <th>assigned</th>
+      <th>civic_number</th>
+      <th>plant_area</th>
+      <th>curb</th>
+      <th>tree_id</th>
+      <th>common_name</th>
+      <th>height_range_id</th>
+      <th>on_street_block</th>
+      <th>cultivar_name</th>
+      <th>root_barrier</th>
+      <th>latitude</th>
+      <th>longitude</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>W 13TH AV</td>
+      <td>MAPLE ST</td>
+      <td>PSEUDOPLATANUS</td>
+      <td>Kitsilano</td>
+      <td>NaN</td>
+      <td>9.00</td>
+      <td>EVEN</td>
+      <td>ACER</td>
+      <td>N</td>
+      <td>1996</td>
+      <td>10</td>
+      <td>Y</td>
+      <td>13310</td>
+      <td>SYCAMORE MAPLE</td>
+      <td>4</td>
+      <td>2900</td>
+      <td>NaN</td>
+      <td>N</td>
+      <td>49.259856</td>
+      <td>-123.150586</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>WALES ST</td>
+      <td>WALES ST</td>
+      <td>PLATANOIDES</td>
+      <td>Renfrew-Collingwood</td>
+      <td>2018-11-28</td>
+      <td>3.00</td>
+      <td>ODD</td>
+      <td>ACER</td>
+      <td>N</td>
+      <td>5291</td>
+      <td>7</td>
+      <td>Y</td>
+      <td>259084</td>
+      <td>PRINCETON GOLD MAPLE</td>
+      <td>1</td>
+      <td>5200</td>
+      <td>PRINCETON GOLD</td>
+      <td>N</td>
+      <td>49.236650</td>
+      <td>-123.051831</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>W BROADWAY</td>
+      <td>W BROADWAY</td>
+      <td>RUBRUM</td>
+      <td>Kitsilano</td>
+      <td>1996-04-19</td>
+      <td>14.00</td>
+      <td>EVEN</td>
+      <td>ACER</td>
+      <td>N</td>
+      <td>3618</td>
+      <td>C</td>
+      <td>Y</td>
+      <td>167986</td>
+      <td>KARPICK RED MAPLE</td>
+      <td>3</td>
+      <td>3600</td>
+      <td>KARPICK</td>
+      <td>N</td>
+      <td>49.264250</td>
+      <td>-123.184020</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>PENTICTON ST</td>
+      <td>PENTICTON ST</td>
+      <td>CALLERYANA</td>
+      <td>Renfrew-Collingwood</td>
+      <td>2006-03-06</td>
+      <td>3.75</td>
+      <td>EVEN</td>
+      <td>PYRUS</td>
+      <td>N</td>
+      <td>2502</td>
+      <td>5</td>
+      <td>Y</td>
+      <td>213386</td>
+      <td>CHANTICLEER PEAR</td>
+      <td>1</td>
+      <td>2500</td>
+      <td>CHANTICLEER</td>
+      <td>Y</td>
+      <td>49.261036</td>
+      <td>-123.052921</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>RHODES ST</td>
+      <td>RHODES ST</td>
+      <td>GLYPTOSTROBOIDES</td>
+      <td>Renfrew-Collingwood</td>
+      <td>2001-11-01</td>
+      <td>3.00</td>
+      <td>ODD</td>
+      <td>METASEQUOIA</td>
+      <td>N</td>
+      <td>5639</td>
+      <td>N</td>
+      <td>Y</td>
+      <td>189223</td>
+      <td>DAWN REDWOOD</td>
+      <td>2</td>
+      <td>5600</td>
+      <td>NaN</td>
+      <td>N</td>
+      <td>49.233354</td>
+      <td>-123.050249</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>29995</th>
+      <td>ROBSON ST</td>
+      <td>ROBSON ST</td>
+      <td>CAMPESTRE</td>
+      <td>West End</td>
+      <td>NaN</td>
+      <td>7.00</td>
+      <td>ODD</td>
+      <td>ACER</td>
+      <td>N</td>
+      <td>1015</td>
+      <td>c</td>
+      <td>Y</td>
+      <td>122814</td>
+      <td>HEDGE MAPLE</td>
+      <td>2</td>
+      <td>1000</td>
+      <td>NaN</td>
+      <td>N</td>
+      <td>49.283666</td>
+      <td>-123.123231</td>
+    </tr>
+    <tr>
+      <th>29996</th>
+      <td>OSLER ST</td>
+      <td>CONNAUGHT DRIVE</td>
+      <td>PLATANOIDES</td>
+      <td>Shaughnessy</td>
+      <td>2007-04-16</td>
+      <td>8.00</td>
+      <td>ODD</td>
+      <td>ACER</td>
+      <td>N</td>
+      <td>4690</td>
+      <td>10</td>
+      <td>Y</td>
+      <td>132211</td>
+      <td>NORWAY MAPLE</td>
+      <td>1</td>
+      <td>1000</td>
+      <td>NaN</td>
+      <td>Y</td>
+      <td>49.243636</td>
+      <td>-123.129480</td>
+    </tr>
+    <tr>
+      <th>29997</th>
+      <td>BEATRICE ST</td>
+      <td>BEATRICE ST</td>
+      <td>CERASIFERA</td>
+      <td>Victoria-Fraserview</td>
+      <td>NaN</td>
+      <td>17.30</td>
+      <td>EVEN</td>
+      <td>PRUNUS</td>
+      <td>N</td>
+      <td>6218</td>
+      <td>9</td>
+      <td>Y</td>
+      <td>59355</td>
+      <td>PISSARD PLUM</td>
+      <td>3</td>
+      <td>6200</td>
+      <td>ATROPURPUREUM</td>
+      <td>N</td>
+      <td>49.227406</td>
+      <td>-123.066936</td>
+    </tr>
+    <tr>
+      <th>29998</th>
+      <td>ANGUS DRIVE</td>
+      <td>ANGUS DRIVE</td>
+      <td>BILOBA</td>
+      <td>Shaughnessy</td>
+      <td>2006-02-17</td>
+      <td>4.00</td>
+      <td>ODD</td>
+      <td>GINKGO</td>
+      <td>N</td>
+      <td>1551</td>
+      <td>9</td>
+      <td>Y</td>
+      <td>207753</td>
+      <td>GINKGO OR MAIDENHAIR TREE</td>
+      <td>1</td>
+      <td>1500</td>
+      <td>NaN</td>
+      <td>Y</td>
+      <td>49.254431</td>
+      <td>-123.140382</td>
+    </tr>
+    <tr>
+      <th>29999</th>
+      <td>MAIN ST</td>
+      <td>MAIN ST</td>
+      <td>EUCHLORA   X</td>
+      <td>Riley Park</td>
+      <td>NaN</td>
+      <td>12.00</td>
+      <td>ODD</td>
+      <td>TILIA</td>
+      <td>N</td>
+      <td>4323</td>
+      <td>C</td>
+      <td>Y</td>
+      <td>92997</td>
+      <td>CRIMEAN LINDEN</td>
+      <td>4</td>
+      <td>4300</td>
+      <td>NaN</td>
+      <td>N</td>
+      <td>49.246969</td>
+      <td>-123.101328</td>
+    </tr>
+  </tbody>
+</table>
+<p>30000 rows × 20 columns</p>
+</div>
+</div>
+</div>
+</section>
+<section id="identify-and-drop-irrelevant-columns" class="level3">
+<h3 class="anchored" data-anchor-id="identify-and-drop-irrelevant-columns">Identify and drop irrelevant columns</h3>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check columns of the original df</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>trees_df_original.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+RangeIndex: 30000 entries, 0 to 29999
+Data columns (total 20 columns):
+ #   Column              Non-Null Count  Dtype  
+---  ------              --------------  -----  
+ 0   std_street          30000 non-null  object 
+ 1   on_street           30000 non-null  object 
+ 2   species_name        30000 non-null  object 
+ 3   neighbourhood_name  30000 non-null  object 
+ 4   date_planted        14085 non-null  object 
+ 5   diameter            30000 non-null  float64
+ 6   street_side_name    30000 non-null  object 
+ 7   genus_name          30000 non-null  object 
+ 8   assigned            30000 non-null  object 
+ 9   civic_number        30000 non-null  int64  
+ 10  plant_area          29722 non-null  object 
+ 11  curb                30000 non-null  object 
+ 12  tree_id             30000 non-null  int64  
+ 13  common_name         30000 non-null  object 
+ 14  height_range_id     30000 non-null  int64  
+ 15  on_street_block     30000 non-null  int64  
+ 16  cultivar_name       16178 non-null  object 
+ 17  root_barrier        30000 non-null  object 
+ 18  latitude            30000 non-null  float64
+ 19  longitude           30000 non-null  float64
+dtypes: float64(3), int64(4), object(13)
+memory usage: 4.6+ MB</code></pre>
+</div>
+</div>
+<p>Based on the above data information and the dataset schema from <a href="https://opendata.vancouver.ca/explore/dataset/street-trees/information/?disjunctive.species_name&amp;disjunctive.common_name&amp;disjunctive.height_range_id" target="_blank">City of Vancouver Open Data Portal - Street Trees</a>, the <strong>columns</strong> can be preliminarily identified as four <strong>groups</strong>:</p>
+<ol type="1">
+<li>Trees biological classifications and names, such as <code>genus_name</code>, <code>species_name</code>, <code>common_name</code>, <code>cultivar_name</code></li>
+<li>Trees growth related characteristics, such as <code>date_planted</code>, <code>diameter</code>, <code>height_range_id</code></li>
+<li>Trees coordinates and areas, such as <code>latitude</code>, <code>longitude</code>, <code>neighbourhood_name</code></li>
+<li>Other specific location / orientation / identification information</li>
+</ol>
+<p>As per the questions, the irrelevant columns under the fourth group and trees coordinates will be dropped. Also, to narrow down the focus to the highest level of tree classification, the columns of <code>species_name</code>, <code>common_name</code>, <code>cultivar_name</code> will also be dropped and only keep the column of <code>genus_name</code>.</p>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Transform the column 'date_planted' to a datetime64 dtype and drop irrelevant columns</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>trees_df_dropped <span class="op">=</span> pd.read_csv(URL,parse_dates <span class="op">=</span> [<span class="st">'date_planted'</span>]</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                                    ).drop(columns<span class="op">=</span>[<span class="st">'std_street'</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>                                                    <span class="st">'on_street'</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>                                                    <span class="st">'street_side_name'</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>                                                    <span class="st">'assigned'</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>                                                    <span class="st">'civic_number'</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>                                                    <span class="st">'plant_area'</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>                                                    <span class="st">'curb'</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>                                                    <span class="st">'on_street_block'</span>,</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>                                                    <span class="st">'tree_id'</span>,</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>                                                    <span class="st">'root_barrier'</span>,</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>                                                    <span class="st">'latitude'</span>,</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>                                                    <span class="st">'longitude'</span>,</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>                                                    <span class="st">'species_name'</span>,</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>                                                    <span class="st">'common_name'</span>,</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>                                                    <span class="st">'cultivar_name'</span>])</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>trees_df_dropped.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+RangeIndex: 30000 entries, 0 to 29999
+Data columns (total 5 columns):
+ #   Column              Non-Null Count  Dtype         
+---  ------              --------------  -----         
+ 0   neighbourhood_name  30000 non-null  object        
+ 1   date_planted        14085 non-null  datetime64[ns]
+ 2   diameter            30000 non-null  float64       
+ 3   genus_name          30000 non-null  object        
+ 4   height_range_id     30000 non-null  int64         
+dtypes: datetime64[ns](1), float64(1), int64(1), object(2)
+memory usage: 1.1+ MB</code></pre>
+</div>
+</div>
+</section>
+<section id="exam-null-values" class="level3">
+<h3 class="anchored" data-anchor-id="exam-null-values">Exam null values</h3>
+<p>Based on the above dateframe information, the column of <code>date_planted</code> has almost half of values missed. Since reviewing trees growth is one of the tasks in this analysis, any observations without the date of being planted will be considered as uninformative data and dropped from the original dataframe. In the EDA, an extra analysis has been performed and verified that dropping the observations with null values in <code>date_planted</code> will not cause the data representativeness issue.</p>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop observations without value of date_planted</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>trees_df_dropped_dropna <span class="op">=</span> trees_df_dropped.dropna(subset<span class="op">=</span>[<span class="st">'date_planted'</span>])</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>trees_df_dropped_dropna.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+Int64Index: 14085 entries, 1 to 29998
+Data columns (total 5 columns):
+ #   Column              Non-Null Count  Dtype         
+---  ------              --------------  -----         
+ 0   neighbourhood_name  14085 non-null  object        
+ 1   date_planted        14085 non-null  datetime64[ns]
+ 2   diameter            14085 non-null  float64       
+ 3   genus_name          14085 non-null  object        
+ 4   height_range_id     14085 non-null  int64         
+dtypes: datetime64[ns](1), float64(1), int64(1), object(2)
+memory usage: 660.2+ KB</code></pre>
+</div>
+</div>
+</section>
+<section id="further-exam-for-error-data" class="level3">
+<h3 class="anchored" data-anchor-id="further-exam-for-error-data">Further exam for error data</h3>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Exam the remaining columns for more details</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>trees_df_dropped_dropna.describe(include<span class="op">=</span><span class="st">'all'</span>,datetime_is_numeric<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>neighbourhood_name</th>
+      <th>date_planted</th>
+      <th>diameter</th>
+      <th>genus_name</th>
+      <th>height_range_id</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>count</th>
+      <td>14085</td>
+      <td>14085</td>
+      <td>14085.000000</td>
+      <td>14085</td>
+      <td>14085.000000</td>
+    </tr>
+    <tr>
+      <th>unique</th>
+      <td>22</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>68</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>top</th>
+      <td>Renfrew-Collingwood</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>ACER</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>freq</th>
+      <td>1323</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>3970</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>mean</th>
+      <td>NaN</td>
+      <td>2003-09-20 17:40:42.172523904</td>
+      <td>6.352586</td>
+      <td>NaN</td>
+      <td>1.822932</td>
+    </tr>
+    <tr>
+      <th>min</th>
+      <td>NaN</td>
+      <td>1989-10-27 00:00:00</td>
+      <td>0.000000</td>
+      <td>NaN</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>25%</th>
+      <td>NaN</td>
+      <td>1997-12-15 00:00:00</td>
+      <td>3.000000</td>
+      <td>NaN</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>50%</th>
+      <td>NaN</td>
+      <td>2003-04-01 00:00:00</td>
+      <td>5.000000</td>
+      <td>NaN</td>
+      <td>2.000000</td>
+    </tr>
+    <tr>
+      <th>75%</th>
+      <td>NaN</td>
+      <td>2009-11-13 00:00:00</td>
+      <td>8.000000</td>
+      <td>NaN</td>
+      <td>2.000000</td>
+    </tr>
+    <tr>
+      <th>max</th>
+      <td>NaN</td>
+      <td>2019-06-03 00:00:00</td>
+      <td>317.000000</td>
+      <td>NaN</td>
+      <td>9.000000</td>
+    </tr>
+    <tr>
+      <th>std</th>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>5.273737</td>
+      <td>NaN</td>
+      <td>0.983476</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p>It has been noticed that the <strong>minimum of <code>diameter</code> and <code>height_range_id</code></strong> are <strong>zero</strong>. For <code>height_range_id</code>, 0 represents the range of height is from 0 to 10 ft. However, since the <code>diameter</code> figure is the diameter of tree at breast height, it should not have the value of 0. So these observations will be considered as invalid data and removed from the df.</p>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>indexs <span class="op">=</span> trees_df_dropped_dropna[trees_df_dropped_dropna[<span class="st">'diameter'</span>] <span class="op">==</span> <span class="dv">0</span>].index</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># To simplify the object names afterwards, make a cope of df named as trees_df</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>trees_df <span class="op">=</span> trees_df_dropped_dropna.copy()</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>trees_df.drop(indexs, inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>trees_df.describe(include<span class="op">=</span><span class="st">'all'</span>,datetime_is_numeric<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>neighbourhood_name</th>
+      <th>date_planted</th>
+      <th>diameter</th>
+      <th>genus_name</th>
+      <th>height_range_id</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>count</th>
+      <td>14083</td>
+      <td>14083</td>
+      <td>14083.000000</td>
+      <td>14083</td>
+      <td>14083.000000</td>
+    </tr>
+    <tr>
+      <th>unique</th>
+      <td>22</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>68</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>top</th>
+      <td>Renfrew-Collingwood</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>ACER</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>freq</th>
+      <td>1323</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>3970</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>mean</th>
+      <td>NaN</td>
+      <td>2003-09-20 23:57:38.893701504</td>
+      <td>6.353489</td>
+      <td>NaN</td>
+      <td>1.822978</td>
+    </tr>
+    <tr>
+      <th>min</th>
+      <td>NaN</td>
+      <td>1989-10-27 00:00:00</td>
+      <td>0.500000</td>
+      <td>NaN</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>25%</th>
+      <td>NaN</td>
+      <td>1997-12-15 12:00:00</td>
+      <td>3.000000</td>
+      <td>NaN</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>50%</th>
+      <td>NaN</td>
+      <td>2003-04-01 00:00:00</td>
+      <td>5.000000</td>
+      <td>NaN</td>
+      <td>2.000000</td>
+    </tr>
+    <tr>
+      <th>75%</th>
+      <td>NaN</td>
+      <td>2009-11-13 00:00:00</td>
+      <td>8.000000</td>
+      <td>NaN</td>
+      <td>2.000000</td>
+    </tr>
+    <tr>
+      <th>max</th>
+      <td>NaN</td>
+      <td>2019-06-03 00:00:00</td>
+      <td>317.000000</td>
+      <td>NaN</td>
+      <td>9.000000</td>
+    </tr>
+    <tr>
+      <th>std</th>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>5.273568</td>
+      <td>NaN</td>
+      <td>0.983520</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="analysis" class="level2">
+<h2 class="anchored" data-anchor-id="analysis">ANALYSIS</h2>
+<section id="dataset-description" class="level3">
+<h3 class="anchored" data-anchor-id="dataset-description">Dataset Description</h3>
+<p>The cleaned target dataframe <strong>trees_df</strong> is composed of 5 columns. There are 68 distinct genera within the total of 14,083 trees (observations). According to <a href="https://opendata.vancouver.ca/explore/dataset/street-trees/information/?disjunctive.species_name&amp;disjunctive.common_name&amp;disjunctive.height_range_id" target="_blank">City of Vancouver Open Data Portal - Street Trees</a> where the dataset was originally obtained, the brief descriptions of columns are listed as below:</p>
+<ul>
+<li><strong>Categorical columns</strong></li>
+</ul>
+<p><code>neighbourhood_name</code>: City’s defined local area in which the tree is located.</p>
+<p><code>genus_name</code>: Genus name of trees.</p>
+<ul>
+<li><strong>Quantitative columns</strong></li>
+</ul>
+<p><code>diameter</code>: DBH in inches (DBH stands for diameter of tree at breast height).</p>
+<p><code>height_range_id</code>: 0-10 for every 10 feet (e.g., 0 = 0-10 ft, 1 = 10-20 ft, 2 = 20-30 ft, and10 = 100+ ft).</p>
+<ul>
+<li><strong>Datetime columns</strong></li>
+</ul>
+<p><code>date_planted</code>: The date of planting.</p>
+<section id="q1---based-on-distribution-of-street-trees-planted-in-vancouver-by-genus-which-genus-is-the-most-popular-one" class="level4">
+<h4 class="anchored" data-anchor-id="q1---based-on-distribution-of-street-trees-planted-in-vancouver-by-genus-which-genus-is-the-most-popular-one">Q1 - Based on distribution of street trees planted in Vancouver by genus, which genus is the most popular one?</h4>
+<p>Biological diversity is one of the interests for the analysis. The quick guess for the answer would be Acer as Acer is a genus of trees commonly known as maples. A maple leaf is on the Canadian flag, and the maple has been chosen as a national symbol in Canada.</p>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To visualize distrubition of genus for whole df</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>plot_1_title <span class="op">=</span> alt.TitleParams(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Figure 1 Number of street trees planted per genus"</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>     subtitle <span class="op">=</span> <span class="st">"Acer is the most popular genus of street trees"</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>plot_1_genus <span class="op">=</span> alt.Chart(trees_df).mark_bar().encode(</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    alt.X(<span class="st">'count():Q'</span>,title<span class="op">=</span><span class="st">'Number of Trees'</span>),</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    alt.Y(<span class="st">'genus_name:N'</span>,title<span class="op">=</span><span class="st">'Genus'</span>,sort<span class="op">=</span><span class="st">'x'</span>)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Add text annotation for the number of trees for each genus</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>text_1_genus <span class="op">=</span> plot_1_genus.mark_text(align<span class="op">=</span><span class="st">'left'</span>,dx<span class="op">=</span><span class="dv">2</span>).encode(text<span class="op">=</span><span class="st">'count():Q'</span>)</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>plot_1_genus <span class="op">=</span> (plot_1_genus <span class="op">+</span> text_1_genus).properties(title<span class="op">=</span>plot_1_title,width<span class="op">=</span><span class="dv">550</span>)</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>plot_1_genus</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+
+<div id="altair-viz-14b3cd86cce447a6bf036a5f2c895125"></div>
+<script type="text/javascript">
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-14b3cd86cce447a6bf036a5f2c895125") {
+      outputDiv = document.getElementById("altair-viz-14b3cd86cce447a6bf036a5f2c895125");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm//vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm//vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm//vega-lite@4.8.1?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm//vega-embed@6?noext",
+    };
+
+    function loadScript(lib) {
+      return new Promise(function(resolve, reject) {
+        var s = document.createElement('script');
+        s.src = paths[lib];
+        s.async = true;
+        s.onload = () => resolve(paths[lib]);
+        s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+        document.getElementsByTagName("head")[0].appendChild(s);
+      });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else if (typeof vegaEmbed === "function") {
+      displayChart(vegaEmbed);
+    } else {
+      loadScript("vega")
+        .then(() => loadScript("vega-lite"))
+        .then(() => loadScript("vega-embed"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 400, "continuousHeight": 300}}, "layer": [{"mark": "bar", "encoding": {"x": {"type": "quantitative", "aggregate": "count", "title": "Number of Trees"}, "y": {"type": "nominal", "field": "genus_name", "sort": "x", "title": "Genus"}}}, {"mark": {"type": "text", "align": "left", "dx": 2}, "encoding": {"text": {"type": "quantitative", "aggregate": "count"}, "x": {"type": "quantitative", "aggregate": "count", "title": "Number of Trees"}, "y": {"type": "nominal", "field": "genus_name", "sort": "x", "title": "Genus"}}}], "data": {"url": "/jupyter/user/648963/proxy/15339/b29f3901103bcc15a69c85a3728fa802.json"}, "title": {"text": "Figure 1 Number of street trees planted per genus", "subtitle": "Acer is the most popular genus of street trees"}, "width": 550, "$schema": "https://vega.github.io/schema/vega-lite/v4.8.1.json"}, {"mode": "vega-lite"});
+</script>
+</div>
+</div>
+<p>From Figure 1, it has been confirmed that Acer is the most popular genus of trees based on the dataframe. The number of Acer trees is more than double of Prunus trees that have the second largest number in the Vancouver street trees. All the rest of the genera have less than 1,000 trees shown in the dataframe, and 47 out of the total 68 genera have less than 100 trees.</p>
+</section>
+<section id="q2---in-the-past-30-years-how-many-trees-have-been-planted-every-single-year-and-what-is-the-number-of-trees-planted-by-genus-each-year" class="level4">
+<h4 class="anchored" data-anchor-id="q2---in-the-past-30-years-how-many-trees-have-been-planted-every-single-year-and-what-is-the-number-of-trees-planted-by-genus-each-year">Q2 - In the past 30 years, how many trees have been planted every single year? And what is the number of trees planted by genus each year?</h4>
+<p>The dataframe has provide the specific date of being planted for each tree. From the available data, the age of current trees will be calculated first and then plot the number of trees planted by year. Since the accuracy is not a priority in this case, only the year of tree planted will be extracted for calculating the age till 2021.</p>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract year of planted and calculate age of trees</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>trees_df_yr <span class="op">=</span> trees_df.assign(year<span class="op">=</span>trees_df[<span class="st">'date_planted'</span>].dt.year)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the age of trees till 2021.</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>trees_df_age <span class="op">=</span> trees_df_yr.assign(age<span class="op">=</span>(<span class="dv">2021</span><span class="op">-</span>trees_df_yr[<span class="st">'year'</span>]))</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot distribution of number of trees planted by year</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co"># It has been tested that if specifying the dtype of column 'year' as quantitative (Q), the x-axis label takes scientific</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co"># formatting, ie. 1,989. To avoid the ",", the dtype of 'year' has been specified as nominal (N)</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>plot_2_title <span class="op">=</span> alt.TitleParams(</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Figure 2 Number of street trees planted each year"</span>,</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>     subtitle <span class="op">=</span> <span class="st">"(Data available from 1989 to 2019)"</span>)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>plot_2_year <span class="op">=</span> alt.Chart(trees_df_age).mark_bar().encode(</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    alt.X(<span class="st">'year:N'</span>,title<span class="op">=</span><span class="va">None</span>),</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    alt.Y(<span class="st">'count():Q'</span>,title<span class="op">=</span><span class="st">'Number of trees planted'</span>)).properties(title<span class="op">=</span>plot_2_title)</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>plot_2_year</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+
+<div id="altair-viz-c6678646d9d0447a95693a64573ebca3"></div>
+<script type="text/javascript">
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-c6678646d9d0447a95693a64573ebca3") {
+      outputDiv = document.getElementById("altair-viz-c6678646d9d0447a95693a64573ebca3");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm//vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm//vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm//vega-lite@4.8.1?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm//vega-embed@6?noext",
+    };
+
+    function loadScript(lib) {
+      return new Promise(function(resolve, reject) {
+        var s = document.createElement('script');
+        s.src = paths[lib];
+        s.async = true;
+        s.onload = () => resolve(paths[lib]);
+        s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+        document.getElementsByTagName("head")[0].appendChild(s);
+      });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else if (typeof vegaEmbed === "function") {
+      displayChart(vegaEmbed);
+    } else {
+      loadScript("vega")
+        .then(() => loadScript("vega-lite"))
+        .then(() => loadScript("vega-embed"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 400, "continuousHeight": 300}}, "data": {"url": "/jupyter/user/648963/proxy/15339/92e48fd7e6d0899a1decc58d8602b681.json"}, "mark": "bar", "encoding": {"x": {"type": "nominal", "field": "year", "title": null}, "y": {"type": "quantitative", "aggregate": "count", "title": "Number of trees planted"}}, "title": {"text": "Figure 2 Number of street trees planted each year", "subtitle": "(Data available from 1989 to 2019)"}, "$schema": "https://vega.github.io/schema/vega-lite/v4.8.1.json"}, {"mode": "vega-lite"});
+</script>
+</div>
+</div>
+<p>Figure 2 indicates that there was a peak period between 1995 and 2013 to plant street trees by the City of Vancouver. During this period, the city had planted the highest number of trees in a single year in 1998 and in 2013. Before 1995 and after 2014, the number of trees planted was relatively lower, especially in 2016 when there were less than 50 new trees on public boulevards in Vancouver. Urban forestry is a systemic project. How many trees are planted is determined by a group of factors, such as public budget, tree replacement plan due to species distribution, insects, diseases, or environmental stress, etc. It is a clear message that the City of Vancouver has maintained a dynamic public trees planting program that benefits the wellbeings of residents in Vancouver.</p>
+<p>Moving further, to plot number of trees planted by year and add dropdown selection by genus.</p>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot number of trees planted by year and add dropdown selection by genus</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Specify the subtitle color and bold it to draw attention</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>plot_3_title <span class="op">=</span> alt.TitleParams(</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Figure 3 Number of street trees planted each year by genus(from 1989 to 2019)"</span>,</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    subtitle <span class="op">=</span> <span class="st">"Dropdown selection is available by genus"</span>,</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    subtitleColor<span class="op">=</span><span class="st">'steelblue'</span>, subtitleFontWeight<span class="op">=</span><span class="st">'bold'</span>)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>genus <span class="op">=</span> <span class="bu">sorted</span>(trees_df_age[<span class="st">'genus_name'</span>].unique())</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>dropdown_genus <span class="op">=</span> alt.binding_select(name<span class="op">=</span><span class="st">'Genus'</span>, options<span class="op">=</span>genus)</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>select_genus <span class="op">=</span> alt.selection_single(fields<span class="op">=</span>[<span class="st">'genus_name'</span>], bind<span class="op">=</span>dropdown_genus)</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Since objective is to see number of trees for each genus, for y axis, specify stack=False</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>plot_3_genus_year_bar <span class="op">=</span> alt.Chart(trees_df_age).mark_bar().encode(</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    alt.X(<span class="st">'year:N'</span>,title<span class="op">=</span><span class="va">None</span>),</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    alt.Y(<span class="st">'count():Q'</span>,stack<span class="op">=</span><span class="va">False</span>,title<span class="op">=</span><span class="st">'Number of trees planted per genus'</span>),</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>    alt.Color(<span class="st">'genus_name:N'</span>,title<span class="op">=</span><span class="st">'Genus name'</span>)</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>).add_selection(select_genus).encode(</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>    opacity<span class="op">=</span>alt.condition(select_genus, alt.value(<span class="fl">0.9</span>), alt.value(<span class="fl">0.0</span>))).properties(title<span class="op">=</span>plot_3_title)</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>plot_3_genus_year_bar</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+
+<div id="altair-viz-d2cbd16d161d42a4b97331128b0b6b73"></div>
+<script type="text/javascript">
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-d2cbd16d161d42a4b97331128b0b6b73") {
+      outputDiv = document.getElementById("altair-viz-d2cbd16d161d42a4b97331128b0b6b73");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm//vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm//vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm//vega-lite@4.8.1?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm//vega-embed@6?noext",
+    };
+
+    function loadScript(lib) {
+      return new Promise(function(resolve, reject) {
+        var s = document.createElement('script');
+        s.src = paths[lib];
+        s.async = true;
+        s.onload = () => resolve(paths[lib]);
+        s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+        document.getElementsByTagName("head")[0].appendChild(s);
+      });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else if (typeof vegaEmbed === "function") {
+      displayChart(vegaEmbed);
+    } else {
+      loadScript("vega")
+        .then(() => loadScript("vega-lite"))
+        .then(() => loadScript("vega-embed"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 400, "continuousHeight": 300}}, "data": {"url": "/jupyter/user/648963/proxy/15339/92e48fd7e6d0899a1decc58d8602b681.json"}, "mark": "bar", "encoding": {"color": {"type": "nominal", "field": "genus_name", "title": "Genus name"}, "opacity": {"condition": {"value": 0.9, "selection": "selector001"}, "value": 0.0}, "x": {"type": "nominal", "field": "year", "title": null}, "y": {"type": "quantitative", "aggregate": "count", "stack": false, "title": "Number of trees planted per genus"}}, "selection": {"selector001": {"type": "single", "fields": ["genus_name"], "bind": {"input": "select", "options": ["ABIES", "ACER", "AESCULUS", "AMELANCHIER", "BETULA", "CALOCEDRUS", "CARPINUS", "CATALPA", "CEDRUS", "CELTIS", "CERCIDIPHYLLUM", "CERCIS", "CHAMAECYPARIS", "CHITALPA", "CLADRASTIS", "CORNUS", "CORYLUS", "CRATAEGUS", "DAVIDIA", "EUCOMMIA", "EUONYMUS", "FAGUS", "FRAXINUS", "GINKGO", "GLEDITSIA", "GYMNOCLADUS", "HIBISCUS", "JUGLANS", "KOELREUTERIA", "LABURNUM", "LIQUIDAMBAR", "LIRIODENDRON", "MAGNOLIA", "MALUS", "MANGLIETIA", "MESPILUS", "METASEQUOIA", "NOTHOFAGUS", "NYSSA", "OSTRYIA", "PARROTIA", "PICEA", "PINUS", "PLATANUS", "POPULUS", "PRUNUS", "PSEUDOTSUGA", "PTEROCARYA", "PYRUS", "QUERCUS", "RHAMNUS", "RHUS", "ROBINIA", "SALIX", "SEQUOIA", "SEQUOIADENDRON", "SOPHORA", "SORBUS", "STEWARTIA", "STYRAX", "SYRINGA", "TAXUS", "THUJA", "TILIA", "TRACHYCARPUS", "TSUGA", "ULMUS", "ZELKOVA"], "name": "Genus"}}}, "title": {"text": "Figure 3 Number of street trees planted each year by genus(from 1989 to 2019)", "subtitle": "Dropdown selection is available by genus", "subtitleColor": "steelblue", "subtitleFontWeight": "bold"}, "$schema": "https://vega.github.io/schema/vega-lite/v4.8.1.json"}, {"mode": "vega-lite"});
+</script>
+</div>
+</div>
+<p>Figure 3 with dropdown selection has combined multiple information required in one plot and provide the audiences with convenience to efficiently explore number of trees planted from 1989 to 2019 for each genus.</p>
+<p>The answer to the question 2 would be valuable reference for the public who are interested with tree planting history in Vancouver. In addition, for researchers, the answer will provide a first-hand insight into the urban forestry and street trees replacement planning.</p>
+</section>
+<section id="q3---based-on-the-growth-rates-of-each-genus-which-genus-is-the-fastest-one-within-the-vancouver-street-trees-dataset" class="level4">
+<h4 class="anchored" data-anchor-id="q3---based-on-the-growth-rates-of-each-genus-which-genus-is-the-fastest-one-within-the-vancouver-street-trees-dataset">Q3 - Based on the growth rates of each genus, which genus is the fastest one within the Vancouver street trees dataset?</h4>
+<p>The insights extracted from this question will not only confirm or verify some of the current scientific conclusions on trees growth patterns, but also provide accumulated evidences for improving the optimization of street trees in cities with similar ecological environment as Vancouver.</p>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate growth rate in diameter, growth rate in height and save them into df</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>trees_df_rate <span class="op">=</span> trees_df_age.assign(rate_dia<span class="op">=</span>trees_df_age[<span class="st">'diameter'</span>]<span class="op">/</span>trees_df_age[<span class="st">'age'</span>],</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>                                    rate_height<span class="op">=</span>trees_df_age[<span class="st">'height_range_id'</span>]<span class="op">/</span>trees_df_age[<span class="st">'age'</span>]</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>                                   ).<span class="bu">round</span>(<span class="dv">2</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot two growth rates using scatter chart</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Add zooming and panning to solve the issue that the plot is saturated</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Add dropdown widget to select genus</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>plot_4_title <span class="op">=</span> alt.TitleParams(</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Figure 4 Trees growth rate in diameter &amp; height per genus"</span>,</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    subtitle <span class="op">=</span> [<span class="st">"Dropdown selection is available by genus"</span>, <span class="st">"Zooming and Panning are available"</span>],</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    subtitleColor<span class="op">=</span><span class="st">'steelblue'</span>, subtitleFontWeight<span class="op">=</span><span class="st">'bold'</span>)</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>plot_growth_rates <span class="op">=</span> alt.Chart(trees_df_rate).mark_point(size<span class="op">=</span><span class="dv">5</span>).encode(</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    alt.X(<span class="st">'rate_dia:Q'</span>,title<span class="op">=</span><span class="st">"Growth rate in diameter (inch/yr)"</span>),</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>    alt.Y(<span class="st">'rate_height:Q'</span>,title<span class="op">=</span><span class="st">"Growth rate in height (unit/yr)"</span>)</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>).interactive()</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>plot_4_growth_rates_genus <span class="op">=</span> plot_growth_rates.add_selection(select_genus).encode(</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>    opacity<span class="op">=</span>alt.condition(select_genus, alt.value(<span class="fl">0.9</span>), alt.value(<span class="fl">0.0</span>))).properties(title<span class="op">=</span>plot_4_title,width<span class="op">=</span><span class="dv">600</span>)</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>plot_4_growth_rates_genus</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+
+<div id="altair-viz-d4a70a75ea4d48aa9bf879db04c06bed"></div>
+<script type="text/javascript">
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-d4a70a75ea4d48aa9bf879db04c06bed") {
+      outputDiv = document.getElementById("altair-viz-d4a70a75ea4d48aa9bf879db04c06bed");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm//vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm//vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm//vega-lite@4.8.1?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm//vega-embed@6?noext",
+    };
+
+    function loadScript(lib) {
+      return new Promise(function(resolve, reject) {
+        var s = document.createElement('script');
+        s.src = paths[lib];
+        s.async = true;
+        s.onload = () => resolve(paths[lib]);
+        s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+        document.getElementsByTagName("head")[0].appendChild(s);
+      });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else if (typeof vegaEmbed === "function") {
+      displayChart(vegaEmbed);
+    } else {
+      loadScript("vega")
+        .then(() => loadScript("vega-lite"))
+        .then(() => loadScript("vega-embed"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 400, "continuousHeight": 300}}, "data": {"url": "/jupyter/user/648963/proxy/15339/441fa82d8e974262f3f2564a79209ee6.json"}, "mark": {"type": "point", "size": 5}, "encoding": {"opacity": {"condition": {"value": 0.9, "selection": "selector001"}, "value": 0.0}, "x": {"type": "quantitative", "field": "rate_dia", "title": "Growth rate in diameter (inch/yr)"}, "y": {"type": "quantitative", "field": "rate_height", "title": "Growth rate in height (unit/yr)"}}, "selection": {"selector002": {"type": "interval", "bind": "scales", "encodings": ["x", "y"]}, "selector001": {"type": "single", "fields": ["genus_name"], "bind": {"input": "select", "options": ["ABIES", "ACER", "AESCULUS", "AMELANCHIER", "BETULA", "CALOCEDRUS", "CARPINUS", "CATALPA", "CEDRUS", "CELTIS", "CERCIDIPHYLLUM", "CERCIS", "CHAMAECYPARIS", "CHITALPA", "CLADRASTIS", "CORNUS", "CORYLUS", "CRATAEGUS", "DAVIDIA", "EUCOMMIA", "EUONYMUS", "FAGUS", "FRAXINUS", "GINKGO", "GLEDITSIA", "GYMNOCLADUS", "HIBISCUS", "JUGLANS", "KOELREUTERIA", "LABURNUM", "LIQUIDAMBAR", "LIRIODENDRON", "MAGNOLIA", "MALUS", "MANGLIETIA", "MESPILUS", "METASEQUOIA", "NOTHOFAGUS", "NYSSA", "OSTRYIA", "PARROTIA", "PICEA", "PINUS", "PLATANUS", "POPULUS", "PRUNUS", "PSEUDOTSUGA", "PTEROCARYA", "PYRUS", "QUERCUS", "RHAMNUS", "RHUS", "ROBINIA", "SALIX", "SEQUOIA", "SEQUOIADENDRON", "SOPHORA", "SORBUS", "STEWARTIA", "STYRAX", "SYRINGA", "TAXUS", "THUJA", "TILIA", "TRACHYCARPUS", "TSUGA", "ULMUS", "ZELKOVA"], "name": "Genus"}}}, "title": {"text": "Figure 4 Trees growth rate in diameter & height per genus", "subtitle": ["Dropdown selection is available by genus", "Zooming and Panning are available"], "subtitleColor": "steelblue", "subtitleFontWeight": "bold"}, "width": 600, "$schema": "https://vega.github.io/schema/vega-lite/v4.8.1.json"}, {"mode": "vega-lite"});
+</script>
+</div>
+</div>
+<p>Note that the growth rate in height is represented in <strong>unit/yr</strong>. Here the “unit” refers to height_range_id: 0-10 for every 10 feet (e.g., 0 = 0-10 ft, 1 = 10-20 ft, 2 = 20-30 ft, and10 = 100+ ft)</p>
+<p>By adding zooming, panning and dropdown widget selection features, audiences can effectively check the two growth rates based on their interested genus.</p>
+<p><strong>It must be noted that</strong> in the original dataframe, the height of trees was collected as <strong>height_range_id</strong>. Audiences should be aware that the calculated average growth rate by height is not an absolute value of height but a processed relative variable. Typically, if the quantity of observations for a particular genus is sufficient (deep research is required to define the “sufficiency”), the result will have more accuracy from the statistical perspective. But if the genus has limited observations in the dataframe, the audiences should be more careful to assess the results. Again, deep research is required in future analysis.</p>
+<p>In order to effectively compare the growth rate for all genera, except for a bar chart that just shows the mean value, a boxplot is also created to include a few key summary statistics and visualize data distribution. This combination will provide more information to audiences particularly for researchers who may care about the statistics more than a mean value.</p>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot average growth rates in diameter per genus</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>plot_5_title <span class="op">=</span> alt.TitleParams(</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Figure 5 Trees average growth rate in diameter per genus"</span>,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    subtitle <span class="op">=</span> <span class="st">"TSUGA, PSEUDOTSUGA &amp; POPULUS are top three fastest growing genera"</span>)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>plot_ave_growth_rate_dia_bar <span class="op">=</span> alt.Chart(trees_df_rate).mark_bar().encode(</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    alt.X(<span class="st">'mean(rate_dia)'</span>, title<span class="op">=</span><span class="st">'Average growth rate in diameter (inch/yr)'</span>),</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    alt.Y(<span class="st">'genus_name:N'</span>,title<span class="op">=</span><span class="st">'Genus'</span>,sort<span class="op">=</span><span class="st">'x'</span>),</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    alt.Color(<span class="st">'count()'</span>,scale<span class="op">=</span>alt.Scale(scheme<span class="op">=</span><span class="st">'blues'</span>),title<span class="op">=</span><span class="st">'Number of trees'</span>)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>).properties(width<span class="op">=</span><span class="dv">130</span>)</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Sort boxplot by average growth rate in diameter to keep consistent with bar chart</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>ave_growth_rate_dia_order <span class="op">=</span> trees_df_rate.groupby(<span class="st">'genus_name'</span>)[<span class="st">'rate_dia'</span>].mean().sort_values().index.tolist()</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="co"># To distinguish the boxplot from the bar chart, specify the color as green</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>plot_ave_growth_rate_dia_box <span class="op">=</span> alt.Chart(trees_df_rate).mark_boxplot(color<span class="op">=</span><span class="st">'green'</span>).encode(</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>    alt.X(<span class="st">'rate_dia:Q'</span>, title<span class="op">=</span><span class="st">'Growth rate in diameter (inch/yr)'</span>),</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>    alt.Y(<span class="st">'genus_name:N'</span>,title<span class="op">=</span><span class="st">'Genus'</span>,sort<span class="op">=</span>ave_growth_rate_dia_order)</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>).properties(width<span class="op">=</span><span class="dv">310</span>)</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Modify the domain of the axis’ scale for boxplot to make the plot more readable</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a><span class="co"># At the same time, discard outliers with the value more than 4 inch/year</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>plot_ave_growth_rate_dia_box_scale <span class="op">=</span> plot_ave_growth_rate_dia_box.encode(alt.X(<span class="st">'rate_dia:Q'</span>, </span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>                                                                               title<span class="op">=</span><span class="st">'Growth rate in diameter (inch/yr)'</span>,</span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>                                                                               scale<span class="op">=</span>alt.Scale(domain<span class="op">=</span>[<span class="dv">0</span>, <span class="dv">4</span>],clamp<span class="op">=</span><span class="va">True</span>)))</span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Use top-level title configuration to locate title in the middle</span></span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>plot_5_ave_growth_rates_dia <span class="op">=</span> (plot_ave_growth_rate_dia_bar <span class="op">|</span> plot_ave_growth_rate_dia_box_scale</span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>                              ).properties(title<span class="op">=</span>plot_5_title).configure_title(anchor<span class="op">=</span><span class="st">'middle'</span>)</span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>plot_5_ave_growth_rates_dia</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+
+<div id="altair-viz-e5bbfe1bf5494a8690fe1a6e519194c0"></div>
+<script type="text/javascript">
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-e5bbfe1bf5494a8690fe1a6e519194c0") {
+      outputDiv = document.getElementById("altair-viz-e5bbfe1bf5494a8690fe1a6e519194c0");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm//vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm//vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm//vega-lite@4.8.1?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm//vega-embed@6?noext",
+    };
+
+    function loadScript(lib) {
+      return new Promise(function(resolve, reject) {
+        var s = document.createElement('script');
+        s.src = paths[lib];
+        s.async = true;
+        s.onload = () => resolve(paths[lib]);
+        s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+        document.getElementsByTagName("head")[0].appendChild(s);
+      });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else if (typeof vegaEmbed === "function") {
+      displayChart(vegaEmbed);
+    } else {
+      loadScript("vega")
+        .then(() => loadScript("vega-lite"))
+        .then(() => loadScript("vega-embed"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 400, "continuousHeight": 300}, "title": {"anchor": "middle"}}, "hconcat": [{"mark": "bar", "encoding": {"color": {"type": "quantitative", "aggregate": "count", "scale": {"scheme": "blues"}, "title": "Number of trees"}, "x": {"type": "quantitative", "aggregate": "mean", "field": "rate_dia", "title": "Average growth rate in diameter (inch/yr)"}, "y": {"type": "nominal", "field": "genus_name", "sort": "x", "title": "Genus"}}, "width": 130}, {"mark": {"type": "boxplot", "color": "green"}, "encoding": {"x": {"type": "quantitative", "field": "rate_dia", "scale": {"clamp": true, "domain": [0, 4]}, "title": "Growth rate in diameter (inch/yr)"}, "y": {"type": "nominal", "field": "genus_name", "sort": ["RHUS", "RHAMNUS", "SALIX", "CEDRUS", "EUONYMUS", "MANGLIETIA", "KOELREUTERIA", "MESPILUS", "GYMNOCLADUS", "PICEA", "SOPHORA", "LABURNUM", "PYRUS", "MALUS", "HIBISCUS", "CRATAEGUS", "OSTRYIA", "STYRAX", "TRACHYCARPUS", "ABIES", "CATALPA", "DAVIDIA", "CORYLUS", "GLEDITSIA", "SEQUOIADENDRON", "SYRINGA", "CORNUS", "MAGNOLIA", "TAXUS", "CLADRASTIS", "GINKGO", "SORBUS", "EUCOMMIA", "CELTIS", "FRAXINUS", "CERCIS", "CHITALPA", "LIRIODENDRON", "ACER", "PARROTIA", "NOTHOFAGUS", "AMELANCHIER", "CARPINUS", "PRUNUS", "TILIA", "PINUS", "FAGUS", "ZELKOVA", "CERCIDIPHYLLUM", "LIQUIDAMBAR", "CALOCEDRUS", "QUERCUS", "PLATANUS", "NYSSA", "ROBINIA", "ULMUS", "STEWARTIA", "JUGLANS", "SEQUOIA", "BETULA", "CHAMAECYPARIS", "METASEQUOIA", "THUJA", "PTEROCARYA", "AESCULUS", "POPULUS", "PSEUDOTSUGA", "TSUGA"], "title": "Genus"}}, "width": 310}], "data": {"url": "/jupyter/user/648963/proxy/15339/441fa82d8e974262f3f2564a79209ee6.json"}, "title": {"text": "Figure 5 Trees average growth rate in diameter per genus", "subtitle": "TSUGA, PSEUDOTSUGA & POPULUS are top three fastest growing genera"}, "$schema": "https://vega.github.io/schema/vega-lite/v4.8.1.json"}, {"mode": "vega-lite"});
+</script>
+</div>
+</div>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot average growth rates in height per genus</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>plot_6_title <span class="op">=</span> alt.TitleParams(</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Figure 6 Trees average growth rate in height per genus"</span>,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    subtitle <span class="op">=</span> <span class="st">"TSUGA, POPULUS &amp; PSEUDOTSUGA are top three fastest growing genera"</span>)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># To distinguish the plot from the above growth rates in diameter chart, change alternative color scheme</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>plot_ave_growth_rate_height_bar <span class="op">=</span> alt.Chart(trees_df_rate).mark_bar().encode(</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    alt.X(<span class="st">'mean(rate_height)'</span>, title<span class="op">=</span><span class="st">'Average growth rate in height (unit/yr)'</span>),</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    alt.Y(<span class="st">'genus_name:N'</span>,title<span class="op">=</span><span class="st">'Genus'</span>,sort<span class="op">=</span><span class="st">'x'</span>),</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    alt.Color(<span class="st">'count()'</span>,scale<span class="op">=</span>alt.Scale(scheme<span class="op">=</span><span class="st">'teals'</span>),title<span class="op">=</span><span class="st">'Number of trees'</span>)</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>).properties(width<span class="op">=</span><span class="dv">130</span>)</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Sort boxplot by average growth rate in height to keep consistent with bar chart</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>ave_growth_rate_height_order <span class="op">=</span> trees_df_rate.groupby(<span class="st">'genus_name'</span>)[<span class="st">'rate_height'</span>].mean().sort_values().index.tolist()</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="co"># To distinguish the boxplot from the bar chart, specify the color as grey</span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>plot_ave_growth_rate_height_box <span class="op">=</span> alt.Chart(trees_df_rate).mark_boxplot(color<span class="op">=</span><span class="st">'grey'</span>).encode(</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>    alt.X(<span class="st">'rate_height:Q'</span>, title<span class="op">=</span><span class="st">'Growth rate in height (unit/yr)'</span>),</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>    alt.Y(<span class="st">'genus_name:N'</span>,title<span class="op">=</span><span class="st">'Genus'</span>,sort<span class="op">=</span>ave_growth_rate_height_order)</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>).properties(width<span class="op">=</span><span class="dv">310</span>)</span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Modify the domain of the axis’ scale for boxplot to make the plot more readable</span></span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a><span class="co"># At the same time, discard outliers with the value more than 0.6 unit/year</span></span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>plot_ave_growth_rate_height_box_scale <span class="op">=</span> plot_ave_growth_rate_height_box.encode(alt.X(<span class="st">'rate_height:Q'</span>, </span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>                                                                               title<span class="op">=</span><span class="st">'Growth rate in height (unit/yr)'</span>,</span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>                                                                               scale<span class="op">=</span>alt.Scale(domain<span class="op">=</span>[<span class="dv">0</span>, <span class="fl">0.6</span>],clamp<span class="op">=</span><span class="va">True</span>)))</span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Use top-level title configuration to locate title in the middle</span></span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>plot_6_ave_growth_rates_height <span class="op">=</span> (plot_ave_growth_rate_height_bar <span class="op">|</span> plot_ave_growth_rate_height_box_scale</span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>                                 ).properties(title<span class="op">=</span>plot_6_title).configure_title(anchor<span class="op">=</span><span class="st">'middle'</span>)</span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>plot_6_ave_growth_rates_height</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+
+<div id="altair-viz-3ff2b483a24c4d70a83e6192e5772425"></div>
+<script type="text/javascript">
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-3ff2b483a24c4d70a83e6192e5772425") {
+      outputDiv = document.getElementById("altair-viz-3ff2b483a24c4d70a83e6192e5772425");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm//vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm//vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm//vega-lite@4.8.1?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm//vega-embed@6?noext",
+    };
+
+    function loadScript(lib) {
+      return new Promise(function(resolve, reject) {
+        var s = document.createElement('script');
+        s.src = paths[lib];
+        s.async = true;
+        s.onload = () => resolve(paths[lib]);
+        s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+        document.getElementsByTagName("head")[0].appendChild(s);
+      });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else if (typeof vegaEmbed === "function") {
+      displayChart(vegaEmbed);
+    } else {
+      loadScript("vega")
+        .then(() => loadScript("vega-lite"))
+        .then(() => loadScript("vega-embed"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 400, "continuousHeight": 300}, "title": {"anchor": "middle"}}, "hconcat": [{"mark": "bar", "encoding": {"color": {"type": "quantitative", "aggregate": "count", "scale": {"scheme": "teals"}, "title": "Number of trees"}, "x": {"type": "quantitative", "aggregate": "mean", "field": "rate_height", "title": "Average growth rate in height (unit/yr)"}, "y": {"type": "nominal", "field": "genus_name", "sort": "x", "title": "Genus"}}, "width": 130}, {"mark": {"type": "boxplot", "color": "grey"}, "encoding": {"x": {"type": "quantitative", "field": "rate_height", "scale": {"clamp": true, "domain": [0, 0.6]}, "title": "Growth rate in height (unit/yr)"}, "y": {"type": "nominal", "field": "genus_name", "sort": ["TRACHYCARPUS", "JUGLANS", "SOPHORA", "SEQUOIA", "KOELREUTERIA", "EUONYMUS", "GYMNOCLADUS", "CEDRUS", "RHAMNUS", "MANGLIETIA", "MALUS", "PYRUS", "HIBISCUS", "CATALPA", "MESPILUS", "EUCOMMIA", "PICEA", "CRATAEGUS", "CORYLUS", "OSTRYIA", "SEQUOIADENDRON", "CLADRASTIS", "RHUS", "SALIX", "ZELKOVA", "SORBUS", "DAVIDIA", "STYRAX", "GLEDITSIA", "GINKGO", "CORNUS", "PRUNUS", "MAGNOLIA", "TAXUS", "NOTHOFAGUS", "CELTIS", "PINUS", "CERCIS", "SYRINGA", "ACER", "ABIES", "LIRIODENDRON", "LABURNUM", "FRAXINUS", "LIQUIDAMBAR", "PARROTIA", "CARPINUS", "CHITALPA", "TILIA", "ROBINIA", "AMELANCHIER", "FAGUS", "CERCIDIPHYLLUM", "PTEROCARYA", "QUERCUS", "THUJA", "ULMUS", "METASEQUOIA", "PLATANUS", "CHAMAECYPARIS", "AESCULUS", "CALOCEDRUS", "NYSSA", "BETULA", "STEWARTIA", "PSEUDOTSUGA", "POPULUS", "TSUGA"], "title": "Genus"}}, "width": 310}], "data": {"url": "/jupyter/user/648963/proxy/15339/441fa82d8e974262f3f2564a79209ee6.json"}, "title": {"text": "Figure 6 Trees average growth rate in height per genus", "subtitle": "TSUGA, POPULUS & PSEUDOTSUGA are top three fastest growing genera"}, "$schema": "https://vega.github.io/schema/vega-lite/v4.8.1.json"}, {"mode": "vega-lite"});
+</script>
+</div>
+</div>
+<p>Note that the growth rate in height is represented in unit/yr. Here the “unit” refers to height_range_id: 0-10 for every 10 feet (e.g., 0 = 0-10 ft, 1 = 10-20 ft, 2 = 20-30 ft, and10 = 100+ ft)</p>
+<p>Based on Figure 5 and 6, TSUGA, POPULUS and PSEUDOTSUGA are identified as the top three fastest growing genera. But as indicated on the plots and Figure 1, the sample size of the three genera is very limited. The number of trees (observations) of TSUGA, POPULUS and PSEUDOTSUGA in the dataframe are 2, 3, and 8, respectively. Since the sample size may affect the confidence level when analyzing and comparing the growth rates among genera, a futher statistical analysis should be considered in the future to justify the conclusion in this case.</p>
+</section>
+<section id="q4---how-many-street-trees-are-growing-in-each-neighbourhood-and-what-are-the-average-age-and-average-diameter-of-trees-in-each-neighbourhood" class="level4">
+<h4 class="anchored" data-anchor-id="q4---how-many-street-trees-are-growing-in-each-neighbourhood-and-what-are-the-average-age-and-average-diameter-of-trees-in-each-neighbourhood">Q4 - How many street trees are growing in each neighbourhood and what are the average age and average diameter of trees in each neighbourhood?</h4>
+<p>The last question might be interesting for residents in Vancouver to know or for potential home buyers to select their desired neighbourhood with considerations of trees distribution and some characters.</p>
+<div class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To make a base map of Vancouver by using the geojson url saved in url_geojson</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>url_geojson <span class="op">=</span> <span class="st">'https://raw.githubusercontent.com/UBC-MDS/exploratory-data-viz/main/data/local-area-boundary.geojson'</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Format it in a Topo json format using alt.Data()</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>data_geojson_remote <span class="op">=</span> alt.Data(url<span class="op">=</span>url_geojson, <span class="bu">format</span><span class="op">=</span>alt.DataFormat(<span class="bu">property</span><span class="op">=</span><span class="st">'features'</span>,<span class="bu">type</span><span class="op">=</span><span class="st">'json'</span>))</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Then make base Vancouver Altair map using the data_geojson_remote object</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Use an identity type and need to reflectY=True. Without this second argument the map of Vancouver is upside down</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>base_map <span class="op">=</span> alt.Chart(data_geojson_remote).mark_geoshape(</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">'white'</span>,stroke<span class="op">=</span><span class="st">"grey"</span>).encode(</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>).project(<span class="bu">type</span><span class="op">=</span><span class="st">'identity'</span>, reflectY<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Perform calculation needed and create a new dataframe.</p>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Rename neighbourhood_name to name since that's what's it's called in the geojson url</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>trees_nbhd_num_df <span class="op">=</span> pd.DataFrame(trees_df_age[<span class="st">'neighbourhood_name'</span>].value_counts()</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>                            ).reset_index().rename(columns<span class="op">=</span>{<span class="st">'index'</span>:<span class="st">'name'</span>,<span class="st">'neighbourhood_name'</span>:<span class="st">'trees_number'</span>})</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>trees_nbhd_age_df <span class="op">=</span> trees_df_age.groupby(<span class="st">'neighbourhood_name'</span>).mean().<span class="bu">round</span>(<span class="dv">1</span>).reset_index(</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>).rename(columns<span class="op">=</span>{<span class="st">'neighbourhood_name'</span>:<span class="st">'name'</span>,<span class="st">'diameter'</span>:<span class="st">'ave_diameter'</span>,<span class="st">'age'</span>:<span class="st">'ave_age'</span>})[[<span class="st">'name'</span>,<span class="st">'ave_diameter'</span>,<span class="st">'ave_age'</span>]]</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>trees_nbhd_df <span class="op">=</span> trees_nbhd_num_df.merge(trees_nbhd_age_df, left_on<span class="op">=</span><span class="st">'name'</span>, right_on<span class="op">=</span><span class="st">'name'</span>)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>trees_nbhd_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>name</th>
+      <th>trees_number</th>
+      <th>ave_diameter</th>
+      <th>ave_age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Renfrew-Collingwood</td>
+      <td>1323</td>
+      <td>5.6</td>
+      <td>17.5</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Hastings-Sunrise</td>
+      <td>1285</td>
+      <td>8.1</td>
+      <td>19.7</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Kensington-Cedar Cottage</td>
+      <td>1169</td>
+      <td>6.5</td>
+      <td>18.7</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Sunset</td>
+      <td>936</td>
+      <td>6.0</td>
+      <td>17.3</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Victoria-Fraserview</td>
+      <td>908</td>
+      <td>5.5</td>
+      <td>17.7</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Dunbar-Southlands</td>
+      <td>762</td>
+      <td>6.1</td>
+      <td>16.7</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Marpole</td>
+      <td>689</td>
+      <td>5.6</td>
+      <td>17.2</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Riley Park</td>
+      <td>684</td>
+      <td>5.8</td>
+      <td>17.2</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Grandview-Woodland</td>
+      <td>632</td>
+      <td>6.6</td>
+      <td>18.0</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>Killarney</td>
+      <td>615</td>
+      <td>6.2</td>
+      <td>17.7</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>Kerrisdale</td>
+      <td>612</td>
+      <td>6.0</td>
+      <td>16.6</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>Oakridge</td>
+      <td>549</td>
+      <td>6.1</td>
+      <td>17.9</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>Arbutus-Ridge</td>
+      <td>535</td>
+      <td>6.8</td>
+      <td>17.5</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>Kitsilano</td>
+      <td>526</td>
+      <td>7.2</td>
+      <td>16.8</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>Mount Pleasant</td>
+      <td>513</td>
+      <td>7.9</td>
+      <td>18.7</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>Shaughnessy</td>
+      <td>483</td>
+      <td>5.1</td>
+      <td>16.6</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>West Point Grey</td>
+      <td>423</td>
+      <td>6.5</td>
+      <td>17.7</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>Downtown</td>
+      <td>393</td>
+      <td>5.8</td>
+      <td>16.4</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>South Cambie</td>
+      <td>362</td>
+      <td>6.5</td>
+      <td>18.3</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>Fairview</td>
+      <td>248</td>
+      <td>6.8</td>
+      <td>16.9</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>Strathcona</td>
+      <td>225</td>
+      <td>6.2</td>
+      <td>16.3</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>West End</td>
+      <td>211</td>
+      <td>7.2</td>
+      <td>18.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add tooltips and hover selection on map</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>hover <span class="op">=</span> alt.selection_single(fields<span class="op">=</span>[<span class="st">'name'</span>], on<span class="op">=</span><span class="st">'mouseover'</span>)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>plot_trees_nbhd <span class="op">=</span> alt.Chart(data_geojson_remote).mark_geoshape().transform_lookup(</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    lookup<span class="op">=</span><span class="st">'properties.name'</span>,</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    from_<span class="op">=</span>alt.LookupData(trees_nbhd_df, <span class="st">'name'</span>, [<span class="st">'trees_number'</span>,<span class="st">'name'</span>])).encode(</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    alt.Color(<span class="st">'trees_number:Q'</span>,title<span class="op">=</span><span class="st">'Number of trees'</span>),</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    opacity<span class="op">=</span>alt.condition(hover, alt.value(<span class="dv">1</span>), alt.value(<span class="fl">0.1</span>)),</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    tooltip<span class="op">=</span>[<span class="st">'name:N'</span>,alt.Tooltip(<span class="st">'trees_number:Q'</span>, title<span class="op">=</span><span class="st">'Number of trees'</span>)]</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>).add_selection(hover).project(<span class="bu">type</span><span class="op">=</span><span class="st">'identity'</span>, reflectY<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>plot_trees_nbhd_map <span class="op">=</span> base_map <span class="op">+</span> plot_trees_nbhd</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot ave_age per ave_diameter</span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Scale the x and y axis by specifying zero=False</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>plot_age_dia <span class="op">=</span> alt.Chart(trees_nbhd_df).mark_point().encode(</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>    alt.X(<span class="st">'ave_diameter:Q'</span>,scale<span class="op">=</span>alt.Scale(zero<span class="op">=</span><span class="va">False</span>),title<span class="op">=</span><span class="st">'Average diameter (inch)'</span>),</span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>    alt.Y(<span class="st">'ave_age:Q'</span>,scale<span class="op">=</span>alt.Scale(zero<span class="op">=</span><span class="va">False</span>),title<span class="op">=</span><span class="st">'Average age (yr)'</span>),</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>    stroke<span class="op">=</span>alt.condition(hover, alt.value(<span class="st">'black'</span>), alt.value(<span class="st">'#ffffff'</span>)))</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>plot_7_title <span class="op">=</span> alt.TitleParams(</span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Figure 7 Trees distribution per neighbourhood (number/age/diameter)"</span>,</span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>    subtitle <span class="op">=</span> [<span class="st">"Hover selection on map is available by neighbourhood"</span>, <span class="st">"Tooltips are available on map"</span>],</span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>    subtitleColor<span class="op">=</span><span class="st">'steelblue'</span>, subtitleFontWeight<span class="op">=</span><span class="st">'bold'</span>)</span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>plot_7_nbhd_map <span class="op">=</span> (plot_trees_nbhd_map <span class="op">&amp;</span> plot_age_dia</span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>                  ).properties(title<span class="op">=</span>plot_7_title).configure_title(anchor<span class="op">=</span><span class="st">'middle'</span>)</span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>plot_7_nbhd_map</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+
+<div id="altair-viz-2e4599e0193d48c6bf14905064b879cf"></div>
+<script type="text/javascript">
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-2e4599e0193d48c6bf14905064b879cf") {
+      outputDiv = document.getElementById("altair-viz-2e4599e0193d48c6bf14905064b879cf");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm//vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm//vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm//vega-lite@4.8.1?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm//vega-embed@6?noext",
+    };
+
+    function loadScript(lib) {
+      return new Promise(function(resolve, reject) {
+        var s = document.createElement('script');
+        s.src = paths[lib];
+        s.async = true;
+        s.onload = () => resolve(paths[lib]);
+        s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+        document.getElementsByTagName("head")[0].appendChild(s);
+      });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else if (typeof vegaEmbed === "function") {
+      displayChart(vegaEmbed);
+    } else {
+      loadScript("vega")
+        .then(() => loadScript("vega-lite"))
+        .then(() => loadScript("vega-embed"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 400, "continuousHeight": 300}, "title": {"anchor": "middle"}}, "vconcat": [{"layer": [{"mark": {"type": "geoshape", "color": "white", "stroke": "grey"}, "encoding": {}, "projection": {"reflectY": true, "type": "identity"}}, {"mark": "geoshape", "encoding": {"color": {"type": "quantitative", "field": "trees_number", "title": "Number of trees"}, "opacity": {"condition": {"value": 1, "selection": "selector003"}, "value": 0.1}, "tooltip": [{"type": "nominal", "field": "name"}, {"type": "quantitative", "field": "trees_number", "title": "Number of trees"}]}, "projection": {"reflectY": true, "type": "identity"}, "selection": {"selector003": {"type": "single", "fields": ["name"], "on": "mouseover"}}, "transform": [{"lookup": "properties.name", "from": {"data": {"url": "/jupyter/user/648963/proxy/15339/883966a1e7ba58e5f38d79c6dfc44bed.json"}, "key": "name", "fields": ["trees_number", "name"]}}]}], "data": {"url": "https://raw.githubusercontent.com/UBC-MDS/exploratory-data-viz/main/data/local-area-boundary.geojson", "format": {"property": "features", "type": "json"}}}, {"data": {"url": "/jupyter/user/648963/proxy/15339/883966a1e7ba58e5f38d79c6dfc44bed.json"}, "mark": "point", "encoding": {"stroke": {"condition": {"value": "black", "selection": "selector003"}, "value": "#ffffff"}, "x": {"type": "quantitative", "field": "ave_diameter", "scale": {"zero": false}, "title": "Average diameter (inch)"}, "y": {"type": "quantitative", "field": "ave_age", "scale": {"zero": false}, "title": "Average age (yr)"}}}], "title": {"text": "Figure 7 Trees distribution per neighbourhood (number/age/diameter)", "subtitle": ["Hover selection on map is available by neighbourhood", "Tooltips are available on map"], "subtitleColor": "steelblue", "subtitleFontWeight": "bold"}, "$schema": "https://vega.github.io/schema/vega-lite/v4.8.1.json"}, {"mode": "vega-lite"});
+</script>
+</div>
+</div>
+<p>Based on the above trees_nbhd_df and Figure 7, the average age of trees in these neighbourhoods are between 16.3 years old and 19.7 years old. And the average diameter of trees are from 5.1 inch to 8.1 inch.</p>
+<p>Through the link of map selection with the scatter plot of Figure 7, it is effective and efficient for audiences to hover over their target neighbourhood on map to quickly obtain the number of trees in the neighbourhood, know how old and how big the trees there on average.</p>
+</section>
+</section>
+</section>
+<section id="discussions" class="level2">
+<h2 class="anchored" data-anchor-id="discussions">DISCUSSIONS</h2>
+<p>The analysis intends to discover an overall view of Vancouver street trees for their biological diversity, growth and distributions within neighbourhoods. Through Figure 1 to Figure 7 and related tables, all four pre-defined questions have been answered. It has been confirmed that within 68 genera and a total of 14,083 trees, Acer is the most popular genus based on the dataset. It is not surprised as the maple trees are Canada’s official arboreal emblem. Historical data shows Vancouver has maintained a dynamic public trees planting program. Especially between 1995 and 2013, a large number of trees had been added to the streets by the government. The plots generated can effectively provide audiences with more details about the yearly number of trees planted by genus, the growth rates by genus, the trees distribution and certain characters by neighbourhood. In addition, by comparing the growth rates within 68 genera, it is noted that TSUGA, POPULUS and PSEUDOTSUGA are the top three fastest growing genera in Vancouver.</p>
+<p>Except for the four questions that have been discussed, <strong>further questions</strong> could be considered in the future:</p>
+<ol type="1">
+<li>What is the specific genus distribution as per neighbourhood. This could be demonstrated on the Vancouver map, too. The answer will be informative for residents to know the distribution of fast-growing trees or shade trees in their area.</li>
+<li>What is the average height range of trees in each neighbourhood. Some house buyers may prefer taller trees or shade trees in their neighbourhood.</li>
+<li>Since genus is the highest level of tree classification in the df, data analyst may extend the analysis into the next level, species, or common names, or cultivar_names to continuously explore the data patterns.</li>
+</ol>
+<p>In the analysis report, the <strong>assumption and limitations of the analysis</strong> should be highlighted for audiences to pay attention, including:</p>
+<ol type="1">
+<li>The original data only includes the public trees on boulevards in the City of Vancouver. Park trees and private trees are not included.</li>
+<li>More than half of the original observations from the original dataset have been dropped since lacking information on the date of the tree being planted. Therefore, the analysis is based on the remaining observations only. This may limit the conclusions or insights extracted from this analysis.</li>
+<li>In order to simplify the analysis, the calculation of the age of trees has not included the specific month and day.</li>
+<li>The information related to the height of trees was collected as height_range_id. So audiences should be aware that the height figures in this report are not the absolute measurement of height.</li>
+<li>Due to the limited sample size, more research is required to verify the conclusion of the fastest growing trees in this report.</li>
+</ol>
+<p><strong>The last important notes</strong>: 1. The top priority of this analysis is emphasizing on the demonstration of learning outcomes from the Data Vis perspectives. The analyst (author) recognized in this report the narrative should be more cohesive, the original dataset column analysis and data wrangling should be supported with more domain expertise if judged from a higher level data analysis standard. 2. More statistical tools could be applied in the analysis to make the report more convincing. This will be considered for future work.</p>
+</section>
+<section id="dashboard-1" class="level2">
+<h2 class="anchored" data-anchor-id="dashboard-1">DASHBOARD 1</h2>
+<div class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Resize plots to accommodate the combined panel</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Create new object to avoid overwriting previous plots</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>plot_1 <span class="op">=</span> plot_1_genus.properties(height<span class="op">=</span><span class="dv">1100</span>,width<span class="op">=</span><span class="dv">250</span>)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>plot_2 <span class="op">=</span> plot_2_year.properties(height<span class="op">=</span><span class="dv">300</span>,width<span class="op">=</span><span class="dv">350</span>)</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>plot_3 <span class="op">=</span> plot_3_genus_year_bar.properties(height<span class="op">=</span><span class="dv">300</span>,width<span class="op">=</span><span class="dv">350</span>)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>plot_4 <span class="op">=</span> plot_4_growth_rates_genus.properties(height<span class="op">=</span><span class="dv">300</span>,width<span class="op">=</span><span class="dv">350</span>)</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>plot_1 <span class="op">|</span> (plot_2 <span class="op">&amp;</span> plot_3 <span class="op">&amp;</span> plot_4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+
+<div id="altair-viz-5cbabcbf07654dd3bf7ae6e49947ef15"></div>
+<script type="text/javascript">
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-5cbabcbf07654dd3bf7ae6e49947ef15") {
+      outputDiv = document.getElementById("altair-viz-5cbabcbf07654dd3bf7ae6e49947ef15");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm//vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm//vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm//vega-lite@4.8.1?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm//vega-embed@6?noext",
+    };
+
+    function loadScript(lib) {
+      return new Promise(function(resolve, reject) {
+        var s = document.createElement('script');
+        s.src = paths[lib];
+        s.async = true;
+        s.onload = () => resolve(paths[lib]);
+        s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+        document.getElementsByTagName("head")[0].appendChild(s);
+      });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else if (typeof vegaEmbed === "function") {
+      displayChart(vegaEmbed);
+    } else {
+      loadScript("vega")
+        .then(() => loadScript("vega-lite"))
+        .then(() => loadScript("vega-embed"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 400, "continuousHeight": 300}}, "hconcat": [{"layer": [{"mark": "bar", "encoding": {"x": {"type": "quantitative", "aggregate": "count", "title": "Number of Trees"}, "y": {"type": "nominal", "field": "genus_name", "sort": "x", "title": "Genus"}}}, {"mark": {"type": "text", "align": "left", "dx": 2}, "encoding": {"text": {"type": "quantitative", "aggregate": "count"}, "x": {"type": "quantitative", "aggregate": "count", "title": "Number of Trees"}, "y": {"type": "nominal", "field": "genus_name", "sort": "x", "title": "Genus"}}}], "data": {"url": "/jupyter/user/648963/proxy/15339/b29f3901103bcc15a69c85a3728fa802.json"}, "height": 1100, "title": {"text": "Figure 1 Number of street trees planted per genus", "subtitle": "Acer is the most popular genus of street trees"}, "width": 250}, {"vconcat": [{"mark": "bar", "encoding": {"x": {"type": "nominal", "field": "year", "title": null}, "y": {"type": "quantitative", "aggregate": "count", "title": "Number of trees planted"}}, "height": 300, "title": {"text": "Figure 2 Number of street trees planted each year", "subtitle": "(Data available from 1989 to 2019)"}, "width": 350}, {"mark": "bar", "encoding": {"color": {"type": "nominal", "field": "genus_name", "title": "Genus name"}, "opacity": {"condition": {"value": 0.9, "selection": "selector001"}, "value": 0.0}, "x": {"type": "nominal", "field": "year", "title": null}, "y": {"type": "quantitative", "aggregate": "count", "stack": false, "title": "Number of trees planted per genus"}}, "height": 300, "selection": {"selector001": {"type": "single", "fields": ["genus_name"], "bind": {"input": "select", "options": ["ABIES", "ACER", "AESCULUS", "AMELANCHIER", "BETULA", "CALOCEDRUS", "CARPINUS", "CATALPA", "CEDRUS", "CELTIS", "CERCIDIPHYLLUM", "CERCIS", "CHAMAECYPARIS", "CHITALPA", "CLADRASTIS", "CORNUS", "CORYLUS", "CRATAEGUS", "DAVIDIA", "EUCOMMIA", "EUONYMUS", "FAGUS", "FRAXINUS", "GINKGO", "GLEDITSIA", "GYMNOCLADUS", "HIBISCUS", "JUGLANS", "KOELREUTERIA", "LABURNUM", "LIQUIDAMBAR", "LIRIODENDRON", "MAGNOLIA", "MALUS", "MANGLIETIA", "MESPILUS", "METASEQUOIA", "NOTHOFAGUS", "NYSSA", "OSTRYIA", "PARROTIA", "PICEA", "PINUS", "PLATANUS", "POPULUS", "PRUNUS", "PSEUDOTSUGA", "PTEROCARYA", "PYRUS", "QUERCUS", "RHAMNUS", "RHUS", "ROBINIA", "SALIX", "SEQUOIA", "SEQUOIADENDRON", "SOPHORA", "SORBUS", "STEWARTIA", "STYRAX", "SYRINGA", "TAXUS", "THUJA", "TILIA", "TRACHYCARPUS", "TSUGA", "ULMUS", "ZELKOVA"], "name": "Genus"}}}, "title": {"text": "Figure 3 Number of street trees planted each year by genus(from 1989 to 2019)", "subtitle": "Dropdown selection is available by genus", "subtitleColor": "steelblue", "subtitleFontWeight": "bold"}, "width": 350}, {"data": {"url": "/jupyter/user/648963/proxy/15339/441fa82d8e974262f3f2564a79209ee6.json"}, "mark": {"type": "point", "size": 5}, "encoding": {"opacity": {"condition": {"value": 0.9, "selection": "selector001"}, "value": 0.0}, "x": {"type": "quantitative", "field": "rate_dia", "title": "Growth rate in diameter (inch/yr)"}, "y": {"type": "quantitative", "field": "rate_height", "title": "Growth rate in height (unit/yr)"}}, "height": 300, "selection": {"selector002": {"type": "interval", "bind": "scales", "encodings": ["x", "y"]}, "selector001": {"type": "single", "fields": ["genus_name"], "bind": {"input": "select", "options": ["ABIES", "ACER", "AESCULUS", "AMELANCHIER", "BETULA", "CALOCEDRUS", "CARPINUS", "CATALPA", "CEDRUS", "CELTIS", "CERCIDIPHYLLUM", "CERCIS", "CHAMAECYPARIS", "CHITALPA", "CLADRASTIS", "CORNUS", "CORYLUS", "CRATAEGUS", "DAVIDIA", "EUCOMMIA", "EUONYMUS", "FAGUS", "FRAXINUS", "GINKGO", "GLEDITSIA", "GYMNOCLADUS", "HIBISCUS", "JUGLANS", "KOELREUTERIA", "LABURNUM", "LIQUIDAMBAR", "LIRIODENDRON", "MAGNOLIA", "MALUS", "MANGLIETIA", "MESPILUS", "METASEQUOIA", "NOTHOFAGUS", "NYSSA", "OSTRYIA", "PARROTIA", "PICEA", "PINUS", "PLATANUS", "POPULUS", "PRUNUS", "PSEUDOTSUGA", "PTEROCARYA", "PYRUS", "QUERCUS", "RHAMNUS", "RHUS", "ROBINIA", "SALIX", "SEQUOIA", "SEQUOIADENDRON", "SOPHORA", "SORBUS", "STEWARTIA", "STYRAX", "SYRINGA", "TAXUS", "THUJA", "TILIA", "TRACHYCARPUS", "TSUGA", "ULMUS", "ZELKOVA"], "name": "Genus"}}}, "title": {"text": "Figure 4 Trees growth rate in diameter & height per genus", "subtitle": ["Dropdown selection is available by genus", "Zooming and Panning are available"], "subtitleColor": "steelblue", "subtitleFontWeight": "bold"}, "width": 350}], "data": {"url": "/jupyter/user/648963/proxy/15339/92e48fd7e6d0899a1decc58d8602b681.json"}}], "$schema": "https://vega.github.io/schema/vega-lite/v4.8.1.json"}, {"mode": "vega-lite"});
+</script>
+</div>
+</div>
+</section>
+<section id="dashboard-2" class="level2">
+<h2 class="anchored" data-anchor-id="dashboard-2">DASHBOARD 2</h2>
+<div class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Since objects with "config" attribute cannot be used within VConcatChart, remove the previous "config"</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Create new object to avoid overwriting previous plots</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>plot_5 <span class="op">=</span> (plot_ave_growth_rate_dia_bar <span class="op">|</span> plot_ave_growth_rate_dia_box_scale).properties(title<span class="op">=</span>plot_5_title)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>plot_6 <span class="op">=</span> (plot_ave_growth_rate_height_bar <span class="op">|</span> plot_ave_growth_rate_height_box_scale).properties(title<span class="op">=</span>plot_6_title)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>plot_7 <span class="op">=</span> (plot_trees_nbhd_map <span class="op">&amp;</span> plot_age_dia).properties(title<span class="op">=</span>plot_7_title)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>(plot_5 <span class="op">&amp;</span> plot_6) <span class="op">&amp;</span> plot_7</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
+
+<div id="altair-viz-63159d730aab43a0afa22adbb2e3d7eb"></div>
+<script type="text/javascript">
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-63159d730aab43a0afa22adbb2e3d7eb") {
+      outputDiv = document.getElementById("altair-viz-63159d730aab43a0afa22adbb2e3d7eb");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm//vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm//vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm//vega-lite@4.8.1?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm//vega-embed@6?noext",
+    };
+
+    function loadScript(lib) {
+      return new Promise(function(resolve, reject) {
+        var s = document.createElement('script');
+        s.src = paths[lib];
+        s.async = true;
+        s.onload = () => resolve(paths[lib]);
+        s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+        document.getElementsByTagName("head")[0].appendChild(s);
+      });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else if (typeof vegaEmbed === "function") {
+      displayChart(vegaEmbed);
+    } else {
+      loadScript("vega")
+        .then(() => loadScript("vega-lite"))
+        .then(() => loadScript("vega-embed"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 400, "continuousHeight": 300}}, "vconcat": [{"hconcat": [{"mark": "bar", "encoding": {"color": {"type": "quantitative", "aggregate": "count", "scale": {"scheme": "blues"}, "title": "Number of trees"}, "x": {"type": "quantitative", "aggregate": "mean", "field": "rate_dia", "title": "Average growth rate in diameter (inch/yr)"}, "y": {"type": "nominal", "field": "genus_name", "sort": "x", "title": "Genus"}}, "width": 130}, {"mark": {"type": "boxplot", "color": "green"}, "encoding": {"x": {"type": "quantitative", "field": "rate_dia", "scale": {"clamp": true, "domain": [0, 4]}, "title": "Growth rate in diameter (inch/yr)"}, "y": {"type": "nominal", "field": "genus_name", "sort": ["RHUS", "RHAMNUS", "SALIX", "CEDRUS", "EUONYMUS", "MANGLIETIA", "KOELREUTERIA", "MESPILUS", "GYMNOCLADUS", "PICEA", "SOPHORA", "LABURNUM", "PYRUS", "MALUS", "HIBISCUS", "CRATAEGUS", "OSTRYIA", "STYRAX", "TRACHYCARPUS", "ABIES", "CATALPA", "DAVIDIA", "CORYLUS", "GLEDITSIA", "SEQUOIADENDRON", "SYRINGA", "CORNUS", "MAGNOLIA", "TAXUS", "CLADRASTIS", "GINKGO", "SORBUS", "EUCOMMIA", "CELTIS", "FRAXINUS", "CERCIS", "CHITALPA", "LIRIODENDRON", "ACER", "PARROTIA", "NOTHOFAGUS", "AMELANCHIER", "CARPINUS", "PRUNUS", "TILIA", "PINUS", "FAGUS", "ZELKOVA", "CERCIDIPHYLLUM", "LIQUIDAMBAR", "CALOCEDRUS", "QUERCUS", "PLATANUS", "NYSSA", "ROBINIA", "ULMUS", "STEWARTIA", "JUGLANS", "SEQUOIA", "BETULA", "CHAMAECYPARIS", "METASEQUOIA", "THUJA", "PTEROCARYA", "AESCULUS", "POPULUS", "PSEUDOTSUGA", "TSUGA"], "title": "Genus"}}, "width": 310}], "title": {"text": "Figure 5 Trees average growth rate in diameter per genus", "subtitle": "TSUGA, PSEUDOTSUGA & POPULUS are top three fastest growing genera"}}, {"hconcat": [{"mark": "bar", "encoding": {"color": {"type": "quantitative", "aggregate": "count", "scale": {"scheme": "teals"}, "title": "Number of trees"}, "x": {"type": "quantitative", "aggregate": "mean", "field": "rate_height", "title": "Average growth rate in height (unit/yr)"}, "y": {"type": "nominal", "field": "genus_name", "sort": "x", "title": "Genus"}}, "width": 130}, {"mark": {"type": "boxplot", "color": "grey"}, "encoding": {"x": {"type": "quantitative", "field": "rate_height", "scale": {"clamp": true, "domain": [0, 0.6]}, "title": "Growth rate in height (unit/yr)"}, "y": {"type": "nominal", "field": "genus_name", "sort": ["TRACHYCARPUS", "JUGLANS", "SOPHORA", "SEQUOIA", "KOELREUTERIA", "EUONYMUS", "GYMNOCLADUS", "CEDRUS", "RHAMNUS", "MANGLIETIA", "MALUS", "PYRUS", "HIBISCUS", "CATALPA", "MESPILUS", "EUCOMMIA", "PICEA", "CRATAEGUS", "CORYLUS", "OSTRYIA", "SEQUOIADENDRON", "CLADRASTIS", "RHUS", "SALIX", "ZELKOVA", "SORBUS", "DAVIDIA", "STYRAX", "GLEDITSIA", "GINKGO", "CORNUS", "PRUNUS", "MAGNOLIA", "TAXUS", "NOTHOFAGUS", "CELTIS", "PINUS", "CERCIS", "SYRINGA", "ACER", "ABIES", "LIRIODENDRON", "LABURNUM", "FRAXINUS", "LIQUIDAMBAR", "PARROTIA", "CARPINUS", "CHITALPA", "TILIA", "ROBINIA", "AMELANCHIER", "FAGUS", "CERCIDIPHYLLUM", "PTEROCARYA", "QUERCUS", "THUJA", "ULMUS", "METASEQUOIA", "PLATANUS", "CHAMAECYPARIS", "AESCULUS", "CALOCEDRUS", "NYSSA", "BETULA", "STEWARTIA", "PSEUDOTSUGA", "POPULUS", "TSUGA"], "title": "Genus"}}, "width": 310}], "title": {"text": "Figure 6 Trees average growth rate in height per genus", "subtitle": "TSUGA, POPULUS & PSEUDOTSUGA are top three fastest growing genera"}}, {"vconcat": [{"layer": [{"mark": {"type": "geoshape", "color": "white", "stroke": "grey"}, "encoding": {}, "projection": {"reflectY": true, "type": "identity"}}, {"mark": "geoshape", "encoding": {"color": {"type": "quantitative", "field": "trees_number", "title": "Number of trees"}, "opacity": {"condition": {"value": 1, "selection": "selector003"}, "value": 0.1}, "tooltip": [{"type": "nominal", "field": "name"}, {"type": "quantitative", "field": "trees_number", "title": "Number of trees"}]}, "projection": {"reflectY": true, "type": "identity"}, "selection": {"selector003": {"type": "single", "fields": ["name"], "on": "mouseover"}}, "transform": [{"lookup": "properties.name", "from": {"data": {"url": "/jupyter/user/648963/proxy/15339/883966a1e7ba58e5f38d79c6dfc44bed.json"}, "key": "name", "fields": ["trees_number", "name"]}}]}], "data": {"url": "https://raw.githubusercontent.com/UBC-MDS/exploratory-data-viz/main/data/local-area-boundary.geojson", "format": {"property": "features", "type": "json"}}}, {"data": {"url": "/jupyter/user/648963/proxy/15339/883966a1e7ba58e5f38d79c6dfc44bed.json"}, "mark": "point", "encoding": {"stroke": {"condition": {"value": "black", "selection": "selector003"}, "value": "#ffffff"}, "x": {"type": "quantitative", "field": "ave_diameter", "scale": {"zero": false}, "title": "Average diameter (inch)"}, "y": {"type": "quantitative", "field": "ave_age", "scale": {"zero": false}, "title": "Average age (yr)"}}}], "title": {"text": "Figure 7 Trees distribution per neighbourhood (number/age/diameter)", "subtitle": ["Hover selection on map is available by neighbourhood", "Tooltips are available on map"], "subtitleColor": "steelblue", "subtitleFontWeight": "bold"}}], "data": {"url": "/jupyter/user/648963/proxy/15339/441fa82d8e974262f3f2564a79209ee6.json"}, "$schema": "https://vega.github.io/schema/vega-lite/v4.8.1.json"}, {"mode": "vega-lite"});
+</script>
+</div>
+</div>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">REFERENCES</h2>
+<section id="resources-used" class="level3">
+<h3 class="anchored">Resources Used</h3>
+<p>Not all the work in this project is original. The following resources have been used as references.</p>
+<ul>
+<li><font color="blue">Data Source</font></li>
+</ul>
+<p>The Vancouver street trees dataset provided by UBC Data Visualization course. The dataset schema from <a href="https://opendata.vancouver.ca/explore/dataset/street-trees/information/?disjunctive.species_name&amp;disjunctive.common_name&amp;disjunctive.height_range_id" target="_blank">City of Vancouver Open Data Portal - Street Trees</a>.</p>
+<ul>
+<li><font color="blue">Sample Report</font></li>
+</ul>
+<p>The sample reports, <em>Evolution of LEGO</em> EDA report and analysis report provided by UBC Data Visualization course.</p>
+<ul>
+<li><font color="blue">Report Writing</font></li>
+</ul>
+<p>Markdown formatting for the text cells in JupyterNotebook, <em>Basic Syntax - The Markdown elements outlined in John Gruber’s design document</em>, retrieved on November 1, 2021 from <a href="https://www.markdownguide.org/basic-syntax/" target="_blank">Markdown Guide</a>.</p>
+<ul>
+<li><font color="blue">Python and Data Vis Techniques</font></li>
+</ul>
+<p>Learned from UBC Data Visualization course, Programming in Python for Data Science course, Piazza group discussions, <a href="https://altair-viz.github.io/" target="_blank">Altair Documentation</a>, and other self-learning resources from the internet.</p>
+<h2 class="anchored" data-anchor-id="resources-used">
+<center>
+<strong>End of the Report</strong>
+</center>
+</h2>
+
+
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp(/https:\/\/sandrajurela\.com/);
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script>
+<script src="https://giscus.app/client.js" data-repo="sandra-jurela/my-personal-Quarto-blog" data-repo-id="R_kgDOI6JBDg" data-category="General" data-category-id="DIC_kwDOI6JBDs4CUB2R" data-mapping="title" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="top" data-theme="light" data-lang="en" crossorigin="anonymous" async="">
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+      <div class="nav-footer-center">© 2023 Sandra Jurela. All Rights Reserved<br>
+Built with 🧠 and <a href="https://quarto.org">Quarto</a> in RStudio.</div>
+  </div>
+</footer>
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>
