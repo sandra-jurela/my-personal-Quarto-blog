@@ -10,7 +10,6 @@ format:
   html:
     theme: theme-light.scss
     css: style_python.css
-    embed-resources: true
 image: images/tree.png
 ---
 
@@ -22,8 +21,8 @@ import altair as alt
 import pandas as pd
 import json
 
-alt.data_transformers.enable("data_server")
-alt.renderers.enable("html")
+# embed the dataset within the visualization specification
+alt.data_transformers.disable_max_rows()
 
 trees_df = pd.read_csv('data/vancouver_trees.csv')
 
@@ -51,17 +50,25 @@ As per the questions, the irrelevant columns under the fourth group and trees co
 
 ```{python}
 trees_df = pd.read_csv('data/vancouver_trees.csv',
-  usecols=['neighbourhood_name','date_planted','diameter','genus_name','height_range_id'],  
-  parse_dates = ['date_planted'])
+                       usecols=['neighbourhood_name',
+                                'date_planted',
+                                'diameter', 
+                                'genus_name',
+                                'height_range_id'],
+                       parse_dates=['date_planted'])
                                     
 trees_df.info()
 ```
 
-### Exam null values
+### Deal with null values
+
+Based on the df information, the column of date_planted has almost half of values missed. Since reviewing trees growth is one of the objectives in this analysis, any observations without date of planted will be considered as uninformative data and dropped from the original df.
+
+This will not cause a problem with the representativeness of the data. Just trust me for now! :)
+
 
 ```{python}
 # Drop observations without value of date_planted
-
 trees_df = trees_df.dropna(subset=['date_planted'])
 
 trees_df.info()
@@ -71,7 +78,6 @@ trees_df.info()
 
 ```{python}
 # Exam the remaining columns for more details
-
 trees_df.describe(include='all', datetime_is_numeric=True)
 ```
 
@@ -111,7 +117,7 @@ The cleaned target dataframe **trees_df** is composed of 5 columns. There are 68
 
 ### Q1
 
-> Based on distribution of street trees planted in Vancouver by genus, which genus is the most popular one?
+#### Based on distribution of street trees planted in Vancouver by genus, which genus is the most popular one?
 
 Biological diversity is one of the interests for the analysis. The quick guess for the answer would be Acer as Acer is a genus of trees commonly known as maples. A maple leaf is on the Canadian flag, and the maple has been chosen as a national symbol in Canada.
 
@@ -138,7 +144,7 @@ From Figure 1, it has been confirmed that Acer is the most popular genus of tree
 
 ### Q2
 
-> In the past 30 years, how many trees have been planted every single year? And what is the number of trees planted by genus each year?
+#### In the past 30 years, how many trees have been planted every single year? And what is the number of trees planted by genus each year?
 
 The dataframe has provide the specific date of being planted for each tree. From the available data, the age of current trees will be calculated first and then plot the number of trees planted by year. Since the accuracy is not a priority in this case, only the year of tree planted will be extracted for calculating the age till 2021.
 
@@ -150,8 +156,6 @@ trees_df_yr = trees_df.assign(year=trees_df['date_planted'].dt.year)
 trees_df_age = trees_df_yr.assign(age=(2021-trees_df_yr['year']))
 
 # Plot distribution of number of trees planted by year
-# It has been tested that if specifying the dtype of column 'year' as quantitative (Q), the x-axis label takes scientific
-# formatting, ie. 1,989. To avoid the ",", the dtype of 'year' has been specified as nominal (N)
 plot_2_title = alt.TitleParams(
     "Figure 2 Number of street trees planted each year",
      subtitle = "(Data available from 1989 to 2019)")
@@ -169,8 +173,6 @@ Moving further, to plot number of trees planted by year and add dropdown selecti
 
 ```{python}
 #| column: body-outset-right
-# Plot number of trees planted by year and add dropdown selection by genus
-
 # Specify the subtitle color and bold it to draw attention
 plot_3_title = alt.TitleParams(
     "Figure 3 Number of street trees planted each year by genus(from 1989 to 2019)",
@@ -183,15 +185,13 @@ dropdown_genus = alt.binding_select(name='Genus', options=genus)
 
 select_genus = alt.selection_single(fields=['genus_name'], bind=dropdown_genus)
 
-# Since objective is to see number of trees for each genus, for y axis, 
-# specify stack=False
 plot_3_genus_year_bar = alt.Chart(trees_df_age).mark_bar().encode(
     alt.X('year:N',title=None),
     alt.Y('count():Q',stack=False,title='Number of trees planted per genus'),
     alt.Color('genus_name:N',title='Genus name')
 ).add_selection(select_genus).encode(
     opacity=alt.condition(select_genus, alt.value(0.9), alt.value(0.0))
-    ).properties(title=plot_3_title)
+).properties(title=plot_3_title)
 
 plot_3_genus_year_bar
 ```
