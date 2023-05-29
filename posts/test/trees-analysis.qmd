@@ -1,10 +1,11 @@
 ---
 title: "Test - Altair Viz"
 description: "Testing Altair rendering."
-date: "2023-05-20"
+date: "2023-05-29"
 categories: 
   - python
   - altair
+  - EDA
 jupyter: python3
 format:
   html:
@@ -12,6 +13,12 @@ format:
     css: style_python.css
 image: images/tree.png
 ---
+
+::: callout-warning
+This is a notebook about Vancouver street trees that is not yet finished!!
+
+What do you think about it?
+:::
 
 ### Imports
 
@@ -65,7 +72,6 @@ trees_df.info()
 Based on the df information, the column of date_planted has almost half of values missed. Since reviewing trees growth is one of the objectives in this analysis, any observations without date of planted will be considered as uninformative data and dropped from the original df.
 
 This will not cause a problem with the representativeness of the data. Just trust me for now! :)
-
 
 ```{python}
 # Drop observations without value of date_planted

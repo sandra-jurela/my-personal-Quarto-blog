@@ -6,6 +6,6 @@ This repository contains the source code for my personal blog where I share my d
 
 It's built with [Quarto](https://quarto.org/) in [RSudio](https://posit.co/), and deployed using [Netlify](https://www.netlify.com/).
 
-Enjoy your visit! 
+Enjoy your visit!
 
 :point_right: [sandrajurela.com](https://sandrajurela.com/)

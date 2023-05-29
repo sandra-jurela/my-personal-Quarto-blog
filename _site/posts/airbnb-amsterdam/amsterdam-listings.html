@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Sandra Jurela">
-<meta name="dcterms.date" content="2023-05-05">
+<meta name="dcterms.date" content="2023-05-25">
 <meta name="description" content="Cleaning data with Pandas and creating a streamlit app.">
 
 <title>Sandra Jurela - Streamlit app - Airbnb Amsterdam Listings</title>
@@ -144,14 +144,14 @@ gtag('config', 'G-JH321LBKZY', { 'anonymize_ip': true});
 <link rel="stylesheet" href="style_python.css">
 <meta property="og:title" content="Sandra Jurela - Streamlit app - Airbnb Amsterdam Listings">
 <meta property="og:description" content="Cleaning data with Pandas and creating a streamlit app.">
-<meta property="og:image" content="https://sandrajurela.com/posts\airbnb-amsterdam\preview.png">
+<meta property="og:image" content="https://sandrajurela.com/posts\airbnb-amsterdam\preview3.png">
 <meta property="og:site-name" content="Sandra Jurela">
-<meta property="og:image:height" content="945">
+<meta property="og:image:height" content="939">
 <meta property="og:image:width" content="1432">
 <meta name="twitter:title" content="Sandra Jurela - Streamlit app - Airbnb Amsterdam Listings">
 <meta name="twitter:description" content="Cleaning data with Pandas and creating a streamlit app.">
-<meta name="twitter:image" content="https://sandrajurela.com/posts\airbnb-amsterdam\preview.png">
-<meta name="twitter:image-height" content="945">
+<meta name="twitter:image" content="https://sandrajurela.com/posts\airbnb-amsterdam\preview3.png">
+<meta name="twitter:image-height" content="939">
 <meta name="twitter:image-width" content="1432">
 <meta name="twitter:card" content="summary_large_image">
 </head>
@@ -235,7 +235,7 @@ gtag('config', 'G-JH321LBKZY', { 'anonymize_ip': true});
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">May 5, 2023</p>
+        <p class="date">May 25, 2023</p>
       </div>
     </div>
     
@@ -254,10 +254,15 @@ gtag('config', 'G-JH321LBKZY', { 'anonymize_ip': true});
   <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
   <li><a href="#data-overview" id="toc-data-overview" class="nav-link" data-scroll-target="#data-overview">Data overview</a>
   <ul class="collapse">
-  <li><a href="#data-dictionary-for-listings-data" id="toc-data-dictionary-for-listings-data" class="nav-link" data-scroll-target="#data-dictionary-for-listings-data">Data dictionary for listings data</a></li>
-  <li><a href="#data-dictionary-for-calendar-data" id="toc-data-dictionary-for-calendar-data" class="nav-link" data-scroll-target="#data-dictionary-for-calendar-data">Data dictionary for calendar data</a></li>
+  <li><a href="#setting-up-the-programming-environment" id="toc-setting-up-the-programming-environment" class="nav-link" data-scroll-target="#setting-up-the-programming-environment">Setting up the programming environment</a></li>
+  <li><a href="#listings-data" id="toc-listings-data" class="nav-link" data-scroll-target="#listings-data">Listings data</a></li>
+  <li><a href="#calendar-data" id="toc-calendar-data" class="nav-link" data-scroll-target="#calendar-data">Calendar data</a></li>
   </ul></li>
-  <li><a href="#cleaning-the-data" id="toc-cleaning-the-data" class="nav-link" data-scroll-target="#cleaning-the-data">Cleaning the data</a></li>
+  <li><a href="#cleaning-the-listings-dataframe" id="toc-cleaning-the-listings-dataframe" class="nav-link" data-scroll-target="#cleaning-the-listings-dataframe">Cleaning the Listings DataFrame</a></li>
+  <li><a href="#calendar-dataframe" id="toc-calendar-dataframe" class="nav-link" data-scroll-target="#calendar-dataframe">Calendar DataFrame</a></li>
+  <li><a href="#merging" id="toc-merging" class="nav-link" data-scroll-target="#merging">Merging</a></li>
+  <li><a href="#grouping" id="toc-grouping" class="nav-link" data-scroll-target="#grouping">Grouping</a></li>
+  <li><a href="#memory-optimization" id="toc-memory-optimization" class="nav-link" data-scroll-target="#memory-optimization">Memory optimization</a></li>
   <li><a href="#streamlit-application" id="toc-streamlit-application" class="nav-link" data-scroll-target="#streamlit-application">Streamlit application</a></li>
   </ul>
 </nav>
@@ -273,27 +278,28 @@ gtag('config', 'G-JH321LBKZY', { 'anonymize_ip': true});
 </section>
 <section id="data-overview" class="level2">
 <h2 class="anchored" data-anchor-id="data-overview">Data overview</h2>
-<p>Setting up the programming environment</p>
+<section id="setting-up-the-programming-environment" class="level3">
+<h3 class="anchored" data-anchor-id="setting-up-the-programming-environment">Setting up the programming environment</h3>
 <div class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># load libraries</span></span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># import libraries</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># show all columns (instead of cascading columns in the middle)</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>pd.set_option(<span class="st">"display.max_columns"</span>, <span class="va">None</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># don't show numbers in scientific notation</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>pd.set_option(<span class="st">"display.float_format"</span>, <span class="st">"</span><span class="sc">{:.2f}</span><span class="st">"</span>.<span class="bu">format</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># don"t show numbers in scientific notation</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>pd.set_option(<span class="st">"display.float_format"</span>, <span class="st">"</span><span class="sc">{:.2f}</span><span class="st">"</span>.<span class="bu">format</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># read the Python Pickle and PyArrow Parquet files</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>df_list <span class="op">=</span> pd.read_pickle(<span class="st">"data/airbnb_amsterdam_listings.pkl"</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>df_cal <span class="op">=</span> pd.read_parquet(<span class="st">"data/airbnb_amsterdam_calendar.parquet"</span>, engine<span class="op">=</span><span class="st">"pyarrow"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Reading the datasets</p>
+</section>
+<section id="listings-data" class="level3">
+<h3 class="anchored" data-anchor-id="listings-data">Listings data</h3>
 <div class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># read the Python Pickle and PyArrow Parquet files</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>df_list <span class="op">=</span> pd.read_pickle(<span class="st">"data/airbnb_amsterdam_listings.pkl"</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>df_cal <span class="op">=</span> pd.read_parquet(<span class="st">"data/airbnb_amsterdam_calendar.parquet"</span>, engine<span class="op">=</span><span class="st">"pyarrow"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Datasets overview</p>
-<div class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df_list.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df_list.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="35">
 
 <div>
 
@@ -529,39 +535,44 @@ gtag('config', 'G-JH321LBKZY', { 'anonymize_ip': true});
 </div>
 </div>
 <p><br></p>
-<section id="data-dictionary-for-listings-data" class="level3">
-<h3 class="anchored" data-anchor-id="data-dictionary-for-listings-data">Data dictionary for listings data</h3>
+<p>This dataset needs extensive cleaning which will be performed in the next step.</p>
+<section id="data-dictionary-for-the-listings-data" class="level4">
+<h4 class="anchored" data-anchor-id="data-dictionary-for-the-listings-data">Data dictionary for the listings data</h4>
 <p>Here is the definition of the listings data columns:</p>
 <ul>
 <li><code>id</code> - Airbnb’s unique identifier for the listing</li>
-<li><code>host_acceptance_rate</code> - Rate at which a host accepts booking request</li>
-<li><code>host_is_superhost</code> - Some Airbnb hosts are considered better than others, which this feature displays</li>
-<li><code>host_listings_count</code> - The number of listings the host has (per Airbnb calculations)</li>
-<li><code>host_total_listings_count</code> - The number of listings the host has (per Airbnb calculations)</li>
-<li><code>neighborhood_cleansed</code> - All neighborhoods present in Amsterdam</li>
-<li><code>latitude</code> - Geographical coordinate going from North to South</li>
-<li><code>longitude</code> - Geographical coordinate going from East to West</li>
-<li><code>room_type</code> - All room types available in Amsterdam on Airbnb</li>
-<li><code>accommodates</code> - Maximum number of people that can fit in the Airbnb listing</li>
-<li><code>bedrooms</code> - Number of bedrooms</li>
-<li><code>beds</code> - Number of beds (does not reveal if they are two-person or one-person beds)</li>
-<li><code>amenities</code> - Number of amenities present in the Airbnb listing</li>
-<li><code>price</code> - Price per day in US dollars</li>
-<li><code>minimum_nights</code> - Minimum number of nights you need to book for this listing</li>
-<li><code>maximum_nights</code> - Maximum number of nights you are allowed to book this listing</li>
-<li><code>has_availability</code> - Displays if this listing can be booked</li>
-<li><code>availability_30</code> - Number of available spots in the next 30 days</li>
-<li><code>number_of_reviews_l30d</code> - Number of reviews created in the last 30 days</li>
-<li><code>review_scores_rating</code> - Average rating given to the Airbnb listing</li>
-<li><code>instant_bookable</code> - Whether the guest can automatically book the listing without the host requiring to accept their booking request. An indicator of a commercial listing.</li>
-<li><code>price_per_person</code> - Price per person per night in US dollars</li>
-<li><code>minimum_price</code> - Price in US dollars times minimum nights</li>
-<li><code>discount_per_…</code> - Displays the discount when 5, 10, or 30+ days are booked</li>
-<li><code>service_cost</code> - Total service cost paid at booking</li>
+<li><code>host_acceptance_rate</code> - rate at which a host accepts booking request</li>
+<li><code>host_is_superhost</code> - some Airbnb hosts are considered better than others, which this feature displays</li>
+<li><code>host_listings_count</code> - the number of listings the host has (per Airbnb calculations)</li>
+<li><code>host_total_listings_count</code> - the number of listings the host has (per Airbnb calculations)</li>
+<li><code>neighborhood_cleansed</code> - all neighborhoods present in Amsterdam</li>
+<li><code>latitude</code> - geographical coordinate going from North to South</li>
+<li><code>longitude</code> - geographical coordinate going from East to West</li>
+<li><code>room_type</code> - all room types available in Amsterdam on Airbnb</li>
+<li><code>accommodates</code> - maximum number of people that can fit in the Airbnb listing</li>
+<li><code>bedrooms</code> - number of bedrooms</li>
+<li><code>beds</code> - number of beds (does not reveal if they are two-person or one-person beds)</li>
+<li><code>amenities</code> - number of amenities present in the Airbnb listing</li>
+<li><code>price</code> - price per day in US dollars</li>
+<li><code>minimum_nights</code> - minimum number of nights you need to book for this listing</li>
+<li><code>maximum_nights</code> - maximum number of nights you are allowed to book this listing</li>
+<li><code>has_availability</code> - displays if this listing can be booked</li>
+<li><code>availability_30</code> - number of available spots in the next 30 days</li>
+<li><code>number_of_reviews_l30d</code> - number of reviews created in the last 30 days</li>
+<li><code>review_scores_rating</code> - average rating given to the Airbnb listing</li>
+<li><code>instant_bookable</code> - whether the guest can automatically book the listing without the host requiring to accept their booking request. An indicator of a commercial listing.</li>
+<li><code>price_per_person</code> - price per person per night in US dollars</li>
+<li><code>minimum_price</code> - price in US dollars times minimum nights</li>
+<li><code>discount_per_…</code> - displays the discount when 5, 10, or 30+ days are booked</li>
+<li><code>service_cost</code> - total service cost paid at booking</li>
 </ul>
-<div class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df_cal.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="4">
+</section>
+</section>
+<section id="calendar-data" class="level3">
+<h3 class="anchored" data-anchor-id="calendar-data">Calendar data</h3>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df_cal.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="36">
 
 <div>
 
@@ -628,64 +639,1047 @@ gtag('config', 'G-JH321LBKZY', { 'anonymize_ip': true});
 </div>
 </div>
 </div>
+<section id="data-dictionary-for-the-calendar-data" class="level4">
+<h4 class="anchored" data-anchor-id="data-dictionary-for-the-calendar-data">Data dictionary for the calendar data</h4>
+<p>Here is the definition of the calendar data columns:</p>
+<ul>
+<li><code>listing_id</code> - Airbnb’s unique identifier for the listing</li>
+<li><code>date</code> - the date in the listing’s calendar</li>
+<li><code>available</code> - whether the date is available for a booking</li>
+<li><code>price_in_dollar</code> - the price listed for the day</li>
+<li><code>minimum_nights</code> - minimum nights for a booking made on this day</li>
+<li><code>maximum_nights</code> - maximum nights for a booking made on this day</li>
+</ul>
 </section>
-<section id="data-dictionary-for-calendar-data" class="level3">
-<h3 class="anchored" data-anchor-id="data-dictionary-for-calendar-data">Data dictionary for calendar data</h3>
-<table class="table">
-<colgroup>
-<col style="width: 26%">
-<col style="width: 26%">
-<col style="width: 47%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Column name</th>
-<th>Data type</th>
-<th>Definition</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>listing_id</td>
-<td>integer</td>
-<td>Airbnb’s unique identifier for the listing</td>
-</tr>
-<tr class="even">
-<td>date</td>
-<td>datetime</td>
-<td>The date in the listing’s calendar</td>
-</tr>
-<tr class="odd">
-<td>available</td>
-<td>boolean</td>
-<td>Whether the date is available for a booking</td>
-</tr>
-<tr class="even">
-<td>price_in_dollar</td>
-<td>float</td>
-<td>The price listed for the day</td>
-</tr>
-<tr class="odd">
-<td>minimum_nights</td>
-<td>integer</td>
-<td>Minimum nights for a booking made on this day</td>
-</tr>
-<tr class="even">
-<td>maximum_nights</td>
-<td>integer</td>
-<td>Maximum nights for a booking made on this day</td>
-</tr>
-</tbody>
+</section>
+</section>
+<section id="cleaning-the-listings-dataframe" class="level2">
+<h2 class="anchored" data-anchor-id="cleaning-the-listings-dataframe">Cleaning the Listings DataFrame</h2>
+<p>To get an overview of the Listings DataFrame, called <code>df_list</code>, we’ll need some details about the columns in the DataFrame, like the column names, their data types, and the number of non-null values.</p>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df_list.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+Int64Index: 6165 entries, 0 to 6172
+Data columns (total 34 columns):
+ #   Column                                Non-Null Count  Dtype  
+---  ------                                --------------  -----  
+ 0   id                                    6165 non-null   int64  
+ 1   host_acceptance_rate                  5365 non-null   float64
+ 2   host_is_superhost                     6165 non-null   object 
+ 3   host_listings_count                   6165 non-null   int64  
+ 4   host_total_listings_count             6165 non-null   int64  
+ 5   neighbourhood_cleansed                6165 non-null   object 
+ 6   latitude                              6165 non-null   float64
+ 7   longitude                             6165 non-null   float64
+ 8   room_type                             6165 non-null   object 
+ 9   accommodates                          6165 non-null   int64  
+ 10  bedrooms                              5859 non-null   float64
+ 11  beds                                  6082 non-null   float64
+ 12  amenities                             6165 non-null   int64  
+ 13  price                                 6165 non-null   object 
+ 14  minimum_nights                        6165 non-null   int64  
+ 15  maximum_nights                        6165 non-null   int64  
+ 16  has_availability                      6165 non-null   object 
+ 17  availability_30                       6165 non-null   int64  
+ 18  availability_60                       6165 non-null   int64  
+ 19  availability_90                       6165 non-null   int64  
+ 20  availability_365                      6165 non-null   int64  
+ 21  number_of_reviews                     6165 non-null   int64  
+ 22  number_of_reviews_ltm                 6165 non-null   int64  
+ 23  number_of_reviews_l30d                6165 non-null   int64  
+ 24  review_scores_rating                  5581 non-null   float64
+ 25  instant_bookable                      6165 non-null   object 
+ 26  reviews_per_month                     5581 non-null   float64
+ 27  price_in_euros                        0 non-null      object 
+ 28  price_per_person                      6165 non-null   object 
+ 29  minimum_price                         6165 non-null   object 
+ 30  discount_per_5_days_booked            6165 non-null   object 
+ 31  discount_per_10_days_booked           6165 non-null   object 
+ 32  discount_per_30_and_more_days_booked  6165 non-null   object 
+ 33  service_cost                          6165 non-null   object 
+dtypes: float64(7), int64(14), object(13)
+memory usage: 1.6+ MB</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>df_list <span class="op">=</span> pd.read_pickle(<span class="st">"data/airbnb_amsterdam_listings.pkl"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>STEP 1</strong> - Perform this four-step process to change each of the three <code>discount_per_...</code> columns into their proper format:</p>
+<ul>
+<li>Remove non-numeric characters, like the percent symbol, so you can perform mathematical calculations on the column</li>
+<li>Change the column into a float data type in order to convert the data into a ratio</li>
+<li>Multiply the whole column by 0.01 so you end up with a probability ratio instead of a percentage</li>
+<li>Overwrite the old discount_per_… column with this new column</li>
+</ul>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df_list.loc[:,<span class="st">'discount_per_5_days_booked'</span>:<span class="st">'discount_per_30_and_more_days_booked'</span>] <span class="op">=</span> (</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    df_list.loc[:,<span class="st">'discount_per_5_days_booked'</span>:<span class="st">'discount_per_30_and_more_days_booked'</span>]</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    .replace(<span class="st">'%'</span>, <span class="st">''</span>, regex<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    .astype(<span class="st">'float'</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    .multiply(<span class="fl">0.01</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>df_list.loc[:,<span class="st">'discount_per_5_days_booked'</span>:<span class="st">'discount_per_30_and_more_days_booked'</span>].head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="39">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>discount_per_5_days_booked</th>
+      <th>discount_per_10_days_booked</th>
+      <th>discount_per_30_and_more_days_booked</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.05</td>
+      <td>0.11</td>
+      <td>0.16</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.05</td>
+      <td>0.12</td>
+      <td>0.16</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.07</td>
+      <td>0.11</td>
+      <td>0.22</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.06</td>
+      <td>0.10</td>
+      <td>0.15</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.09</td>
+      <td>0.22</td>
+      <td>0.20</td>
+    </tr>
+  </tbody>
 </table>
+</div>
+</div>
+</div>
+<p><strong>STEP 2</strong> - The columns <code>host_is_superhost</code>, <code>instant_bookable</code>, and <code>has_availability</code> are all boolean columns in the sense that their data represents true and false values, but currently are recognized as objects.</p>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>df_list[[<span class="st">"host_is_superhost"</span>, <span class="st">"instant_bookable"</span>, <span class="st">"has_availability"</span>]].head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="40">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>host_is_superhost</th>
+      <th>instant_bookable</th>
+      <th>has_availability</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>f</td>
+      <td>t</td>
+      <td>t</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>t</td>
+      <td>f</td>
+      <td>t</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>f</td>
+      <td>f</td>
+      <td>t</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>f</td>
+      <td>f</td>
+      <td>t</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>t</td>
+      <td>f</td>
+      <td>t</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p>The letters in these columns (t and f) are written as strings and not as boolean data types. This means we need to replace our string values with the boolean equivalent dtype.</p>
+<p>Change the columns host_is_superhost, instant_bookable, and has_availability into a boolean data type for better data processing:</p>
+<ul>
+<li>Replace f and t with False and True</li>
+<li>Set the column as type bool</li>
+<li>Overwrite the old columns with the new values</li>
+</ul>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>df_list[[<span class="st">"host_is_superhost"</span>, <span class="st">"instant_bookable"</span>, <span class="st">"has_availability"</span>]] <span class="op">=</span> (</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    df_list[[<span class="st">"host_is_superhost"</span>, <span class="st">"instant_bookable"</span>, <span class="st">"has_availability"</span>]]</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    .replace({<span class="st">"f"</span>: <span class="va">False</span>, <span class="st">"t"</span>: <span class="va">True</span>})</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    .astype(<span class="st">'bool'</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>df_list[[<span class="st">"host_is_superhost"</span>, <span class="st">"instant_bookable"</span>, <span class="st">"has_availability"</span>]].head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="41">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>host_is_superhost</th>
+      <th>instant_bookable</th>
+      <th>has_availability</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>False</td>
+      <td>True</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>True</td>
+      <td>False</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>True</td>
+      <td>False</td>
+      <td>True</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p><strong>STEP 3</strong> - A closer look at the prices in the four columns <code>price</code>, <code>price_per_person</code>, <code>minimum_price</code>, and <code>service_cost</code> reveals that they all follow the same pattern:</p>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>df_list[[<span class="st">"price"</span>, <span class="st">"price_per_person"</span>, <span class="st">"minimum_price"</span>, <span class="st">'service_cost'</span>]].head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="42">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>price</th>
+      <th>price_per_person</th>
+      <th>minimum_price</th>
+      <th>service_cost</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>$88.00</td>
+      <td>$44</td>
+      <td>$176</td>
+      <td>$4.99</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>$105.00</td>
+      <td>$52.5</td>
+      <td>$315</td>
+      <td>$4.99</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>$152.00</td>
+      <td>$38</td>
+      <td>$304</td>
+      <td>$4.99</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>$87.00</td>
+      <td>$43.5</td>
+      <td>$174</td>
+      <td>$4.99</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>$160.00</td>
+      <td>$40</td>
+      <td>$320</td>
+      <td>$4.99</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>df_list[<span class="st">'price'</span>] <span class="op">=</span> (</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    df_list[<span class="st">'price'</span>]</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    .<span class="bu">str</span>.replace(<span class="st">'$'</span>, <span class="st">''</span>, regex<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    .<span class="bu">str</span>.replace(<span class="st">','</span>, <span class="st">''</span>, regex<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    .astype(<span class="st">'float'</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>df_list[<span class="st">'price_per_person'</span>] <span class="op">=</span> (</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    df_list[<span class="st">'price_per_person'</span>]</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    .<span class="bu">str</span>.replace(<span class="st">'$'</span>, <span class="st">''</span>, regex<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    .<span class="bu">str</span>.replace(<span class="st">','</span>, <span class="st">''</span>, regex<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    .astype(<span class="st">'float'</span>)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>df_list[<span class="st">'minimum_price'</span>] <span class="op">=</span> (</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    df_list[<span class="st">'minimum_price'</span>]</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    .<span class="bu">str</span>.replace(<span class="st">'$'</span>, <span class="st">''</span>, regex<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    .<span class="bu">str</span>.replace(<span class="st">','</span>, <span class="st">''</span>, regex<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>    .astype(<span class="st">'float'</span>)</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>df_list[<span class="st">'service_cost'</span>] <span class="op">=</span> (</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>    df_list[<span class="st">'service_cost'</span>]</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>    .<span class="bu">str</span>.replace(<span class="st">'$'</span>, <span class="st">''</span>, regex<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>    .<span class="bu">str</span>.replace(<span class="st">','</span>, <span class="st">''</span>, regex<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>    .astype(<span class="st">'float'</span>)</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>df_list[[<span class="st">"price"</span>, <span class="st">"price_per_person"</span>, <span class="st">"minimum_price"</span>, <span class="st">'service_cost'</span>]].head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="43">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>price</th>
+      <th>price_per_person</th>
+      <th>minimum_price</th>
+      <th>service_cost</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>88.00</td>
+      <td>44.00</td>
+      <td>176.00</td>
+      <td>4.99</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>105.00</td>
+      <td>52.50</td>
+      <td>315.00</td>
+      <td>4.99</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>152.00</td>
+      <td>38.00</td>
+      <td>304.00</td>
+      <td>4.99</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>87.00</td>
+      <td>43.50</td>
+      <td>174.00</td>
+      <td>4.99</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>160.00</td>
+      <td>40.00</td>
+      <td>320.00</td>
+      <td>4.99</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p><strong>STEP 4</strong> - Renaming columns</p>
+<p>The following column names need to be changed:</p>
+<ul>
+<li><code>price</code> into <code>price_in_dollar</code></li>
+<li><code>neighbourhood_cleansed</code> into <code>neighbourhood</code></li>
+</ul>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>df_list <span class="op">=</span> df_list.rename(</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  columns<span class="op">=</span>{</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"price"</span>: <span class="st">"price_in_dollar"</span>, </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"neighbourhood_cleansed"</span>: <span class="st">"neighbourhood"</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>STEP 5</strong> Taking a closer look at the <code>neighbourhood</code> and <code>room_type</code> columns reveals that these columns are assigned an <strong>object dtype</strong>. We want them to be a <strong>category</strong> dtype.</p>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>df_list[[<span class="st">'neighbourhood'</span>, <span class="st">'room_type'</span>]] <span class="op">=</span> (</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    df_list[[<span class="st">'neighbourhood'</span>, <span class="st">'room_type'</span>]]</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    .astype(<span class="st">'category'</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>STEP 6</strong> - Deleting irrelevant columns</p>
+<p>We need to delete some columns that are irrelevant to this current use case.</p>
+<p>Let’s inspect the <code>price_in_euros</code> column first, because this column seems to contain only null values, which inherently do not add any meaning to the dataset.</p>
+<div class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>df_list[<span class="st">'price_in_euros'</span>].unique()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="46">
+<pre><code>array([None], dtype=object)</code></pre>
+</div>
+</div>
+<p>The approach reveals that this column contains no unique values and is thus empty. We’ll trop it with other irrelevant columns.</p>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>df_list <span class="op">=</span> df_list.drop(</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">'price_in_euros'</span>,</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">'host_listings_count'</span>, </span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">'host_total_listings_count'</span>, </span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">'availability_60'</span>,</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">'availability_90'</span>, </span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">'availability_365'</span>, </span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">'number_of_reviews'</span>,</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">'number_of_reviews_ltm'</span>, </span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">'reviews_per_month'</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s now have a look at which data types we still need to change and which columns have some null values.</p>
+<div class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>df_list.info(verbose<span class="op">=</span><span class="va">True</span>, show_counts<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+Int64Index: 6165 entries, 0 to 6172
+Data columns (total 25 columns):
+ #   Column                                Non-Null Count  Dtype   
+---  ------                                --------------  -----   
+ 0   id                                    6165 non-null   int64   
+ 1   host_acceptance_rate                  5365 non-null   float64 
+ 2   host_is_superhost                     6165 non-null   bool    
+ 3   neighbourhood                         6165 non-null   category
+ 4   latitude                              6165 non-null   float64 
+ 5   longitude                             6165 non-null   float64 
+ 6   room_type                             6165 non-null   category
+ 7   accommodates                          6165 non-null   int64   
+ 8   bedrooms                              5859 non-null   float64 
+ 9   beds                                  6082 non-null   float64 
+ 10  amenities                             6165 non-null   int64   
+ 11  price_in_dollar                       6165 non-null   float64 
+ 12  minimum_nights                        6165 non-null   int64   
+ 13  maximum_nights                        6165 non-null   int64   
+ 14  has_availability                      6165 non-null   bool    
+ 15  availability_30                       6165 non-null   int64   
+ 16  number_of_reviews_l30d                6165 non-null   int64   
+ 17  review_scores_rating                  5581 non-null   float64 
+ 18  instant_bookable                      6165 non-null   bool    
+ 19  price_per_person                      6165 non-null   float64 
+ 20  minimum_price                         6165 non-null   float64 
+ 21  discount_per_5_days_booked            6165 non-null   float64 
+ 22  discount_per_10_days_booked           6165 non-null   float64 
+ 23  discount_per_30_and_more_days_booked  6165 non-null   float64 
+ 24  service_cost                          6165 non-null   float64 
+dtypes: bool(3), category(2), float64(13), int64(7)
+memory usage: 1.0 MB</code></pre>
+</div>
+</div>
+<p><strong>STEP 7</strong> - Some listings have no reviews and an unknown host acceptance rate. Most Airbnb users exclude such listings from their search results. To mimic this filtering approach, we’ll filter out any rows that do not have a <code>review_scores_rating</code> and without a `<code>host_acceptance_rate</code>.</p>
+<div class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>df_list <span class="op">=</span> df_list.dropna(subset<span class="op">=</span>[<span class="st">'review_scores_rating'</span>, <span class="st">'host_acceptance_rate'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>STEP 8</strong> - Which columns still have missing values and how much?</p>
+<div class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>df_list.isnull().<span class="bu">sum</span>().loc[<span class="kw">lambda</span> x : x <span class="op">!=</span> <span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="50">
+<pre><code>bedrooms    264
+beds         69
+dtype: int64</code></pre>
+</div>
+</div>
+<p>Let’s make some simple assumptions based on the <code>room_type</code> assigned to the listing. Which room types are found in the dataset.</p>
+<div class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>df_list[<span class="st">"room_type"</span>].value_counts()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="51">
+<pre><code>Entire home/apt    3158
+Private room       1633
+Hotel room           67
+Shared room          28
+Name: room_type, dtype: int64</code></pre>
+</div>
+</div>
+<p>There are four room types. Let’s make the assumption that the columns <code>bedrooms</code> and <code>beds</code> are potentially influenced by <code>room_type</code>.</p>
+<p>Therefore, we can make the following rules:</p>
+<ul>
+<li>If you have a <strong>“Private room”</strong> or <strong>“Shared room”</strong> as <code>room_type</code>, then we believe the listing only has one bedroom.</li>
+<li>If the listing has <strong>“Hotel room”</strong> or <strong>“Entire home/apt”</strong> as <code>room_type</code>, then we can divide the number of guests the listing accomodates by 2 and round up.</li>
+<li>If any of these numbers are missing, then we can leave it empty.</li>
+</ul>
+<p>Translate these requirements into a Python function, and you get:</p>
+<div class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fill_empty_bedrooms(accommodates: <span class="bu">int</span>, bedrooms: <span class="bu">int</span>, room_type: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">int</span>:</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (room_type <span class="op">==</span> <span class="st">"Private room"</span>) <span class="kw">or</span> (room_type <span class="op">==</span> <span class="st">"Shared room"</span>):</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">1</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> (room_type <span class="op">==</span> <span class="st">"Hotel room"</span>) <span class="kw">or</span> (room_type <span class="op">==</span> <span class="st">"Entire home/apt"</span>):</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> np.ceil(accommodates <span class="op">/</span> <span class="dv">2</span>)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> bedrooms</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>In the case of Pandas, we are using <code>apply()</code> to semi-vectorize our function, but secretly this function just implements something that mimics a for loop. Using a <code>lambda</code> together with <code>apply()</code> allows us to access multiple columns to generate an outcome.</p>
+<p>This approach is often good enough, but not always, especially if you are dealing with large datasets. Below we will run the <code>apply()</code> function for output.</p>
+<div class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>df_list[<span class="st">"bedrooms"</span>] <span class="op">=</span> df_list[[<span class="st">"accommodates"</span>, <span class="st">"bedrooms"</span>, <span class="st">"room_type"</span>]].<span class="bu">apply</span>(</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">lambda</span> x: fill_empty_bedrooms(x[<span class="st">"accommodates"</span>], x[<span class="st">"bedrooms"</span>], x[<span class="st">"room_type"</span>]),</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    axis<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Thanks to our logic and assumptions, most listings now have a proper amount of defined rooms. However, there are still a few listings without any number of rooms defined. Remove all rows/entries that have an empty bedrooms, beds.</p>
+<div class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>df_list[[<span class="st">"bedrooms"</span>, <span class="st">"beds"</span>]].isnull().<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="54">
+<pre><code>bedrooms     0
+beds        69
+dtype: int64</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>df_list <span class="op">=</span> df_list.dropna(subset<span class="op">=</span>[<span class="st">"beds"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>df_list[[<span class="st">"bedrooms"</span>, <span class="st">"beds"</span>]].isnull().<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="56">
+<pre><code>bedrooms    0
+beds        0
+dtype: int64</code></pre>
+</div>
+</div>
+<section id="memory-usage" class="level5">
+<h5 class="anchored" data-anchor-id="memory-usage">Memory usage</h5>
+<div class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>df_list.memory_usage(deep<span class="op">=</span><span class="va">True</span>).<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="57">
+<pre><code>835941</code></pre>
+</div>
+</div>
 </section>
 </section>
-<section id="cleaning-the-data" class="level2">
-<h2 class="anchored" data-anchor-id="cleaning-the-data">Cleaning the data</h2>
+<section id="calendar-dataframe" class="level2">
+<h2 class="anchored" data-anchor-id="calendar-dataframe">Calendar DataFrame</h2>
+<div class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>df_cal.head(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="58">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>listing_id</th>
+      <th>date</th>
+      <th>available</th>
+      <th>price_in_dollar</th>
+      <th>minimum_nights</th>
+      <th>maximum_nights</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>23726706</td>
+      <td>2022-06-05</td>
+      <td>False</td>
+      <td>90.00</td>
+      <td>2</td>
+      <td>1125</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>23726706</td>
+      <td>2022-06-06</td>
+      <td>False</td>
+      <td>90.00</td>
+      <td>2</td>
+      <td>1125</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>23726706</td>
+      <td>2022-06-07</td>
+      <td>False</td>
+      <td>90.00</td>
+      <td>2</td>
+      <td>1125</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<section id="minimum-stay" class="level4">
+<h4 class="anchored" data-anchor-id="minimum-stay">Minimum stay</h4>
+<p>You are looking to stay for a minimum of 3 days. Since you are unsure when it will be booked, you’d like to exclude all <code>listing_ids</code> that go below that threshold of 3 days no matter what time of year. This is because you think that bookings with a minimum stay of 3 days are more likely to have discount prices.</p>
+<p>With these excluded, you would like to see the expected booking price for 5 days:</p>
+<ul>
+<li>Using the helper code, create a conditional index for entries <code>listing_id</code> that are above the 3 day threshold</li>
+<li>Remove them using <code>.loc[conditional_index]</code> over the conditional index.</li>
+<li>Calculate the price of booking a listing for 5 days by multiplying the current day multiplied by 5, and assign this to a column called <code>five_day_dollar_price</code></li>
+</ul>
+<div class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># First start by making a copy, for debugging purposes</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>calendar_newdf <span class="op">=</span> df_cal.copy()</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>include_list <span class="op">=</span> calendar_newdf[<span class="st">"minimum_nights"</span>] <span class="op">&gt;=</span> <span class="dv">3</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Get all the listings with a minimum nights of 3+</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the include_list</span></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>calendar_newdf <span class="op">=</span> calendar_newdf.loc[include_list]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>calendar_newdf[<span class="st">"five_day_dollar_price"</span>] <span class="op">=</span> calendar_newdf[<span class="st">"price_in_dollar"</span>] <span class="op">*</span> <span class="dv">5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>calendar_newdf.head(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="61">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>listing_id</th>
+      <th>date</th>
+      <th>available</th>
+      <th>price_in_dollar</th>
+      <th>minimum_nights</th>
+      <th>maximum_nights</th>
+      <th>five_day_dollar_price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>365</th>
+      <td>35815036</td>
+      <td>2022-06-05</td>
+      <td>False</td>
+      <td>105.00</td>
+      <td>3</td>
+      <td>1125</td>
+      <td>525.00</td>
+    </tr>
+    <tr>
+      <th>367</th>
+      <td>35815036</td>
+      <td>2022-06-07</td>
+      <td>True</td>
+      <td>105.00</td>
+      <td>3</td>
+      <td>1125</td>
+      <td>525.00</td>
+    </tr>
+    <tr>
+      <th>368</th>
+      <td>35815036</td>
+      <td>2022-06-08</td>
+      <td>True</td>
+      <td>105.00</td>
+      <td>3</td>
+      <td>1125</td>
+      <td>525.00</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Now let’s transform our newly created DataFrame into a pivot table, where we aggregate our rows using the listing_id as the index, and the columns <code>available</code> and <code>five_day_dollar_price</code> as values.</p>
+<div class="cell" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>calendar_summarizeddf <span class="op">=</span> pd.pivot_table(</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>calendar_newdf,</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span><span class="st">"listing_id"</span>,</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    values<span class="op">=</span>[<span class="st">"available"</span>, <span class="st">"five_day_dollar_price"</span>],</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    aggfunc<span class="op">=</span>np.mean</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>calendar_summarizeddf.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="62">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>available</th>
+      <th>five_day_dollar_price</th>
+    </tr>
+    <tr>
+      <th>listing_id</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2818</th>
+      <td>0.21</td>
+      <td>346.90</td>
+    </tr>
+    <tr>
+      <th>44391</th>
+      <td>0.00</td>
+      <td>1200.00</td>
+    </tr>
+    <tr>
+      <th>49552</th>
+      <td>0.46</td>
+      <td>1162.50</td>
+    </tr>
+    <tr>
+      <th>55709</th>
+      <td>0.00</td>
+      <td>818.68</td>
+    </tr>
+    <tr>
+      <th>55868</th>
+      <td>0.00</td>
+      <td>749.22</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="maximum-price-and-date" class="level4">
+<h4 class="anchored" data-anchor-id="maximum-price-and-date">Maximum price and date</h4>
+<p>Can you make a pivot table that states the maximum <code>price_in_dollar</code> for every Airbnb listing?</p>
+<div class="cell" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>temp_sum_df <span class="op">=</span> pd.pivot_table(</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>calendar_newdf,</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>[<span class="st">"listing_id"</span>],</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    values<span class="op">=</span>[<span class="st">"price_in_dollar"</span>],</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>    aggfunc<span class="op">=</span>np.<span class="bu">max</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>temp_sum_df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="63">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>price_in_dollar</th>
+    </tr>
+    <tr>
+      <th>listing_id</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2818</th>
+      <td>80.00</td>
+    </tr>
+    <tr>
+      <th>44391</th>
+      <td>240.00</td>
+    </tr>
+    <tr>
+      <th>49552</th>
+      <td>300.00</td>
+    </tr>
+    <tr>
+      <th>55709</th>
+      <td>250.00</td>
+    </tr>
+    <tr>
+      <th>55868</th>
+      <td>200.00</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="merging" class="level2">
+<h2 class="anchored" data-anchor-id="merging">Merging</h2>
+<p>We are going to merge the pivot table that includes the <code>five_day_dollar_price</code> for each listing with <code>listings_df.</code> We have to keep in mind that we want to keep only those rows of Airbnb listing IDs that are present in both datasets.</p>
+<div class="cell" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>final_df <span class="op">=</span> pd.merge(</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>    df_list,</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>    calendar_summarizeddf,</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>    left_on<span class="op">=</span>[<span class="st">"id"</span>],</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>    right_on<span class="op">=</span>[<span class="st">"listing_id"</span>],</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>    how<span class="op">=</span><span class="st">"inner"</span></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>final_df.head(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="64">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>id</th>
+      <th>host_acceptance_rate</th>
+      <th>host_is_superhost</th>
+      <th>neighbourhood</th>
+      <th>latitude</th>
+      <th>longitude</th>
+      <th>room_type</th>
+      <th>accommodates</th>
+      <th>bedrooms</th>
+      <th>beds</th>
+      <th>amenities</th>
+      <th>price_in_dollar</th>
+      <th>minimum_nights</th>
+      <th>maximum_nights</th>
+      <th>has_availability</th>
+      <th>availability_30</th>
+      <th>number_of_reviews_l30d</th>
+      <th>review_scores_rating</th>
+      <th>instant_bookable</th>
+      <th>price_per_person</th>
+      <th>minimum_price</th>
+      <th>discount_per_5_days_booked</th>
+      <th>discount_per_10_days_booked</th>
+      <th>discount_per_30_and_more_days_booked</th>
+      <th>service_cost</th>
+      <th>available</th>
+      <th>five_day_dollar_price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>35815036</td>
+      <td>1.00</td>
+      <td>True</td>
+      <td>Noord-Oost</td>
+      <td>52.42</td>
+      <td>4.96</td>
+      <td>Entire home/apt</td>
+      <td>2</td>
+      <td>1.00</td>
+      <td>1.00</td>
+      <td>5</td>
+      <td>105.00</td>
+      <td>3</td>
+      <td>100</td>
+      <td>True</td>
+      <td>4</td>
+      <td>6</td>
+      <td>4.96</td>
+      <td>False</td>
+      <td>52.50</td>
+      <td>315.00</td>
+      <td>0.05</td>
+      <td>0.12</td>
+      <td>0.16</td>
+      <td>4.99</td>
+      <td>0.66</td>
+      <td>528.89</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>19572024</td>
+      <td>1.00</td>
+      <td>False</td>
+      <td>Watergraafsmeer</td>
+      <td>52.31</td>
+      <td>4.91</td>
+      <td>Entire home/apt</td>
+      <td>6</td>
+      <td>3.00</td>
+      <td>6.00</td>
+      <td>14</td>
+      <td>279.00</td>
+      <td>3</td>
+      <td>300</td>
+      <td>True</td>
+      <td>6</td>
+      <td>3</td>
+      <td>4.69</td>
+      <td>False</td>
+      <td>46.50</td>
+      <td>837.00</td>
+      <td>0.09</td>
+      <td>0.16</td>
+      <td>0.14</td>
+      <td>4.99</td>
+      <td>0.82</td>
+      <td>1496.55</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2973384</td>
+      <td>0.38</td>
+      <td>False</td>
+      <td>Watergraafsmeer</td>
+      <td>52.31</td>
+      <td>4.91</td>
+      <td>Entire home/apt</td>
+      <td>5</td>
+      <td>3.00</td>
+      <td>3.00</td>
+      <td>7</td>
+      <td>185.00</td>
+      <td>6</td>
+      <td>21</td>
+      <td>True</td>
+      <td>0</td>
+      <td>0</td>
+      <td>4.83</td>
+      <td>False</td>
+      <td>37.00</td>
+      <td>1110.00</td>
+      <td>0.06</td>
+      <td>0.12</td>
+      <td>0.18</td>
+      <td>4.99</td>
+      <td>0.04</td>
+      <td>941.30</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="grouping" class="level2">
+<h2 class="anchored" data-anchor-id="grouping">Grouping</h2>
+<p>Now, let’s perform a groupby where we look at the median values of <code>five_day_dollar_price</code> and <code>review_scores_rating</code> with respect to the <code>room_type.</code> Do these results match your intuition?</p>
+<div class="cell" data-execution_count="32">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>final_df.groupby(by<span class="op">=</span><span class="st">'room_type'</span>)[[<span class="st">'review_scores_rating'</span>, <span class="st">'five_day_dollar_price'</span>]].median()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="65">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>review_scores_rating</th>
+      <th>five_day_dollar_price</th>
+    </tr>
+    <tr>
+      <th>room_type</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Entire home/apt</th>
+      <td>4.88</td>
+      <td>975.00</td>
+    </tr>
+    <tr>
+      <th>Hotel room</th>
+      <td>4.56</td>
+      <td>1110.16</td>
+    </tr>
+    <tr>
+      <th>Private room</th>
+      <td>4.79</td>
+      <td>710.91</td>
+    </tr>
+    <tr>
+      <th>Shared room</th>
+      <td>4.60</td>
+      <td>724.11</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p>You might have expected that shared rooms are the cheapest and thus have the lowest rating with respect to median scores. The same can’t be said for the most expensive option — a hotel room. Will this influence your future considerations when booking 🤔?</p>
+<p>(But before you let this influence your decisions too much, it might be better to assume that this data might be biased in favor of Airbnb and not hotels in general. 🤷)</p>
+</section>
+<section id="memory-optimization" class="level2">
+<h2 class="anchored" data-anchor-id="memory-optimization">Memory optimization</h2>
+<div class="cell" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>final_df.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+Int64Index: 2883 entries, 0 to 2882
+Data columns (total 27 columns):
+ #   Column                                Non-Null Count  Dtype   
+---  ------                                --------------  -----   
+ 0   id                                    2883 non-null   int64   
+ 1   host_acceptance_rate                  2883 non-null   float64 
+ 2   host_is_superhost                     2883 non-null   bool    
+ 3   neighbourhood                         2883 non-null   category
+ 4   latitude                              2883 non-null   float64 
+ 5   longitude                             2883 non-null   float64 
+ 6   room_type                             2883 non-null   category
+ 7   accommodates                          2883 non-null   int64   
+ 8   bedrooms                              2883 non-null   float64 
+ 9   beds                                  2883 non-null   float64 
+ 10  amenities                             2883 non-null   int64   
+ 11  price_in_dollar                       2883 non-null   float64 
+ 12  minimum_nights                        2883 non-null   int64   
+ 13  maximum_nights                        2883 non-null   int64   
+ 14  has_availability                      2883 non-null   bool    
+ 15  availability_30                       2883 non-null   int64   
+ 16  number_of_reviews_l30d                2883 non-null   int64   
+ 17  review_scores_rating                  2883 non-null   float64 
+ 18  instant_bookable                      2883 non-null   bool    
+ 19  price_per_person                      2883 non-null   float64 
+ 20  minimum_price                         2883 non-null   float64 
+ 21  discount_per_5_days_booked            2883 non-null   float64 
+ 22  discount_per_10_days_booked           2883 non-null   float64 
+ 23  discount_per_30_and_more_days_booked  2883 non-null   float64 
+ 24  service_cost                          2883 non-null   float64 
+ 25  available                             2883 non-null   float64 
+ 26  five_day_dollar_price                 2883 non-null   float64 
+dtypes: bool(3), category(2), float64(15), int64(7)
+memory usage: 533.0 KB</code></pre>
+</div>
+</div>
 </section>
 <section id="streamlit-application" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="streamlit-application">Streamlit application</h2>
-<div class="column-body">
-<iframe height="1450" width="100%" frameborder="no" src="https://sandra-jurela-airbnb-amsterdam-streamlit-app-app-zls5nw.streamlit.app/?embedded=true">
+<div class="column-body-outset">
+<iframe height="2150" width="100%" frameborder="no" src="https://sandra-jurela-airbnb-amsterdam-streamlit-app2-app-zi5wg6.streamlit.app/?embedded=true">
 </iframe>
 </div>
 

@@ -2,66 +2,46 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://sandrajurela.com/about.html</loc>
-    <lastmod>2023-05-20T10:37:59.509Z</lastmod>
+    <lastmod>2023-05-29T18:11:26.037Z</lastmod>
   </url>
   <url>
     <loc>https://sandrajurela.com/index.html</loc>
-    <lastmod>2023-05-22T11:13:14.860Z</lastmod>
-  </url>
-  <url>
-    <loc>https://sandrajurela.com/posts/answering-business-questions-using-sql/chinook.html</loc>
-    <lastmod>2023-03-21T16:12:44.064Z</lastmod>
-  </url>
-  <url>
-    <loc>https://sandrajurela.com/posts/cryptocurrency-sql-case-study/cryptocurrency.html</loc>
-    <lastmod>2023-05-18T04:51:05.672Z</lastmod>
-  </url>
-  <url>
-    <loc>https://sandrajurela.com/posts/customer-analysis-advanced-plots-with-ggplot2/customer-analysis-advanced-plots-with-ggplot2.html</loc>
-    <lastmod>2023-03-29T13:45:59.440Z</lastmod>
-  </url>
-  <url>
-    <loc>https://sandrajurela.com/posts/shiny-mass-shootings/mass-shootings.html</loc>
-    <lastmod>2023-05-21T11:03:24.834Z</lastmod>
-  </url>
-  <url>
-    <loc>https://sandrajurela.com/posts/titanic-survival-exercises/titanic-survival-exercises.html</loc>
-    <lastmod>2023-05-17T17:28:38.721Z</lastmod>
-  </url>
-  <url>
-    <loc>https://sandrajurela.com/posts/web-scraping-rotten-tomatoes/rotten-tomatoes.html</loc>
-    <lastmod>2023-03-21T16:12:51.323Z</lastmod>
-  </url>
-  <url>
-    <loc>https://sandrajurela.com/posts/customer-segmentation/cust-segm-report.html</loc>
-    <lastmod>2023-05-21T12:25:36.975Z</lastmod>
-  </url>
-  <url>
-    <loc>https://sandrajurela.com/posts/customer-segmentation/tabs_badges.html</loc>
-    <lastmod>2023-04-11T18:10:40.374Z</lastmod>
-  </url>
-  <url>
-    <loc>https://sandrajurela.com/posts/streamlit-app/amsterdam-listings.html</loc>
-    <lastmod>2023-05-04T04:48:32.585Z</lastmod>
+    <lastmod>2023-05-29T18:11:28.028Z</lastmod>
   </url>
   <url>
     <loc>https://sandrajurela.com/posts/airbnb-amsterdam/amsterdam-listings.html</loc>
-    <lastmod>2023-05-18T05:31:58.151Z</lastmod>
+    <lastmod>2023-05-29T18:11:30.015Z</lastmod>
   </url>
   <url>
-    <loc>https://sandrajurela.com/posts/vancouver-street-trees/trees-analysis.html</loc>
-    <lastmod>2023-05-20T06:24:39.667Z</lastmod>
+    <loc>https://sandrajurela.com/posts/answering-business-questions-using-sql/chinook.html</loc>
+    <lastmod>2023-05-29T18:11:32.137Z</lastmod>
   </url>
   <url>
-    <loc>https://sandrajurela.com/posts/vancouver-street-trees/final_project_analysis_report.html</loc>
-    <lastmod>2023-05-17T17:29:40.468Z</lastmod>
+    <loc>https://sandrajurela.com/posts/cryptocurrency-sql-case-study/cryptocurrency.html</loc>
+    <lastmod>2023-05-29T18:11:34.296Z</lastmod>
   </url>
   <url>
-    <loc>https://sandrajurela.com/posts/vancouver-street-trees/trees-analysis_delete.html</loc>
-    <lastmod>2023-05-17T18:06:17.263Z</lastmod>
+    <loc>https://sandrajurela.com/posts/customer-analysis-advanced-plots-with-ggplot2/customer-analysis-advanced-plots-with-ggplot2.html</loc>
+    <lastmod>2023-05-29T18:11:35.683Z</lastmod>
+  </url>
+  <url>
+    <loc>https://sandrajurela.com/posts/customer-segmentation/cust-segm-report.html</loc>
+    <lastmod>2023-05-29T18:11:37.063Z</lastmod>
+  </url>
+  <url>
+    <loc>https://sandrajurela.com/posts/shiny-mass-shootings/mass-shootings.html</loc>
+    <lastmod>2023-05-29T18:11:38.841Z</lastmod>
   </url>
   <url>
     <loc>https://sandrajurela.com/posts/test/trees-analysis.html</loc>
-    <lastmod>2023-05-22T11:13:24.982Z</lastmod>
+    <lastmod>2023-05-29T18:11:41.530Z</lastmod>
+  </url>
+  <url>
+    <loc>https://sandrajurela.com/posts/titanic-survival-exercises/titanic-survival-exercises.html</loc>
+    <lastmod>2023-05-29T18:11:42.875Z</lastmod>
+  </url>
+  <url>
+    <loc>https://sandrajurela.com/posts/web-scraping-rotten-tomatoes/rotten-tomatoes.html</loc>
+    <lastmod>2023-05-29T18:11:44.174Z</lastmod>
   </url>
 </urlset>

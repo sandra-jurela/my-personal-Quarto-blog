@@ -1,12 +1,25 @@
+div.sourceCode {
+  background-color: #fafafa;
+}
+
+
 pre.sourceCode {
-    border-left: 3px;
-    border-left-style: solid;
-    border-left-color: #3fb618;
-    padding-left: -0.1em;
-    border-right: none;
-    border-top: none;
-    border-bottom: none;
-    font-size: .875em;
-    overflow: visible !important;
-    padding: 0.7em;
+  code-block-bg: #f6f8fa;
+  border-left: 3px;
+  border-left-style: solid;
+  border-left-color: #3fb618;
+  padding-left: -0.1em;
+  border-right: none;
+  border-top: none;
+  border-bottom: none;
+  font-size: .875em;
+  overflow: visible !important;
+  padding: 0.7em;
+}
+
+
+.table {
+  --bs-table-striped-bg: #fafafa;
+  width: 100%;
+  font-size: 16px;
 }
