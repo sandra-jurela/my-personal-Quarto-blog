@@ -2,46 +2,38 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://sandrajurela.com/about.html</loc>
-    <lastmod>2023-05-29T18:11:26.037Z</lastmod>
+    <lastmod>2023-05-29T18:39:54.500Z</lastmod>
   </url>
   <url>
     <loc>https://sandrajurela.com/index.html</loc>
-    <lastmod>2023-05-29T18:11:28.028Z</lastmod>
-  </url>
-  <url>
-    <loc>https://sandrajurela.com/posts/airbnb-amsterdam/amsterdam-listings.html</loc>
-    <lastmod>2023-05-29T18:11:30.015Z</lastmod>
+    <lastmod>2023-05-29T18:39:56.111Z</lastmod>
   </url>
   <url>
     <loc>https://sandrajurela.com/posts/answering-business-questions-using-sql/chinook.html</loc>
-    <lastmod>2023-05-29T18:11:32.137Z</lastmod>
+    <lastmod>2023-05-29T18:39:59.830Z</lastmod>
   </url>
   <url>
     <loc>https://sandrajurela.com/posts/cryptocurrency-sql-case-study/cryptocurrency.html</loc>
-    <lastmod>2023-05-29T18:11:34.296Z</lastmod>
+    <lastmod>2023-05-29T18:40:01.928Z</lastmod>
   </url>
   <url>
     <loc>https://sandrajurela.com/posts/customer-analysis-advanced-plots-with-ggplot2/customer-analysis-advanced-plots-with-ggplot2.html</loc>
-    <lastmod>2023-05-29T18:11:35.683Z</lastmod>
+    <lastmod>2023-05-29T18:40:03.282Z</lastmod>
   </url>
   <url>
     <loc>https://sandrajurela.com/posts/customer-segmentation/cust-segm-report.html</loc>
-    <lastmod>2023-05-29T18:11:37.063Z</lastmod>
+    <lastmod>2023-05-29T18:40:04.658Z</lastmod>
   </url>
   <url>
     <loc>https://sandrajurela.com/posts/shiny-mass-shootings/mass-shootings.html</loc>
-    <lastmod>2023-05-29T18:11:38.841Z</lastmod>
-  </url>
-  <url>
-    <loc>https://sandrajurela.com/posts/test/trees-analysis.html</loc>
-    <lastmod>2023-05-29T18:11:41.530Z</lastmod>
+    <lastmod>2023-05-29T18:40:06.250Z</lastmod>
   </url>
   <url>
     <loc>https://sandrajurela.com/posts/titanic-survival-exercises/titanic-survival-exercises.html</loc>
-    <lastmod>2023-05-29T18:11:42.875Z</lastmod>
+    <lastmod>2023-05-29T18:40:10.373Z</lastmod>
   </url>
   <url>
     <loc>https://sandrajurela.com/posts/web-scraping-rotten-tomatoes/rotten-tomatoes.html</loc>
-    <lastmod>2023-05-29T18:11:44.174Z</lastmod>
+    <lastmod>2023-05-29T18:40:11.905Z</lastmod>
   </url>
 </urlset>

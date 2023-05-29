@@ -12,6 +12,7 @@ format:
     theme: theme-light.scss
     css: style_python.css
 image: images/tree.png
+draft: true
 ---
 
 ::: callout-warning

@@ -12,6 +12,7 @@ format:
     theme: theme-light.scss
     css: style_python.css
 image: preview3.png
+draft: true
 ---
 
 ## Introduction
