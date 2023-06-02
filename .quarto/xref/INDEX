@@ -76,5 +76,8 @@
   },
   "posts/test/trees-analysis.qmd": {
     "trees-analysis.html": "45836d60"
+  },
+  "posts/airbnb-hawaii/kauai_eda.qmd": {
+    "kauai_eda.html": "3b5e033b"
   }
 }

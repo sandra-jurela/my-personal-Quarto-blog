@@ -144,14 +144,14 @@ gtag('config', 'G-JH321LBKZY', { 'anonymize_ip': true});
 <link rel="stylesheet" href="style_python.css">
 <meta property="og:title" content="Sandra Jurela - Streamlit app - Airbnb Amsterdam Listings">
 <meta property="og:description" content="Cleaning data with Pandas and creating a streamlit app.">
-<meta property="og:image" content="https://sandrajurela.com/posts\airbnb-amsterdam\preview3.png">
+<meta property="og:image" content="https://sandrajurela.com/posts\airbnb-amsterdam\preview.png">
 <meta property="og:site-name" content="Sandra Jurela">
-<meta property="og:image:height" content="939">
+<meta property="og:image:height" content="945">
 <meta property="og:image:width" content="1432">
 <meta name="twitter:title" content="Sandra Jurela - Streamlit app - Airbnb Amsterdam Listings">
 <meta name="twitter:description" content="Cleaning data with Pandas and creating a streamlit app.">
-<meta name="twitter:image" content="https://sandrajurela.com/posts\airbnb-amsterdam\preview3.png">
-<meta name="twitter:image-height" content="939">
+<meta name="twitter:image" content="https://sandrajurela.com/posts\airbnb-amsterdam\preview.png">
+<meta name="twitter:image-height" content="945">
 <meta name="twitter:image-width" content="1432">
 <meta name="twitter:card" content="summary_large_image">
 </head>
@@ -218,6 +218,7 @@ gtag('config', 'G-JH321LBKZY', { 'anonymize_ip': true});
                 <div class="quarto-category">python</div>
                 <div class="quarto-category">sreamlit</div>
                 <div class="quarto-category">data cleaning</div>
+                <div class="quarto-category">data wrangling</div>
               </div>
                   </div>
   </div>
@@ -299,7 +300,7 @@ gtag('config', 'G-JH321LBKZY', { 'anonymize_ip': true});
 <h3 class="anchored" data-anchor-id="listings-data">Listings data</h3>
 <div class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df_list.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="35">
+<div class="cell-output cell-output-display" data-execution_count="2">
 
 <div>
 
@@ -572,7 +573,7 @@ gtag('config', 'G-JH321LBKZY', { 'anonymize_ip': true});
 <h3 class="anchored" data-anchor-id="calendar-data">Calendar data</h3>
 <div class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df_cal.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="36">
+<div class="cell-output cell-output-display" data-execution_count="3">
 
 <div>
 
@@ -721,7 +722,7 @@ memory usage: 1.6+ MB</code></pre>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>df_list.loc[:,<span class="st">'discount_per_5_days_booked'</span>:<span class="st">'discount_per_30_and_more_days_booked'</span>].head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="39">
+<div class="cell-output cell-output-display" data-execution_count="6">
 
 <div>
 
@@ -773,7 +774,7 @@ memory usage: 1.6+ MB</code></pre>
 <p><strong>STEP 2</strong> - The columns <code>host_is_superhost</code>, <code>instant_bookable</code>, and <code>has_availability</code> are all boolean columns in the sense that their data represents true and false values, but currently are recognized as objects.</p>
 <div class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>df_list[[<span class="st">"host_is_superhost"</span>, <span class="st">"instant_bookable"</span>, <span class="st">"has_availability"</span>]].head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="40">
+<div class="cell-output cell-output-display" data-execution_count="7">
 
 <div>
 
@@ -837,7 +838,7 @@ memory usage: 1.6+ MB</code></pre>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>df_list[[<span class="st">"host_is_superhost"</span>, <span class="st">"instant_bookable"</span>, <span class="st">"has_availability"</span>]].head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="41">
+<div class="cell-output cell-output-display" data-execution_count="8">
 
 <div>
 
@@ -889,7 +890,7 @@ memory usage: 1.6+ MB</code></pre>
 <p><strong>STEP 3</strong> - A closer look at the prices in the four columns <code>price</code>, <code>price_per_person</code>, <code>minimum_price</code>, and <code>service_cost</code> reveals that they all follow the same pattern:</p>
 <div class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>df_list[[<span class="st">"price"</span>, <span class="st">"price_per_person"</span>, <span class="st">"minimum_price"</span>, <span class="st">'service_cost'</span>]].head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="42">
+<div class="cell-output cell-output-display" data-execution_count="9">
 
 <div>
 
@@ -974,7 +975,7 @@ memory usage: 1.6+ MB</code></pre>
 <span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>df_list[[<span class="st">"price"</span>, <span class="st">"price_per_person"</span>, <span class="st">"minimum_price"</span>, <span class="st">'service_cost'</span>]].head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="43">
+<div class="cell-output cell-output-display" data-execution_count="10">
 
 <div>
 
@@ -1055,7 +1056,7 @@ memory usage: 1.6+ MB</code></pre>
 <p>Let’s inspect the <code>price_in_euros</code> column first, because this column seems to contain only null values, which inherently do not add any meaning to the dataset.</p>
 <div class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>df_list[<span class="st">'price_in_euros'</span>].unique()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="46">
+<div class="cell-output cell-output-display" data-execution_count="13">
 <pre><code>array([None], dtype=object)</code></pre>
 </div>
 </div>
@@ -1120,7 +1121,7 @@ memory usage: 1.0 MB</code></pre>
 <p><strong>STEP 8</strong> - Which columns still have missing values and how much?</p>
 <div class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>df_list.isnull().<span class="bu">sum</span>().loc[<span class="kw">lambda</span> x : x <span class="op">!=</span> <span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="50">
+<div class="cell-output cell-output-display" data-execution_count="17">
 <pre><code>bedrooms    264
 beds         69
 dtype: int64</code></pre>
@@ -1129,7 +1130,7 @@ dtype: int64</code></pre>
 <p>Let’s make some simple assumptions based on the <code>room_type</code> assigned to the listing. Which room types are found in the dataset.</p>
 <div class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>df_list[<span class="st">"room_type"</span>].value_counts()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="51">
+<div class="cell-output cell-output-display" data-execution_count="18">
 <pre><code>Entire home/apt    3158
 Private room       1633
 Hotel room           67
@@ -1165,7 +1166,7 @@ Name: room_type, dtype: int64</code></pre>
 <p>Thanks to our logic and assumptions, most listings now have a proper amount of defined rooms. However, there are still a few listings without any number of rooms defined. Remove all rows/entries that have an empty bedrooms, beds.</p>
 <div class="cell" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>df_list[[<span class="st">"bedrooms"</span>, <span class="st">"beds"</span>]].isnull().<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="54">
+<div class="cell-output cell-output-display" data-execution_count="21">
 <pre><code>bedrooms     0
 beds        69
 dtype: int64</code></pre>
@@ -1176,7 +1177,7 @@ dtype: int64</code></pre>
 </div>
 <div class="cell" data-execution_count="23">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>df_list[[<span class="st">"bedrooms"</span>, <span class="st">"beds"</span>]].isnull().<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="56">
+<div class="cell-output cell-output-display" data-execution_count="23">
 <pre><code>bedrooms    0
 beds        0
 dtype: int64</code></pre>
@@ -1186,7 +1187,7 @@ dtype: int64</code></pre>
 <h5 class="anchored" data-anchor-id="memory-usage">Memory usage</h5>
 <div class="cell" data-execution_count="24">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>df_list.memory_usage(deep<span class="op">=</span><span class="va">True</span>).<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="57">
+<div class="cell-output cell-output-display" data-execution_count="24">
 <pre><code>835941</code></pre>
 </div>
 </div>
@@ -1196,7 +1197,7 @@ dtype: int64</code></pre>
 <h2 class="anchored" data-anchor-id="calendar-dataframe">Calendar DataFrame</h2>
 <div class="cell" data-execution_count="25">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>df_cal.head(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="58">
+<div class="cell-output cell-output-display" data-execution_count="25">
 
 <div>
 
@@ -1262,14 +1263,13 @@ dtype: int64</code></pre>
 <span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Get all the listings with a minimum nights of 3+</span></span>
 <span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the include_list</span></span>
-<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>calendar_newdf <span class="op">=</span> calendar_newdf.loc[include_list]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>calendar_newdf <span class="op">=</span> calendar_newdf.loc[include_list]</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>calendar_newdf[<span class="st">"five_day_dollar_price"</span>] <span class="op">=</span> calendar_newdf[<span class="st">"price_in_dollar"</span>] <span class="op">*</span> <span class="dv">5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-execution_count="27">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>calendar_newdf[<span class="st">"five_day_dollar_price"</span>] <span class="op">=</span> calendar_newdf[<span class="st">"price_in_dollar"</span>] <span class="op">*</span> <span class="dv">5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-execution_count="28">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>calendar_newdf.head(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="61">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>calendar_newdf.head(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="27">
 
 <div>
 
@@ -1323,16 +1323,16 @@ dtype: int64</code></pre>
 </div>
 </div>
 <p>Now let’s transform our newly created DataFrame into a pivot table, where we aggregate our rows using the listing_id as the index, and the columns <code>available</code> and <code>five_day_dollar_price</code> as values.</p>
-<div class="cell" data-execution_count="29">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>calendar_summarizeddf <span class="op">=</span> pd.pivot_table(</span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>calendar_newdf,</span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span><span class="st">"listing_id"</span>,</span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    values<span class="op">=</span>[<span class="st">"available"</span>, <span class="st">"five_day_dollar_price"</span>],</span>
-<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    aggfunc<span class="op">=</span>np.mean</span>
-<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>calendar_summarizeddf.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="62">
+<div class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>calendar_summarizeddf <span class="op">=</span> pd.pivot_table(</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>calendar_newdf,</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span><span class="st">"listing_id"</span>,</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    values<span class="op">=</span>[<span class="st">"available"</span>, <span class="st">"five_day_dollar_price"</span>],</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>    aggfunc<span class="op">=</span>np.mean</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>)                      <span class="co"># .add_suffix('_avg')</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>calendar_summarizeddf.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="28">
 
 <div>
 
@@ -1384,16 +1384,16 @@ dtype: int64</code></pre>
 <section id="maximum-price-and-date" class="level4">
 <h4 class="anchored" data-anchor-id="maximum-price-and-date">Maximum price and date</h4>
 <p>Can you make a pivot table that states the maximum <code>price_in_dollar</code> for every Airbnb listing?</p>
-<div class="cell" data-execution_count="30">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>temp_sum_df <span class="op">=</span> pd.pivot_table(</span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>calendar_newdf,</span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>[<span class="st">"listing_id"</span>],</span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    values<span class="op">=</span>[<span class="st">"price_in_dollar"</span>],</span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>    aggfunc<span class="op">=</span>np.<span class="bu">max</span></span>
-<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>temp_sum_df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="63">
+<div class="cell" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>temp_sum_df <span class="op">=</span> pd.pivot_table(</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>calendar_newdf,</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>[<span class="st">"listing_id"</span>],</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    values<span class="op">=</span>[<span class="st">"price_in_dollar"</span>],</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    aggfunc<span class="op">=</span>np.<span class="bu">max</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>).add_suffix(<span class="st">'_max'</span>)</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>temp_sum_df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="29">
 
 <div>
 
@@ -1401,7 +1401,7 @@ dtype: int64</code></pre>
   <thead>
     <tr>
       <th></th>
-      <th>price_in_dollar</th>
+      <th>price_in_dollar_max</th>
     </tr>
     <tr>
       <th>listing_id</th>
@@ -1439,17 +1439,17 @@ dtype: int64</code></pre>
 <section id="merging" class="level2">
 <h2 class="anchored" data-anchor-id="merging">Merging</h2>
 <p>We are going to merge the pivot table that includes the <code>five_day_dollar_price</code> for each listing with <code>listings_df.</code> We have to keep in mind that we want to keep only those rows of Airbnb listing IDs that are present in both datasets.</p>
-<div class="cell" data-execution_count="31">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>final_df <span class="op">=</span> pd.merge(</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>    df_list,</span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>    calendar_summarizeddf,</span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>    left_on<span class="op">=</span>[<span class="st">"id"</span>],</span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>    right_on<span class="op">=</span>[<span class="st">"listing_id"</span>],</span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>    how<span class="op">=</span><span class="st">"inner"</span></span>
-<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>final_df.head(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="64">
+<div class="cell" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>final_df <span class="op">=</span> pd.merge(</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>    df_list,</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    calendar_summarizeddf,</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    left_on<span class="op">=</span>[<span class="st">"id"</span>],</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>    right_on<span class="op">=</span>[<span class="st">"listing_id"</span>],</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>    how<span class="op">=</span><span class="st">"inner"</span></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>final_df.head(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="30">
 
 <div>
 
@@ -1586,9 +1586,17 @@ dtype: int64</code></pre>
 <section id="grouping" class="level2">
 <h2 class="anchored" data-anchor-id="grouping">Grouping</h2>
 <p>Now, let’s perform a groupby where we look at the median values of <code>five_day_dollar_price</code> and <code>review_scores_rating</code> with respect to the <code>room_type.</code> Do these results match your intuition?</p>
+<div class="cell" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>final_df.groupby(by<span class="op">=</span><span class="st">'room_type'</span>)[[<span class="st">'review_scores_rating'</span>, <span class="st">'five_day_dollar_price'</span>]].median()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <div class="cell" data-execution_count="32">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>final_df.groupby(by<span class="op">=</span><span class="st">'room_type'</span>)[[<span class="st">'review_scores_rating'</span>, <span class="st">'five_day_dollar_price'</span>]].median()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="65">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>(final_df</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>    .groupby(by<span class="op">=</span><span class="st">'room_type'</span>)</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    .agg(review_scores_rating_median<span class="op">=</span>(<span class="st">'review_scores_rating'</span>, <span class="st">'median'</span>),</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>         five_day_dollar_price_median<span class="op">=</span>(<span class="st">'five_day_dollar_price'</span>, <span class="st">'median'</span>)</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="31">
 
 <div>
 
@@ -1596,8 +1604,8 @@ dtype: int64</code></pre>
   <thead>
     <tr>
       <th></th>
-      <th>review_scores_rating</th>
-      <th>five_day_dollar_price</th>
+      <th>review_scores_rating_median</th>
+      <th>five_day_dollar_price_median</th>
     </tr>
     <tr>
       <th>room_type</th>

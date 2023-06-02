@@ -1,6 +1,6 @@
 ---
 title: "Shiny App - Mass Shootings in the USA"
-description: "EDA with Shiny app on mass shootings between August 20th, 1982 and May 6th, 2023."
+description: "EDA with Shiny app on mass shootings between August 20th, 1982 and May 15th, 2023."
 date: "2023-03-01"
 categories: 
   - R
@@ -13,7 +13,7 @@ image: images/preview.png
 ::: {.callout-note appearance="simple"}
 This post will be regularly updated with each new case.
 
-Last update on May 12, 2023.
+Last update on June 02, 2023.
 :::
 
 <br/>
@@ -39,7 +39,7 @@ mass_shootings <- read_csv("data/mass_shootings_usa_1982-2023.csv")
 mass_shootings %>% glimpse()
 ```
 
-We have 143 cases, described with 24 variables. At first glance, this dataset clearly needs extensive cleaning.
+We have 144 cases, described with 24 variables. At first glance, this dataset clearly needs extensive cleaning.
 
 ## Data cleaning
 
@@ -79,7 +79,7 @@ mass_shootings_cln %>%
   pivot_longer(cols = everything(), names_to = "column", values_to = "n_missing")
 ```
 
-17 of the most recent cases don't have location coordinates at all. We'll address this in the final cleanup step.
+18 of the most recent cases don't have location coordinates at all. We'll address this in the final cleanup step.
 
 ### 🧹 Step 2. Fixing unique values of categorical variables
 
@@ -271,7 +271,7 @@ mass_shootings_cln %>%
 
 -   The vast majority of shooters were between 15 and 50 years old.
 -   The age distribution is bimodal, with one mode around 23 years of age and a second mode around 41 years of age.
--   Most shooters were in the 20-25 age group (18.4 %), followed by 40-45 (16.3 %) and 25-30 (16.3 %).
+-   Most shooters were in the 20-25 age group (18.3 %), followed by 40-45 (16.2 %) and 25-30 (16.2 %).
 
 🔎 Who was the youngest shooter?
 
@@ -302,7 +302,7 @@ ggplotly(p2)
 
 -   We can see an increase in mass shootings in the last 12 years.
 -   2020 has a smaller number of cases probably due to Covid restrictions.
--   The data for 2023 is incomplete, but 6 cases in the first five months seems a lot.
+-   The data for 2023 is incomplete, but 7 cases in the first five months seems a lot.
 
 ### 📊 Fatalities-Injured relationship
 

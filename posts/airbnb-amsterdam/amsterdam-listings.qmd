@@ -11,7 +11,7 @@ format:
   html:
     theme: theme-light.scss
     css: style_python.css
-image: preview3.png
+image: preview.png
 draft: true
 ---
 
@@ -342,12 +342,11 @@ include_list = calendar_newdf["minimum_nights"] >= 3
 # Get all the listings with a minimum nights of 3+
 # Use the include_list
 calendar_newdf = calendar_newdf.loc[include_list]
-```
 
-
-```{python}
 calendar_newdf["five_day_dollar_price"] = calendar_newdf["price_in_dollar"] * 5
 ```
+
+
 ```{python}
 calendar_newdf.head(3)
 ```
@@ -362,7 +361,7 @@ calendar_summarizeddf = pd.pivot_table(
     index="listing_id",
     values=["available", "five_day_dollar_price"],
     aggfunc=np.mean
-)
+)                      # .add_suffix('_avg')
 
 calendar_summarizeddf.head()
 ```
@@ -378,7 +377,7 @@ temp_sum_df = pd.pivot_table(
     index=["listing_id"],
     values=["price_in_dollar"],
     aggfunc=np.max
-)
+).add_suffix('_max')
 
 temp_sum_df.head()
 ```
@@ -403,8 +402,20 @@ final_df.head(3)
 Now, let's perform a groupby where we look at the median values of `five_day_dollar_price` and `review_scores_rating` with respect to the `room_type.` Do these results match your intuition?
 
 ```{python}
+#| eval: false
+#| echo: false
 final_df.groupby(by='room_type')[['review_scores_rating', 'five_day_dollar_price']].median()
 ```
+
+```{python}
+(final_df
+    .groupby(by='room_type')
+    .agg(review_scores_rating_median=('review_scores_rating', 'median'),
+         five_day_dollar_price_median=('five_day_dollar_price', 'median')
+    )
+)
+```
+
 You might have expected that shared rooms are the cheapest and thus have the lowest rating with respect to median scores. The same can't be said for the most expensive option — a hotel room. Will this influence your future considerations when booking 🤔?
 
 (But before you let this influence your decisions too much, it might be better to assume that this data might be biased in favor of Airbnb and not hotels in general. 🤷)
