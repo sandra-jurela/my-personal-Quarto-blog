@@ -1,0 +1,565 @@
+---
+title: "Bank Customer Retention Analysis in Python"
+description: "What marketing campaigns could help reduce customer churn?"
+date: "2023-06-10"
+categories: 
+  - python
+  - altair
+  - EDA
+format:
+  html:
+    theme: theme-light.scss
+    css: style_python.css
+image: img/preview.png
+draft: false
+---
+
+## Introduction
+
+In this hypothetical case study I've been hired as a financial analyst by the marketing department within a bank.
+
+They are faced with more and more customers leaving their credit card services. They would like to understand what characteristics lend themselves to someone who is going to churn so they can proactively go to the customer to provide them better services and turn customers' decisions in the opposite direction.
+
+As a part of my first analysis, they've asked me to take a look at the available data and help them understand how to increase customer retention.
+
+## Problem Statement
+
+> **What marketing campaigns could we implement to help reduce customer churn?**
+
+## Imports
+
+```{python}
+import pandas as pd
+import numpy as np
+import altair as alt
+
+# Show all columns (instead of cascading columns in the middle)
+pd.set_option("display.max_columns", None)
+# Don't show numbers in scientific notation
+pd.set_option("display.float_format", "{:.2f}".format)
+
+# Enable plotting more than 5000 points
+alt.data_transformers.disable_max_rows()
+```
+
+## Data Overview
+
+The dataset consists of about 10,000 customers described with their age, income level, marital status, credit card limit, credit card category, etc. it's available on Kaggle at the [following link](https://www.kaggle.com/datasets/whenamancodes/credit-card-customers-prediction).
+
+### Data Dictionary
+
+-   `CLIENTNUM` - Unique identifier for the customer holding the account
+-   `Attrition_Flag` - If the account is closed then Attrited Customer, else Existing Customer
+-   `Customer_Age` - Customer's age in years
+-   `Gender` - Male = M, Female = F
+-   `Dependent_count` - Number of dependents
+-   `Education_Level` - Educational qualification of the account holder (example: high school, college graduate, etc.)
+-   `Marital_Status` - Married, Single, Divorced, Unknown
+-   `Income_Category` - Annual income category of the account holder (Less than \$40K, \$40K-\$60K, \$60K-\$80K, \$80K-\$120K, \$120K +
+-   `Card_Category` - Type of card (Blue, Silver, Gold, Platinum)
+-   `Months_on_book` - Period of relationship with bank
+-   `Total_Relationship_count` - Total number of products held by the customer
+-   `Months_Inactive_12_mon` - Number of months inactive in the last 12 months
+-   `Contacts_Count_12_mon` - Number of contacts in the last 12 months
+-   `Credit_Limit` - Credit limit on the credit card
+-   `Total_Revolving_Bal` - Total revolving balance on the credit card
+-   `Avg_Open_To_Buy`- Open to buy credit line (average of last 12 months)
+-   `Total_Amt_Chng_Q4_Q1` - Change in transaction amount (Q4 over Q1)
+-   `Total_Trans_Amt` - Total transaction amount (last 12 months)
+-   `Total_Trans_Ct` - Total transaction count (last 12 months)
+-   `Total_Ct_Chng_Q4_Q1` - Change in transaction count (Q4 over Q1)
+-   `Avg_Utilization_Ratio` - Average card utilization ratio
+
+```{python}
+# Read in the data and remove the last two columns irrelevant for the analysis
+data = pd.read_csv("data/BankChurners.csv").iloc[: , :-2]
+
+data.head()
+```
+
+```{python}
+data.shape
+```
+We have a total of 10127 customers described with 21 attributes.
+
+```{python}
+data.info()
+```
+
+This dataset is actually very clean. We'll only do some preprocessing steps before the analysis.
+
+## Data Preprocessing 
+
+### Binning Customer Age
+
+We'll create specific age categories and place ages within a range in these categories. For instance, category `20s` will containe ages between 20 and 29, and so on.
+
+```{python}
+# looking for min and max age
+print(data['Customer_Age'].min())
+print(data['Customer_Age'].max())
+```
+
+```{python}
+bins = [25, 30, 40, 50, 60, 70, 80]
+labels = ['20s', '30s', '40s', '50s', '60s', '70s']
+
+data['Customer_Age_bins'] = pd.cut(
+    data['Customer_Age'], 
+    bins=bins, 
+    labels=labels, 
+    include_lowest=True, 
+    right=False
+)
+```
+
+Let's verify that the behavior we expected from this method resulted in the right output. Since we overrode the inclusive values, we should see that `30` should show in the `30s` bin vs the `20s` bin.
+
+```{python}
+data[data['Customer_Age'] == 30].head(3)
+```
+
+### Converting data types for memory optimization
+
+```{python}
+data.info(verbose=False, show_counts=False, memory_usage='deep') 
+```
+
+Currently, the total deep memory usage of the DataFrame is 4.9 MB. We'll reduce it with smaller datatypes.
+
+```{python}
+data = data.astype(
+    {   
+        'Attrition_Flag': 'category',    # categories
+        'Gender': 'category',           
+        'Education_Level': 'category', 
+        'Marital_Status': 'category', 
+        'Income_Category': 'category', 
+        'Card_Category': 'category',
+        'Customer_Age': 'int8',          # integers
+        'Dependent_count': 'int8',
+        'Months_on_book': 'int8',
+        'Total_Relationship_Count':'int8',
+        'Months_Inactive_12_mon':'int8',
+        'Contacts_Count_12_mon':'int8',
+        'Total_Revolving_Bal':'int16',
+        'Total_Trans_Amt':'int16',
+        'Total_Trans_Ct':'int16',              
+        'Credit_Limit': 'float32',       # floats
+        'Avg_Open_To_Buy': 'float32', 
+        'Total_Amt_Chng_Q4_Q1': 'float16', 
+        'Total_Ct_Chng_Q4_Q1': 'float16', 
+        'Avg_Utilization_Ratio': 'float16'
+    }
+)
+```
+
+
+```{python}
+data.info(memory_usage='deep') 
+```
+We can see at the bottom that the memory usage is now only 408.7 KB (10 times lower).
+
+
+## Exploratory Data Analysis (EDA)
+
+### 🔍 Percentage of churned customers
+
+
+```{python}
+data['Attrition_Flag'].value_counts()   
+```
+
+We'll use `normalize=True` to get the share of churned 
+and existing customers. 
+
+```{python}
+churned = data['Attrition_Flag'].value_counts(normalize=True)['Attrited Customer']
+
+print(round(churned * 100 , 2), '% of customers have churned.')
+```
+
+
+### 📝 Summary Statistics
+
+```{python}
+data.describe()
+```
+
+<br/>
+
+Here we can see:
+
+1. The longest customer in this dataset has been around for **56 months** or about 4 years and a half. (Max)
+
+2. The average number of relationships a customer has is **~4**. (Mean and median agree here)
+
+3. The average credit limit is **\$8.6K**, but the median credit limit is much lower at **$4.5K**. (signals some skew in this variable) 
+
+
+### 📊 Distributions
+
+#### Histograms
+
+Let's take a look at the distribution for the `Months_on_book` variable.
+
+```{python}
+alt.Chart(data).mark_bar().encode(   
+    alt.X('Months_on_book', bin=alt.Bin(maxbins=30), title="Months on book"),
+    alt.Y('count()')
+).properties(width=500)
+```
+
+It looks pretty normal outside of a very strong peak at ~36 months (roughly 2800 customers). If we had access to the owner to ask more questions about this, we would want to know if this was a data error (default months for those without a record), or if there was a major marketing campaign that brought in a lot of users 36 months ago.
+
+Now let's take a look at the `Credit_Limit` variable that we looked at before.
+
+```{python}
+hist = alt.Chart(data).mark_bar().encode(   
+    alt.X('Credit_Limit', bin=alt.Bin(step=1500), title="Credit Limit"),
+    alt.Y('count()')
+).properties(width=500)
+
+aggregates = alt.Chart(data).transform_aggregate(
+    mean='mean(Credit_Limit)',
+    median='median(Credit_Limit)',
+).transform_fold(
+    ['mean', 'median']
+).mark_rule().encode(
+    x='value:Q',
+    color='key:N',
+    size=alt.value(2)
+)
+
+hist + aggregates
+```
+
+It's clear that the `Credit_Limit` is a skewed variable, being skewed higher (or to the right) by a few customers with high Credit Limits. 
+
+
+Let's try `Total_Trans_Ct` that looked to have a somewhat similar mean and median.
+
+```{python}
+alt.Chart(data).mark_bar().encode(   
+    alt.X('Total_Trans_Ct', bin=alt.Bin(maxbins=30), title="Total Transaction Count"),
+    alt.Y('count()')
+).properties(width=500)
+```
+
+
+This is a **bimodal** distribution, which usually indicates two different groups.
+
+#### Boxplot
+
+Let's look at the total number of transactions by gender.
+
+```{python}
+color_scale = alt.Scale(domain=['M', 'F'],
+                        range=['#1f77b4', '#e377c2'])
+                        
+alt.Chart(data).mark_boxplot(size=25).encode(
+    alt.X('Gender', axis=alt.Axis(labelAngle=-0)),
+    alt.Y('Total_Trans_Ct'),
+    alt.Color('Gender', scale=color_scale)
+).properties(width=150)
+```
+
+This plot quickly shows us that the median transaction count is slightly higher for females than males and outliers seem to be present among both groups. 
+
+#### Pyramid chart
+
+Was there a difference in the distribution of customers by age and gender? A pyramid chart can help us find the answer.
+
+To get the data in the format we need, we will need to aggregate the data up to the age and gender level.
+
+```{python}
+pyramid_df = (data
+    .groupby(['Gender', 'Customer_Age_bins'])
+    ['CLIENTNUM']
+    .nunique()
+    .reset_index()
+)
+
+left = alt.Chart(pyramid_df[pyramid_df['Gender']=="F"]).mark_bar().encode(
+    alt.Y('Customer_Age_bins', axis=None),
+    alt.X('CLIENTNUM', title='Customers', sort='descending'),
+    alt.Color('Gender', scale=color_scale, legend=None)
+).properties(title='Female', width=350)
+
+middle = alt.Chart(pyramid_df).mark_text().encode(
+    alt.Y('Customer_Age_bins', axis=None),
+    alt.Text('Customer_Age_bins'),
+).properties(width=20)
+
+right = alt.Chart(pyramid_df[pyramid_df['Gender']=="M"]).mark_bar().encode(
+    alt.Y('Customer_Age_bins', axis=None),
+    alt.X('CLIENTNUM', title='Customers'),
+    alt.Color('Gender', scale=color_scale, legend=None)
+).properties(title='Male', width=300)
+
+left | middle | right
+```
+
+Here we see there is no real difference in the distribution of customers by age and gender. The majority of customers are in their `40s`. We have only two male customers in their `70s` which is hardly visible here.
+
+### 📊 Categorical variables 
+
+Next we'll see how attrited and existing customers are represented in all category groups.
+
+```{python}
+# get the list of vategorical variables, remove `Attrition_flag`
+cat_list = sorted((list(set(data.columns) - set(data._get_numeric_data().columns))))[1:]
+cat_list
+```
+
+```{python}
+#| column: page-right
+def cat_column_bar(cat_column):
+
+    return alt.Chart(data).mark_bar().encode(
+        alt.X('count()', stack="normalize", axis=alt.Axis(format='%'), title='Percent'),
+        alt.Y(cat_column),
+        color=alt.Color('Attrition_Flag', sort="descending")
+    ).properties(width=250)
+    
+(cat_column_bar(cat_list[0]) | 
+ cat_column_bar(cat_list[1]) | 
+ cat_column_bar(cat_list[2]) | 
+ cat_column_bar(cat_list[3]) | 
+ cat_column_bar(cat_list[4]) | 
+ cat_column_bar(cat_list[5]) 
+)
+```
+
+<br/>
+
+Nothing alarming here. Churned customers are almost equally distributed along all category groups. 
+
+Individual values for customers with a `platinum` credit card and the age group `70s` deviate from the average due to the small number of customers in these groups.
+
+### 📊 Comparing Categories
+
+We will look at the average `Credit_Limit` by age group.
+
+```{python}
+bar = alt.Chart(data).mark_bar().encode(
+    alt.X('Customer_Age_bins', axis=alt.Axis(labelAngle=-0), title='Customer age group'),
+    alt.Y('mean(Credit_Limit)'),
+    alt.Color('Customer_Age_bins', legend=None)
+).properties(width=300)
+
+error_bars = alt.Chart(data).mark_errorbar(extent='ci').encode(  
+    x='Customer_Age_bins',
+    y='Credit_Limit',
+    strokeWidth=alt.value(2)
+)
+
+bar + error_bars
+```
+
+And now we'll look at the `Credit_Limit` by age group and gender.
+
+```{python}
+grouped_bar = alt.Chart(data).mark_bar().encode(
+    alt.X('Gender', axis=alt.Axis(title=None, labels=False, ticks=False)),
+    alt.Y('mean(Credit_Limit)', title="Mean Credit Limit", axis=alt.Axis(grid=False)),
+    alt.Color('Gender', scale=color_scale)
+).properties(width=50)
+
+error_bars = alt.Chart(data).mark_errorbar(extent='ci').encode(  
+    x='Gender',
+    y=alt.Y('Credit_Limit', title='Credit Limit'),
+    strokeWidth=alt.value(2)
+)
+
+(grouped_bar + error_bars).facet(
+    column=alt.Column('Customer_Age_bins', title='Customer age group')
+).configure_headerColumn(
+    titleOrient='bottom', 
+    labelOrient='bottom'
+).configure_view(
+    stroke='transparent'
+)
+```
+
+Females on average are getting credit limits much lower than males! They probably have lower wages. Let's check this out.
+
+
+
+```{python}
+income_cat_order = ['Less than $40K', '$40K - $60K', '$60K - $80K', 
+                    '$80K - $120K', '$120K +', 'Unknown']
+                    
+alt.Chart(data).mark_bar().encode(
+    alt.X('count()'),
+    alt.Y('Income_Category', sort=income_cat_order, title='Income Category'),
+    alt.Color('Gender', scale=color_scale)
+)
+```
+
+
+This is interesting. There is not a single woman in this dataset who earns `$60K-$80K`, `$80K-$120K`, or `$120K +` a year.
+
+Does this follow their education level?
+
+```{python}
+edu_cat_order = ['Uneducated', 'High School', 'College', 'Graduate', 
+                 'Post-Graduate', 'Doctorate', 'Unknown']
+
+alt.Chart(data).mark_bar().encode(
+    alt.X('count()'),
+    alt.Y('Education_Level', sort=edu_cat_order, title='Education Level'),
+    alt.Color('Gender', scale=color_scale)
+)
+```
+
+
+Certainly not. Men and women are equally educated. But compared to women in general, men are clearly more represented in better-paid jobs and in better-paid positions.
+
+
+### 📝 Pivot table
+
+Coming back to the business problem, we want to understand something about customers who are leaving. Let's see if we can see anything obvious about their behavior.
+
+```{python}
+(data
+    .groupby(['Attrition_Flag'])
+    .agg({'CLIENTNUM':'nunique',  # number of unique customers in each group
+          'Customer_Age': 'mean',  # the rest are looking at the mean per group
+          'Dependent_count': 'mean',
+          'Months_on_book': 'mean',
+          'Total_Relationship_Count': 'mean',
+          'Months_Inactive_12_mon': 'mean',
+          'Contacts_Count_12_mon': 'mean',
+          'Credit_Limit': 'mean',
+          'Total_Revolving_Bal': 'mean',
+          'Avg_Open_To_Buy': 'mean',
+          'Total_Amt_Chng_Q4_Q1': 'mean',
+          'Total_Trans_Amt': 'mean',
+          'Total_Trans_Ct': 'mean',
+          'Total_Ct_Chng_Q4_Q1': 'mean',
+          'Avg_Utilization_Ratio': 'mean'})
+    .transpose()
+    .assign(Diff = (lambda x: (x['Attrited Customer'] / x['Existing Customer'] - 1)))
+    .sort_values('Diff')
+    .rename_axis(None, axis=1)
+)
+```
+
+We can see that the `Total_Revolving_Bal` and `Avg_Utilization_Ratio` show the biggest differences (45% below existing customers) along with `Total_Trans_Ct` and `Total_Trans_Amt` (35% below existing customers), and `Total_Ct_Chng_Q4_Q1` (25% below existing customers).
+
+**Average Transaction Value**
+
+Average Transaction Value is the average amount a customer spends on a single purchase.
+
+We can calculate it by dividing the `Total_Trans_Amt` by the `Total_Trans_Ct.`
+
+For churned customers it equels to **$68.9**, and for existing customers **$67.8**. They are almost equal in value.
+
+**Average Card Utilization Ratio**
+
+It represents the amount of revolving credit customer is using divided by the total credit available to them.
+
+Let's look at the `Avg_Utilization_Ratio` distribution.
+
+```{python}
+#| column: page-right
+alt.Chart(data).mark_bar(opacity=0.7).encode(
+    alt.X('Avg_Utilization_Ratio', bin=alt.Bin(step=0.025), 
+          axis=alt.Axis(format='%'), title="Average Utilization Ratio"),
+    alt.Y('count()', stack=False),
+    alt.Color('Attrition_Flag', sort='descending', title='Attrition Flag')
+).properties(width=700)
+```
+
+We can see that 57% (934) of churned customers have the average utilization ratio less than 2.5%. Actually, 55% (902) of churned customers have that ratio less than 1%. They just don't use their credit card much which could be one of the main reasons for credit card cancellation!
+
+
+### 📊 Transaction Amounts and Counts relationship
+
+Scatter plot with Transaction Amounts and Counts looks interesting.
+
+```{python}
+alt.Chart(data).mark_circle(stroke="white", strokeWidth=0.4).encode(
+    alt.X('Total_Trans_Amt', title='Total Transaction Amount'),
+    alt.Y('Total_Trans_Ct', title='Total Transaction Count'),
+) #.properties(width=500, height=300)
+```
+
+This plot clearly shows three distinct groups! Let's see if anything shows up when we add the `Attrition_Flag` as a color.
+
+```{python}
+#| column: page-right
+scatter = alt.Chart(data).mark_circle(stroke="white", strokeWidth=0.4).encode(
+    alt.X('Total_Trans_Amt', title='Total Transaction Amount'),
+    alt.Y('Total_Trans_Ct', title='Total Transaction Count'),
+    alt.Color('Attrition_Flag', sort='descending', title='Attrition Flag')
+).properties(width=625, height=400)
+
+hist_amt = alt.Chart(data).mark_bar(opacity=0.7).encode(
+    alt.X('Total_Trans_Amt', bin=alt.Bin(step=500), title='', 
+          scale=alt.Scale(domain=[0, 20000])),
+    alt.Y('count()', stack=False, title=''),
+    alt.Color('Attrition_Flag', sort='descending')
+).properties(width=625, height=150)
+
+hist_ct = alt.Chart(data).mark_bar(opacity=0.7).encode(
+    alt.X('count()', stack=False, title=''), 
+    alt.Y('Total_Trans_Ct', bin=alt.Bin(maxbins=30), title='',
+          scale=alt.Scale(domain=[0, 140])),
+    alt.Color('Attrition_Flag', sort='descending')
+).properties(width=100, height=400)
+
+# putting them all together!
+
+plot_title = alt.TitleParams(
+    "Transaction Amounts and Counts for Customers",
+    subtitle = "No Churned Customers above $11K of Spend"
+)
+
+(hist_amt & (scatter | hist_ct)).properties(title=plot_title
+).configure_title(fontSize=16, dy=-10
+).configure_legend(
+    offset=-120,
+    strokeColor='gray',
+    padding=10,
+    cornerRadius=10,
+)
+```
+
+We can see that there is no attrited customer above **$11K** of spend.
+
+The question is: "How can we get more customers above the $11K threshold?"
+
+### 📊 Can we influence the Q4 to Q1 dip?
+
+The Q4-Q1 change (`Total_Ct_Chng_Q4_Q1`) is significantly different for churned customers too! This indicates that churned customers are spending significantly less (-25% lower than their counterparts) after the holiday season, pulling back much more sigificantly. If we can impact this variable, we can also directly impact the Total Transaction Count!
+
+```{python}
+#| column: page-right
+alt.Chart(data).transform_density(
+     'Total_Ct_Chng_Q4_Q1',
+     groupby=['Attrition_Flag'],
+     as_=['Total_Ct_Chng_Q4_Q1', 'density']
+).mark_area(opacity=0.7, clip=True).encode(                
+     alt.X('Total_Ct_Chng_Q4_Q1', scale=alt.Scale(domain=[0, 2]),
+           title='Total Transaction Count Change (Q4 to Q1)'),   
+     alt.Y('density:Q', scale=alt.Scale(domain=[0, 3])),  
+     alt.Color('Attrition_Flag', sort='descending')
+).properties(title='Change in Transaction Count (Q4 over Q1)', width=500, height=300
+).configure_title(fontSize=16, dy=-10, anchor='start')
+```
+
+## Recommendations
+
+- **Promotions during Q1 time to keep the spending levels high.** The more we spend the more attached we feel to the card, it's benefits, etc. A "prevent the cliff" campaign where all customers who have historically shown a strong drop off, will get targeted with this promo.
+
+- **Customer surveys.** For those who are spending above $11,000 to understand why they love our card and what keeps them around. If we were also able to get responses from some of our churn customers, we can develop stronger marketing campaigns around our findings.  
+
+- **Offer loyalty points, cash back, etc.**
+
+- Look at any historical marketing campaigns to see what we can learn from what worked / didn't work.
+
+
+
+

@@ -79,5 +79,11 @@
   },
   "posts/airbnb-hawaii/kauai_eda.qmd": {
     "kauai_eda.html": "3b5e033b"
+  },
+  "posts/credit-card-retention/canalysis.qmd": {
+    "canalysis.html": "49bcf7f3"
+  },
+  "posts/credit-card-retention/analysis.qmd": {
+    "analysis.html": "c223fddd"
   }
 }

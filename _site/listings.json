@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/credit-card-retention/analysis.html",
       "/posts/shiny-mass-shootings/mass-shootings.html",
       "/posts/customer-segmentation/cust-segm-report.html",
       "/posts/cryptocurrency-sql-case-study/cryptocurrency.html",
