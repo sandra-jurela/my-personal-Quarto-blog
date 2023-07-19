@@ -7,27 +7,44 @@ about:
   image-shape: round
   links:
     - icon: envelope-fill
-      text: Email
+      text: email
       href: mailto:sandrajurela777@gmail.com
     - icon: linkedin
-      text: Linkedin
+      text: linkedin
       href: https://www.linkedin.com/in/sandra-jurela-a95985211/
     - icon: github
-      text: Github
+      text: github
       href: https://github.com/sandra-jurela
+    - icon: facebook
+      text: facebook
+      href: https://www.facebook.com/arcturian.love/
 comments: false
 ---
 
 Hi and welcome to my personal blog. My name is Sandra Jurela and here I will be sharing my journey into Data Science. Recently I have developed a real passion for Data Science and this blog truly is a manifestation of that.
 
-I hold a Master's degree in Civil Engineering (Hydrology and Water Resources Science). I started my career as a construction designer, and then for 10 years worked as a hydrologist at the Croatian Meteorological and Hydrological Service. I currently work for my family’s business, and freelance as a data analyst.
+I hold a Master's degree in Civil Engineering (Hydrology and Water Resources Science). I started my career as a construction designer, and then for 10 years worked as a hydrologist at the Croatian Meteorological and Hydrological Service. I currently work for my family's business, and freelance as a data analyst.
 
 I live in Zagreb, Croatia, with my two boys (life partner and our sweet son).
 
 If you'd like to connect with me, please do. I hope you enjoy your visit!
 
-----
+------------------------------------------------------------------------
 
 {{< iconify logos tableau size=2xl >}}
 
 Since the bootstrap icon for Tableau is not yet available, here is the [link](https://public.tableau.com/app/profile/sandra.jurela) to my Tableau Public repository.
+
+------------------------------------------------------------------------
+
+{{< fa solid music >}} 
+
+*Row, row, row your boat*
+
+*Gently down the stream*
+
+*Merrily merrily, merrily, merrily*
+
+*Life is but a dream*
+
+{{< fa solid music >}} 
