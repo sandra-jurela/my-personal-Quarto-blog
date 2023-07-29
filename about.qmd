@@ -1,5 +1,5 @@
 ---
-title: "Let's be friends"
+title: "Let's connect"
 image: img/profile.jpg
 about:
   template: trestles
@@ -27,24 +27,14 @@ I hold a Master's degree in Civil Engineering (Hydrology and Water Resources Sci
 
 I live in Zagreb, Croatia, with my two boys (life partner and our sweet son).
 
-If you'd like to connect with me, please do. I hope you enjoy your visit!
+If you'd like to connect with me, please do.
+
+I hope you enjoy your visit!
 
 ------------------------------------------------------------------------
 
 {{< iconify logos tableau size=2xl >}}
 
-Since the bootstrap icon for Tableau is not yet available, here is the [link](https://public.tableau.com/app/profile/sandra.jurela) to my Tableau Public repository.
+Feel free to visit my [Tableau Public repository.](https://public.tableau.com/app/profile/sandra.jurela).
 
-------------------------------------------------------------------------
 
-{{< fa solid music >}} 
-
-*Row, row, row your boat*
-
-*Gently down the stream*
-
-*Merrily merrily, merrily, merrily*
-
-*Life is but a dream*
-
-{{< fa solid music >}} 

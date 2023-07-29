@@ -40,11 +40,11 @@ pd.set_option("display.float_format", "{:.2f}".format)
 alt.data_transformers.disable_max_rows()
 ```
 
-I will use [Altair](https://altair-viz.github.io/index.html) for data visualizations. It's a declarative statistical visualization library for Python. It's very intuitive to use, and after some experience with Matplotlib and Seaborn, I'm pleasantly surprised with it. 😁
+I will use [Altair](https://altair-viz.github.io/index.html) for data visualizations. It's a declarative statistical visualization library for Python, built on top of the powerful Vega-Lite grammar, It's very intuitive to use, and after some experience with Matplotlib and Seaborn, I'm pleasantly surprised with it. 😇
 
 ## Data Overview
 
-The dataset consists of about 10,000 customers described with their age, income level, marital status, credit card limit, credit card category, etc. it's available on Kaggle at the [following link](https://www.kaggle.com/datasets/whenamancodes/credit-card-customers-prediction).
+The dataset consists of about 10,000 customers described with their age, income level, marital status, credit card limit, credit card category, etc. It's available on Kaggle at the [following link](https://www.kaggle.com/datasets/whenamancodes/credit-card-customers-prediction).
 
 ### Data Dictionary
 
@@ -448,7 +448,7 @@ alt.Chart(data).mark_bar(opacity=0.7).encode(
 ).properties(width=700)
 ```
 
-We can see that 57% (934) of churned customers have the average utilization ratio less than 2.5%. 
+We can see that 57% (934) of churned customers have the average utilization ratio less than 2.5%.
 
 How many churned customers have a credit card utilization ratio of zero?
 
@@ -469,7 +469,7 @@ alt.Chart(data).mark_circle(stroke="white", strokeWidth=0.4).encode(
 ) #.properties(width=500, height=300)
 ```
 
-This plot clearly shows three distinct groups. Will anything show up if we add Attrition_Flag as a color? We'll also add histograms for transaction amounts and counts.
+This plot clearly shows three distinct groups. Will anything show up if we add `Attrition_Flag` as a color? We'll also add histograms for transaction amounts and counts.
 
 ```{python}
 #| column: page-right
@@ -510,10 +510,9 @@ plot_title = alt.TitleParams(
 )
 ```
 
+We can see that there are no customers who have churned that have spent **\$11K** or more,
 
-We can see that there are no customers who have churned that have spent **\$11K** or more, 
-
-We can also see churned customers with transaction amounts between **\$4K and $11K** who have separated from existing customers.
+We can also see churned customers with transaction amounts between **\$4K and \$11K** who have separated from existing customers.
 
 We'll create bins and separate these groups from each other so we can effectively look at their differences.
 
@@ -545,7 +544,7 @@ data.groupby(['Total_Trans_Amt_bin', 'Attrition_Flag']).agg({
 }).T
 ```
 
-Churned customers with transaction amounts between \$4K and \$11K are more like existing customers with transaction amounts above $11K (similar credit limit), but they spend less.
+In terms of average credit limit, churned customers with transaction amounts between \$4K and \$11K are more like existing customers with transaction amounts above \$11K (very similar average credit limit, around \$14K). Simply put, they spent less. And as a result, the translation of those points (churned customers) to the left and downward may be seen on the previous graph.
 
 ### 📊 Can we influence the Q4 to Q1 dip?
 
