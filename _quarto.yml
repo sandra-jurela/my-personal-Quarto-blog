@@ -28,6 +28,7 @@ website:
     center: |
       © 2023 Sandra Jurela. All Rights Reserved     
       Built with 🧠 and [Quarto](https://quarto.org) in RStudio.
+  
 format:
   html:
     theme: theme-light.scss
@@ -40,4 +41,6 @@ editor: visual
 comments:
   giscus:
     repo: sandra-jurela/my-personal-Quarto-blog
+    
+
 
