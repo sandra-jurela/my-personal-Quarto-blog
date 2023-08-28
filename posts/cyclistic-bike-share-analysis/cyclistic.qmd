@@ -1,0 +1,972 @@
+---
+title: "Cyclistic Bike-Share Analysis"
+description: |
+  The latest version of my capstone project for the Google Data Analytics Professional Certificate.
+date: 2023-08-25
+categories:
+  - EDA
+  - data cleaning
+  - data wrangling
+  - data visualization
+  - R
+image: images/preview.png
+code-summary: "Show code"
+---
+
+![](images/cyclistic.png){fig-align="center"}
+
+## Foreword
+
+In September 2021, I completed the [Google Data Analytics Professional Certificate](https://www.coursera.org/professional-certificates/google-data-analytics?utm_source=gg&utm_medium=sem&utm_campaign=B2C_INDIA__branded_FTCOF_courseraplus_arte_monthly&utm_content=B2C&campaignid=20454824098&adgroupid=153188780860&device=c&keyword=coursera%20online%20courses&matchtype=b&network=g&devicemodel=&adpostion=&creativeid=669591345022&gclid=Cj0KCQjwi7GnBhDXARIsAFLvH4kcoOoIqg7f4xx3OTTbKe9ogNM5dbyucPvN6dKqjWn2cwdyo7ENRRkaAji8EALw_wcB) hosted on Coursera. The program is very extensive and covers all the steps of the data analysis process as taught by Google (**ask**, **prepare**, **process**, **analyze**, **share**, and **act**). It was my first encounter with databases and analytics tools. I really enjoyed it very much, and I have to say, it made some useful corrections to my analytical mind. I am very grateful for that and highly recommend it!
+
+It consists of 8 courses, the last of which is dedicated to a capstone project. As a passionate cyclist, I have chosen the Cyclistic bike-share case study to showcase what I have learned. In terms of analytics, this was my very first project and I hope you'll enjoy it!
+
+## Introduction
+
+In this case study, I am a junior data analyst working in the marketing analyst team at Cyclistic, a fictional bike-share company in Chicago. The director of marketing believes the company's future success depends on maximizing the number of annual memberships. Therefore, my team wants to understand how casual riders and annual members use Cyclistic bikes differently. From these insights, my team will design a new marketing strategy to convert casual riders into annual members. But first, Cyclistic executives must approve our recommendations, so they must be backed up with compelling data insights and professional data visualizations.
+
+Three questions will guide the future marketing program:
+
+1.  How do annual members and casual riders use Cyclistic bikes differently?
+2.  Why would casual riders buy Cyclistic annual memberships?
+3.  How can Cyclistic use digital media to influence casual riders to become members?
+
+Lily Moreno, the director of marketing and my manager has assigned me the first question to answer.
+
+## ✨ PART I: Ask
+
+In the first step of the data analysis process, we identify the business task and consider key stakeholders.
+
+<p style="border-width:3px; border-style:solid; border-color:#4779b9; padding: 1em;">**Business task**<br>How do annual members and casual riders use Cyclistic bikes differently?</p>
+
+**Primary Stakeholders**
+
+1.  Lily Moreno: the Director of Marketing and my manager
+2.  Cyclistic Executive Team: the notoriously detail-oriented executive team who will decide whether to approve the recommended marketing program.
+
+**Secondary Stakeholders**
+
+1.  Cyclistic Marketing Analytics Team: a team of data analysts who are responsible for collecting, analyzing, and reporting data that helps guide Cyclistic marketing strategy (my team)
+
+## ✨ PART II: Prepare
+
+The objective of this step is to prepare data for the analysis. I will use the past **12 months** of Cyclitis's historical trip data (from **September 2020 to August 2021**) to analyze and identify trends. Because Cyclistic is a fictional company, for the purposes of this case study, I will use data from a real bike-share company in Chicago, **Divvy**. The data has been made available for public use by Motivate International Inc. under this [license](https://ride.divvybikes.com/data-license-agreement) and can be downloaded [here](http://divvy-tripdata.s3.amazonaws.com/index.html).
+
+The data is released on a monthly schedule and anonymized. It is reliable, original, comprehensive, current, and cited.
+
+I have downloaded **12 CSV files** (datasets). Each dataset contains historical trip data for an individual month. In all 12 datasets, each variable has its own column, each observation has its own row, and each value has its own cell. Therefore, I can conclude that the datasets are tidy.
+
+There are **13 columns** (variables) in each CSV file. Metadata isn't provided, but most of the variables are self-explanatory.
+
+### Data dictionary
+
+| No  | Column Name          | Data Type   | Definition                        |
+|-----|----------------------|-------------|-----------------------------------|
+| 1   | `ride_id`            | Text        | Unique ride ID                    |
+| 2   | `rideable_type`      | Text        | Classic, docked, or electric bike |
+| 3   | `started_at`         | Date & Time | Trip start date and time          |
+| 4   | `ended_at`           | Date & Time | Trip end date and time            |
+| 5   | `start_station_name` | Text        | Trip start station name           |
+| 6   | `start_station_id`   | Text        | Trip start station ID             |
+| 7   | `end_station_name`   | Text        | Trip end station name             |
+| 8   | `end_station_id`     | Text        | Trip end station ID               |
+| 9   | `start_lat`          | Numeric     | Trip start station latitude       |
+| 10  | `start_lng`          | Numeric     | Trip start station longitude      |
+| 11  | `end_lat`            | Numeric     | Trip end station latitude         |
+| 12  | `end_lng`            | Numeric     | Trip end station longitude        |
+| 13  | `member_casual`      | Text        | User type (casual or member)      |
+
+Only two variables need further clarification:
+
+-   `rideable_type` - there are three possible values for this variable: `classic_bike`, `docked_bike`, and `electric_bike`. `classic_bike` is actually a classic dockless bike, `docked_bike` is a classic docked bike, and `electric_bike` is an e-bike that can be either docked at any station or locked with cable at any e-station for no additional cost. For an extra \$2, it's possible to lock a bike to any public bike rack, light pole, signpost, or retired parking meter outside of a station within the service area. Classic blue Divvy bikes can only be docked at the traditional Divvy stations.
+
+-   `member_casual` - there are two possible values for this variable: `casual` and `member`, representing casual riders and annual members. Casual riders buy a Single Ride Pass (one trip up to 30 minutes) or a Day Pass (unlimited 3-hour rides for 24-hours), while members buy an Annual Membership (unlimited 45-min rides). This is important because, in the cleaning step of the analysis, I will filter out all trips with a ride length longer than **3 hours**.
+
+```{r}
+#| echo: false
+#| out-width: "100%"
+#| fig-cap: "Fig 1: Divvy plans and pricing"
+knitr::include_graphics("images/divvy_plans.jpg")
+```
+
+### Data issues
+
+If we want to show the most popular stations for each group on the map, each station must have unique geographical coordinates. This is not the case for trips taken with electric bikes. Each such ride has its own starting and ending coordinates, regardless of the start or end station. The reason for this is that electric bikes can be parked outside of the stations within a service area. The following maps made in Tableau on just one month of data serve to illustrate this issue:
+
+```{r}
+#| echo: false
+#| out-width: "100%"
+#| fig-cap: "Fig 2: Start station frequency for classic and docked bikes"
+knitr::include_graphics("images/trips_classicbike_map.png")
+```
+
+```{r}
+#| echo: false
+#| out-width: "100%"
+#| fig-cap: "Fig 3: Start station frequency for electric bikes"
+knitr::include_graphics("images/trips_ebike_map.jpg")
+```
+
+Therefore, we'll additionally use the publicly available CSV file, Divvy_Bicycle_Stations.csv, that contains a list of all stations and corresponding geographical coordinates ([link](https://data.cityofchicago.org/Transportation/Divvy-Bicycle-Stations/bbyy-e7gq)). This file is updated regularly. My version is from October 2021. We'll also use it to check current station names.
+
+### Setting up the programming environment
+
+```{r}
+# loading packages
+library(tidyverse)
+library(lubridate)
+library(janitor)
+library(skimr)
+library(leaflet)
+library(reactable)
+library(htmltools)
+
+# ggplot theme
+theme_set(theme_classic())
+```
+
+### Reading the datasets
+
+Let's see what's in the data directory.
+
+```{r}
+data_dir <- "data"
+
+fs::dir_ls(data_dir)
+```
+
+We'll combine `dir_ls()`, `map_dfr()` and `read_csv()` to find data files with monthly trip data in the directory and read them all together into a single data frame. Columns `start_station_id` and `end_station_id` in the first three datasets (2020-Sep to 2020-Nov) are of the numeric data type, and all the rest are of characters. To make row binding possible, we'll give an instruction to read them all as characters.
+
+```{r}
+# monthly trip data
+all_trips <- data_dir %>% 
+  fs::dir_ls(regexp = "tripdata") %>% 
+  map_dfr(read_csv, 
+          col_types = cols("start_station_id" = col_character(), 
+                           "end_station_id" = col_character()))
+
+# current Divvy stations with coordinates
+divvy_stations <- read_csv("data/Divvy_Bicycle_Stations.csv") %>% 
+  clean_names()
+```
+
+### Data overview
+
+**Monthly trip data**
+
+```{r}
+# data dimensions (rows x columns)
+dim_desc(all_trips)
+```
+
+It's a large dataset with almost 5 million rows and 13 columns.
+
+```{r}
+glimpse(all_trips)
+```
+
+```{r}
+rmarkdown::paged_table(head(all_trips)) 
+```
+
+```{r}
+head(all_trips$started_at)
+```
+
+Datetimes are stored in the UTC timezone, which is good considering I'm in Europe.
+
+**Current Divvy stations with corresponding coordinates**
+
+```{r}
+dim_desc(divvy_stations)
+```
+
+```{r}
+rmarkdown::paged_table(head(divvy_stations)) 
+```
+
+<br/>
+
+## ✨ PART III - Process
+
+In this step, we are going to explore the data further and finally clean it.
+
+Right now we can aggregate data only at the ride level, so we'll create 3 new columns `year_month`, `day_of_week`, and `hour` extracted from the datetime column `started_at` and convert them to factors where needed.
+
+```{r}
+all_trips <- all_trips %>% 
+  mutate(year_month = format(started_at, "%Y-%m") %>% as_factor(),
+         day_of_week = wday(started_at, label = TRUE, 
+                            week_start = getOption("lubridate.week.start", 1)),
+         hour = hour(started_at) %>% as_factor()) 
+```
+
+Calculating and creating a new column `ride_length` in minutes, then converting it to a numeric data type and rounding to 2 decimal places
+
+```{r}
+all_trips <- all_trips %>% 
+  mutate(ride_length = difftime(ended_at, started_at, units="mins") %>% 
+           as.numeric() %>% round(2))
+```
+
+Checking if everything is OK.
+
+```{r}
+rmarkdown::paged_table(sample_n(all_trips, 10))
+```
+
+<br/>
+
+All is good! Let's see the summary statistics.
+
+```{r}
+all_trips %>% skim_without_charts()
+```
+
+<br/>
+
+By observing the data summary we can notice the following issues that need to be addressed:
+
+-   The number of unique ride IDs doesn't match the number of observations - duplicate rows,
+-   Missing values (NAs) in the `start_station_name`, `start_station_id`, `end_station_name`, and `end_station_id` columns,
+-   Number of station IDs doesn't match the number of stations - it is almost twice as big,
+-   Name of the `member_casual` column is vague, we'll rename it to `user_type`,
+-   5015 missing values (NAs) in the `end_lat` and `end_lng` columns,
+-   The minimum value for the `ride_length` column is -20.2 days, the maximum value is 38.9 days.
+
+#### 🛠️Removing duplicated records based on the `ride_id` column
+
+Each row represents one observation (trip). Based on the previous summary, there are a total of 4,913,072 rows and 4,912,863 unique `ride_id` values, meaning there are 209 rows of duplicated data.
+
+```{r}
+dupes <- all_trips %>% 
+  get_dupes(ride_id) 
+
+dupes %>% rmarkdown::paged_table()
+```
+
+These are all trips taken with docked bikes. They started on two different dates, 2020-11-25 and 2020-12-15, and ended on 2020-11-25. Since trips started on 2020-12-15 have negative ride lengths, we're going to remove them and create a new dataframe.
+
+```{r}
+all_trips_cln <- 
+  setdiff(all_trips, 
+          dupes %>% select(-dupe_count) %>% filter(date(started_at) == "2020-12-15")) 
+```
+
+Number of removed records.
+
+```{r}
+nrow(all_trips) - nrow(all_trips_cln)
+```
+
+#### 🛠️ Renaming column `member_casual` to `user_type`
+
+```{r}
+all_trips_cln <- all_trips_cln %>% rename(user_type = member_casual)
+```
+
+#### 🛠️ Removing observations with missing values in the `end_lat` and `end_lng` columns
+
+Every ride has to end somewhere. The average ride length is unusually high for this subset (you don't see it here; I want to spare you the details). Traffic accident, malfunction? We'll remove those trips.
+
+We won't need the columns with coordinates anymore, so we'll remove them to make the dataframe lighter. Later on, we'll join the coordinates from the `divvy_stations` dataframe.
+
+```{r}
+all_trips_cln <- all_trips_cln %>% 
+  filter(!is.na(end_lat), !is.na(end_lng)) %>% 
+  select(-c(start_lat, start_lng, end_lat, end_lng))
+```
+
+#### 🛠️ Removing trips
+
+-   associated with Divvy test and repair stations
+-   with negative ride length (the end of the trip precedes the start)
+-   with ride length between 0 and 1 min (potentially false starts or users trying to re-dock a bike to ensure it was secure)
+-   with a ride length longer than 180 minutes (3 hours)
+
+Looking for specific values in the `start_station_name` column associated with Divvy test and repair stations.
+
+<details>
+
+<summary>Unique start station names</summary>
+
+```{r}
+unique(all_trips_cln$start_station_name)
+```
+
+</details>
+
+Creating a vector of station names identified as Divvy test and repair stations.
+
+```{r}
+trs_name <- c("Base – 2132 W Hubbard Warehouse",
+              "DIVVY CASSETTE REPAIR MOBILE STATION",
+              "HUBBARD ST BIKE CHECKING (LBS-WH-TEST)",
+              "WEST CHI-WATSON")
+```
+
+Looking for specific values in the `start_station_id` column associated with Divvy test and repair stations.
+
+<details>
+
+<summary>Unique start station IDs</summary>
+
+```{r}
+unique(all_trips_cln$start_station_id)
+```
+
+</details>
+
+Creating a vector of station ids identified as ids associated with Divvy test and repair stations.
+
+```{r}
+trs_id <- c("DIVVY 001",
+            "DIVVY CASSETTE REPAIR MOBILE STATION",
+            "Hubbard Bike-checking (LBS-WH-TEST)")
+```
+
+Keeping only trips that are relevant for the analysis.
+
+```{r}
+all_trips_cln <- all_trips_cln %>%
+  filter(!start_station_name %in% trs_name &
+         !end_station_name %in% trs_name &
+         !start_station_id %in% trs_id &
+         !end_station_id %in% trs_id &
+         between(ride_length, 1, 180))
+```
+
+```{r}
+dim_desc(all_trips_cln)
+```
+
+#### 🔍 Inspecting the difference between the number of station IDs and the number of station names
+
+```{r}
+all_trips_cln %>% 
+  group_by(start_station_name, start_station_id) %>% 
+  summarise(min_datetime = min(started_at), 
+            max_datetime = max(started_at), 
+            count = n(),.groups = 'drop') %>%
+  arrange(start_station_name, min_datetime) %>% 
+  head(20) %>% 
+  knitr::kable()
+```
+
+**Conclusion:** Divvy changed station IDs for most stations at the beginning of December 2020. This will not affect the analysis, so we'll leave it as is. What is important is that at the time of a ride, each station has been assigned a unique ID. Let's see why this change happened.
+
+Creating a 3-dimensional frequency table.
+
+```{r}
+ftable(all_trips_cln$user_type, all_trips_cln$year_month, all_trips_cln$rideable_type)
+```
+
+From September to November 2020, there were only two rideable types, `docked_bike` and `electric_bike`. At the beginning of December 2020, a new rideable type is introduced, the `classic_bike`, and a distinction is made between the `docked_bike` and the `classic_bike`. Since the beginning of 2021, casual riders can use classic and docked bikes, while annual members can only use classic bikes. Therefore, we cannot conclude a preference for one rideable type over another between casuals and members. Only when it comes to electric bikes.
+
+#### 🔍 🛠️ Checking if any station has changed its name at some point
+
+```{r}
+all_trips_cln %>% 
+  group_by(start_station_id, year_month) %>%
+  summarise(n_distinct_start_station_name = n_distinct(start_station_name), 
+            .groups = 'drop') %>% 
+  filter(n_distinct_start_station_name > 1) %>% 
+  knitr::kable()
+```
+
+```{r}
+start_id <- c("13074", "13099", "13300", "19", "26", "317", "332", "351", "503",
+              "625", "631", "704", "709", "725", "E011", "LF-005", "TA1305000039",
+              "TA1306000029", "TA1307000041", "TA1309000039", "TA1309000049")
+```
+
+```{r}
+all_trips_cln %>%
+  filter(start_station_id %in% start_id) %>% 
+  group_by(start_station_id, start_station_name) %>%
+  summarise(min_datetime = min(started_at), 
+            max_datetime = max(started_at), 
+            count = n(), .groups = 'drop' ) %>% 
+  arrange(start_station_id, min_datetime) %>% 
+  knitr::kable()
+```
+
+Among other changes, in July 2021, Chicago renamed the iconic Lake Shore Drive to honor its city's 'founder' Jean Baptiste Point DuSable. It is now known as DuSable Lake Shore Drive. You can read the story [here](https://abc7chicago.com/lake-shore-drive-dusable-rename-chicago-jean-baptiste-point-du-sable/10831970/).
+
+We'll now replace old station names in the `start_station_name` and `end_station_name` columns with new ones. This step is necessary if we want to get an accurate list of the most popular stations.
+
+```{r}
+all_trips_cln <- all_trips_cln %>% 
+  mutate(start_station_name = recode(start_station_name, 
+        "Broadway & Wilson Ave" = "Broadway & Wilson - Truman College Vaccination Site",
+        "Halsted St & 18th St" = "Halsted St & 18th St (Temp)",
+        "Lake Shore Dr & Monroe St" = "DuSable Lake Shore Dr & Monroe St",
+        "Throop (Loomis) St & Taylor St" = "Throop St & Taylor St",
+        "McClurg Ct & Illinois St" = "New St & Illinois St",
+        "Burling St (Halsted) & Diversey Pkwy (Temp)" = "Burling St & Diversey Pkwy",
+        "Drake Ave & Fullerton Ave" = "St. Louis Ave & Fullerton Ave",
+        "Malcolm X College" = "Malcolm X College Vaccination Site",
+        "Lake Shore Dr & North Blvd" = "DuSable Lake Shore Dr & North Blvd",
+        "Marshfield Ave & Cortland St" = "Elston Ave & Cortland St",
+        "Lake Shore Dr & Ohio St" = "DuSable Lake Shore Dr & Ohio St",
+        "Lake Shore Dr & Wellington Ave" = "DuSable Lake Shore Dr & Wellington Ave",
+        "Lake Shore Dr & Diversey Pkwy" = "DuSable Lake Shore Dr & Diversey Pkwy",
+        "Lake Shore Dr & Belmont Ave" = "DuSable Lake Shore Dr & Belmont Ave")) %>% 
+  mutate(end_station_name = recode(end_station_name, 
+        "Broadway & Wilson Ave" = "Broadway & Wilson - Truman College Vaccination Site",
+        "Halsted St & 18th St" = "Halsted St & 18th St (Temp)",
+        "Lake Shore Dr & Monroe St" = "DuSable Lake Shore Dr & Monroe St",
+        "Throop (Loomis) St & Taylor St" = "Throop St & Taylor St",
+        "McClurg Ct & Illinois St" = "New St & Illinois St",
+        "Burling St (Halsted) & Diversey Pkwy (Temp)" = "Burling St & Diversey Pkwy",
+        "Drake Ave & Fullerton Ave" = "St. Louis Ave & Fullerton Ave",
+        "Malcolm X College" = "Malcolm X College Vaccination Site",
+        "Lake Shore Dr & North Blvd" = "DuSable Lake Shore Dr & North Blvd",
+        "Marshfield Ave & Cortland St" = "Elston Ave & Cortland St",
+        "Lake Shore Dr & Ohio St" = "DuSable Lake Shore Dr & Ohio St",
+        "Lake Shore Dr & Wellington Ave" = "DuSable Lake Shore Dr & Wellington Ave",
+        "Lake Shore Dr & Diversey Pkwy" = "DuSable Lake Shore Dr & Diversey Pkwy",
+        "Lake Shore Dr & Belmont Ave" = "DuSable Lake Shore Dr & Belmont Ave"))
+```
+
+#### 🔍 Inspecting observations with missing values (NAs) in the `start_station_name`, `start_station_id`, `end_station_name`, and `end_station_id` columns
+
+```{r}
+all_trips_NA <- all_trips_cln %>% 
+  filter(is.na(start_station_name) | 
+         is.na(end_station_name) |
+         is.na(start_station_id) | 
+         is.na(end_station_id))
+
+# number of NAs in each column
+colSums(is.na(all_trips_NA))
+```
+
+```{r}
+# contingency table for the subset with NAs
+table(all_trips_NA$year_month, all_trips_NA$rideable_type)
+```
+
+```{r}
+# contingency table for the whole dataset
+table(all_trips_cln$year_month, all_trips_cln$rideable_type)
+```
+
+```{r}
+all_trips_NA %>%   
+  count(user_type)
+```
+
+```{r}
+summary(all_trips_NA$ride_length)
+```
+
+Deleting the observations with missing values can reduce the statistical power of the analysis. We must understand why the data is missing. The reason for missing values here is the fact that electric bikes can be parked outside of the stations within a service area. You can find more information [here](https://divvybikes.com/pricing/ebikes). In Zone 1, an out-of-station parking fee (\$2) is charged. In Zone 2, the out-of-station parking fee is waived to account for the lower density of stations.
+
+There is no way to substitute missing values, and nothing indicates that something is wrong with this subset. If we delete it, we will lose a small percentage of rides taken with classic bikes (**0.1%**) and a lot of rides taken with electric bikes (**42%**). We'll keep these observations.
+
+#### ✅ Final dataset ready for analysis
+
+```{r}
+# selecting columns needed for analysis
+al_trips_cln <- all_trips_cln %>% 
+  select(start_station_name, end_station_name, user_type, year_month, day_of_week, 
+         hour, ride_length, rideable_type)
+```
+
+```{r}
+# final dataset dimensions
+dim_desc(al_trips_cln)
+```
+
+```{r}
+# proportion of trips removed
+(nrow(all_trips) - nrow(all_trips_cln)) / nrow(all_trips) 
+```
+
+## ✨ PART IV - Analyze & Share
+
+In this step, we'll try to find an answer to the question, **"How do annual members and casual riders use Cyclistic bikes differently?"**, and share key findings by analyzing the following:
+
+-   number of rides
+-   average ride length
+-   bike-type usage
+-   most popular stations
+
+```{r}
+#| code-fold: true
+#| code-summary: "Code for ggplot theme customization"
+# theme customization
+my_theme <- theme(plot.title=element_text(size=14),
+                  plot.subtitle=element_text(size=10),
+                  axis.text.x=element_text(size=10),
+                  axis.text.y=element_text(size=10),
+                  axis.title.x=element_text(size=10),
+                  axis.title.y=element_text(size=10),
+                  strip.text = element_text(size=12),
+                  legend.title=element_text(size=11),
+                  legend.text=element_text(size=11))
+
+my_colors <- c("#355273", "#FF3030") 
+```
+
+<br/>
+
+### 💡 Number of rides
+
+#### 📊 Total Rides by User Type
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show code"
+all_trips_cln %>% 
+  select(user_type) %>% 
+  group_by(user_type) %>% 
+  summarise(total_rides = n(), .groups = 'drop') %>% 
+  webr::PieDonut(aes(user_type, count = total_rides), r0 = 0.7, r1 = 0.9, 
+                 labelpositionThreshold = 1, showPieName = FALSE, pieAlpha = 1) + 
+  scale_fill_manual(values = my_colors) +
+  annotate(geom = 'text', x = 0, y = 0, 
+           label = str_c("Totak Rides: ", round(nrow(all_trips_cln)/1e6, 1), "M"),
+           size = 4.7) +
+  theme_void()
+```
+
+#### 📊 Total Rides by Month
+
+<details>
+
+<summary>Show code and table output</summary>
+
+```{r}
+total_rides_by_month <- all_trips_cln %>% 
+  select(user_type, year_month) %>% 
+  group_by(user_type, year_month) %>% 
+  summarise(total_rides = n()) %>% 
+  mutate(percentage = scales::percent(total_rides/sum(total_rides), accuracy = 0.1)) %>% 
+  ungroup()
+  
+total_rides_by_month %>% knitr::kable()
+```
+
+</details>
+
+```{r}
+#| code-fold: true
+#| fig-width: 8
+#| fig-height: 6
+total_rides_by_month %>% 
+  ggplot(aes(x = year_month, y = total_rides, fill = user_type)) + 
+  geom_col(width = 0.65, position = position_dodge(0.75)) + 
+  scale_y_continuous(labels = scales::comma) +
+  scale_fill_manual(values = my_colors) +
+  labs(title = "Total Rides by Month", subtitle = "September 2020 - August 2021",
+       x = "", y = "", fill = "User Type") + 
+  my_theme +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "top")
+```
+
+It is evident that the number of rides through the months directly correlates with the weather. Weather history in Chicago ([Weather Spark](https://weatherspark.com/h/y/14091/2021/Historical-Weather-during-2021-in-Chicago-Illinois-United-States#Figures-Temperature)) for the period September 2020 - August 2021 reveals common temperatures throughout the year with the exception of February 2021 (freezing, snow) and the summer months June, July, and August 2021 (above-average temperatures).
+
+The number of rides taken by casuals exceeded the number of rides taken by members only in June, July, and August 2021, during which time casual rides accounted for **55.1%** of total casual rides.
+
+The number of rides by casuals in relation to members is much lower in the period from October 2020 to January 2021. The possible cause is the COVID-19 pandemic. We can see the number of new cases per capita in the following [animation](https://www.reddit.com/r/dataisbeautiful/comments/q4dc8b/oc_the_pandemic_in_the_us_in_60_seconds/).
+
+<br/>
+
+#### 📊 Total Rides by Day of the Week
+
+<details>
+
+<summary>Show code and table output</summary>
+
+```{r}
+total_rides_by_dow <- all_trips_cln %>% 
+  select(user_type, day_of_week) %>% 
+  group_by(user_type, day_of_week) %>% 
+  summarise(total_rides = n()) %>% 
+  mutate(percentage = scales::percent(total_rides/sum(total_rides), accuracy = 0.1)) %>% 
+  ungroup()
+
+total_rides_by_dow %>% knitr::kable()
+```
+
+</details>
+
+```{r}
+#| code-fold: true
+#| fig-width: 6
+#| fig-height: 5
+total_rides_by_dow %>% 
+  ggplot(aes(x = day_of_week, y = total_rides, fill = user_type)) + 
+  geom_col(width = 0.65, position = position_dodge(0.75)) + 
+  scale_y_continuous(labels = scales::comma) +
+  scale_fill_manual(values = my_colors) +
+  labs(title = "Total Rides by Day of the Week", 
+       subtitle = "September 2020 - August 2021",
+       x = "", y = "", fill = "User Type") +
+  my_theme +
+  theme(legend.position = "top")
+```
+
+Casual riders prefer Saturday rides (22.4% of total casual rides). Sunday is the second day with the highest number of rides (18.9%), followed by Friday (14.5%). Rides from Monday to Thursday are equally split (11%).
+
+Members' rides are much more evenly split (13--15%). Members took the fewest rides on Sundays (12.5%).
+
+<br/>
+
+#### 📊 Total Rides by Hour
+
+<details>
+
+<summary>Show code and table output</summary>
+
+```{r}
+total_rides_by_hour <- all_trips_cln %>%
+  select(user_type, hour) %>% 
+  group_by(user_type, hour) %>% 
+  summarise(total_rides = n()) %>% 
+  mutate(percentage = scales::percent(total_rides/sum(total_rides), accuracy = 0.1)) %>% 
+  ungroup()
+
+total_rides_by_hour %>% knitr::kable() 
+```
+
+</details>
+
+```{r}
+#| code-fold: true
+#| fig-width: 7
+#| fig-height: 5
+total_rides_by_hour %>% 
+  ggplot(aes(x = hour, y = total_rides, color = user_type)) +
+  geom_line(aes(group = user_type), size = 1) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_color_manual(values = my_colors) +
+  labs(title = "Total Rides by Hour", subtitle = "September 2020 - August 2021",
+       x = "", y = "", color = "User Type") +
+  expand_limits(y = 3e5) +
+  my_theme +
+  theme(legend.position = "top")
+```
+
+Among members, we see spikes in use at 8 a.m. and 5 p.m., with another small bump at noon. Annual members are locals and frequent riders. They use bikes to commute to work or school, run errands, or get to appointments.
+
+Among casual riders, we see a spike in use at 5 p.m. Casual riders are one-way commuters. Overall, they tend to ride in the late morning and afternoon.
+
+### 💡 Average ride length
+
+Ride Length summary statistics by user type in minutes.
+
+```{r}
+all_trips_cln %>%   
+  select(user_type, ride_length) %>% 
+  group_by(user_type) %>% 
+  summarize(min = min(ride_length),
+            q1 = quantile(ride_length, 0.25),
+            median = median(ride_length),
+            mean = mean(ride_length),
+            q3 = quantile(ride_length, 0.75),
+            max = max(ride_length)) %>% 
+  knitr::kable()
+```
+
+The average ride length for casuals (26 min) is almost twice as long as the average ride length for members (14 min). On average, rides by casuals last 12 minutes longer than rides by annual members.
+
+<br/>
+
+#### 📊 Average Ride Length by Day of the Week
+
+<details>
+
+<summary>Show code and table output</summary>
+
+```{r}
+avg_ride_length_by_dow <- all_trips_cln %>% 
+  select(user_type, day_of_week, ride_length) %>% 
+  group_by(user_type, day_of_week) %>% 
+  summarise(avg_ride_length = mean(ride_length) %>% round(2)) %>% 
+  ungroup()
+
+avg_ride_length_by_dow %>% knitr::kable() 
+```
+
+</details>
+
+```{r}
+#| code-fold: true
+#| fig-width: 6
+#| fig-height: 5
+avg_ride_length_by_dow %>% 
+  ggplot(aes(x = day_of_week, y = avg_ride_length, fill = user_type)) + 
+  geom_col(width = 0.665, position = position_dodge(0.75)) + 
+  scale_y_continuous(labels = scales::comma) +
+  scale_fill_manual(values = my_colors) +
+  labs(title = "Average Ride Length (minute) by Day of the Week",
+       subtitle = "September 2020 - August 2021",
+       x = "", y = "", fill = "User Type") +
+  my_theme +
+  theme(legend.position = "top") 
+```
+
+The average ride length for members is constant from Monday to Friday (13 min), with a slight increase on Saturdays and Sundays (15 min).
+
+The average ride length for casuals varies during the week (from 22 to 30 min), The highest average ride length is on Sundays (30 min), followed by Saturdays (28 min).
+
+<br/>
+
+#### 📊 Average Ride Length by Hour
+
+<details>
+
+<summary>Show code and table output</summary>
+
+```{r}
+avg_ride_length_by_hour <- all_trips_cln %>% 
+  select(user_type, hour, ride_length) %>% 
+  group_by(user_type, hour) %>% 
+  summarise(avg_ride_length = mean(ride_length) %>% round(2)) %>% 
+  ungroup()
+
+avg_ride_length_by_hour %>% knitr::kable()
+```
+
+</details>
+
+```{r}
+#| code-fold: true
+#| fig-width: 7
+#| fig-height: 5
+avg_ride_length_by_hour %>% 
+  ggplot(aes(x = hour, y = avg_ride_length, color = user_type)) +
+  geom_line(aes(group = user_type), size = 1) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_color_manual(values = my_colors) +
+  labs(title = "Average Ride Length (minute) by Hour", 
+       subtitle = "September 2020 - August 2021",
+       x = "", y = "", color = "User Type") +
+  my_theme +
+  theme(legend.position = "top")
+```
+
+The longest rides for casuals start in the late mornings and afternoons. The average ride length for members is pretty much constant during the day.
+
+<br/>
+
+#### 📊 Average Ride Length by Hour and Day of the Week
+
+```{r}
+#| code-fold: true
+#| fig-width: 10
+#| fig-height: 7
+all_trips_cln %>%
+  group_by(user_type, day_of_week, hour) %>%
+  summarise(avg_ride_length = mean(ride_length), .groups = 'drop') %>% 
+  ggplot(aes(x = hour, y = avg_ride_length, color = user_type)) +
+  geom_line(aes(group = user_type), size=1) +
+  facet_wrap(~day_of_week) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_discrete(breaks = seq(1, 23, 2)) +
+  scale_color_manual(values = my_colors) +
+  labs(title = "Average Ride Length (minute) by Hour and Day of the Week", 
+       subtitle = "September 2020 - August 2021",
+       x = "", y = "", color = "User Type") +
+  my_theme +
+  theme(legend.position = "top")
+```
+
+### 💡 Bike-type usage
+
+```{r}
+all_trips_cln %>% 
+  select(user_type, rideable_type) %>% 
+  group_by(user_type, rideable_type) %>% 
+  summarise(total_rides = n()) %>% 
+  mutate(percentage = scales::percent(total_rides/sum(total_rides), accuracy = 0.1)) %>% 
+  ungroup() %>% 
+  pivot_wider(-total_rides, names_from = rideable_type, values_from = percentage) %>% 
+  knitr::kable()
+```
+
+**Note:** Both `classic_bike` and `docked_bike` are classic bikes. `classic_bike` is a classic docless bike, while `docked_bike` is a classic docked bike.
+
+On average, casual riders took 66% of total casual rides with classic bikes and 34% with electric. Members took slightly fewer rides with electric bikes (30.5%) than casuals.
+
+<br/>
+
+#### 📊 Rideable Type by Month
+
+```{r}
+#| code-fold: true
+#| fig-width: 8
+#| fig-height: 5
+all_trips_cln %>%
+  group_by(user_type, year_month, rideable_type) %>% 
+  summarise(total_rides = n()) %>% 
+  ggplot(aes(x = year_month, y = total_rides, fill = rideable_type)) +
+  geom_col(width = 0.7, position = "fill") +
+  facet_wrap(~user_type) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(title = "Rideable Type Usage by Month", 
+       subtitle = "September 2020 - August 2021",
+       x = "", y = "") + 
+  my_theme + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "top")
+```
+
+We can see that from October 2020 to January 2021, more rides were taken with electric bikes than on average. Since fewer rides were taken in those months, both groups had more electric bikes at their disposal.
+
+### 💡 Most popular stations
+
+Now we'll find out the top 20 most popular stations for casuals and members. The most popular starting and destination stations don't differ much, so I chose to work with starting stations.
+
+#### 🛠️ Data wrangling
+
+```{r}
+top_start_stations <- all_trips_cln %>% 
+  select(user_type, start_station_name) %>% 
+  filter(!is.na(start_station_name)) %>% 
+  group_by(user_type, start_station_name) %>% 
+  summarise(total_rides = n()) %>% 
+  slice_max(total_rides, n = 20) %>% 
+  mutate(rank = row_number()) %>% 
+  ungroup() %>% 
+  # join coordinates
+  left_join(divvy_stations %>% select(station_name, latitude, longitude), 
+            by = c("start_station_name" = "station_name"))
+
+top_start_stations
+```
+
+#### 📄 Interactive data table with the most popular stations
+
+💡 The table below is sortable. You can sort a column by clicking on its header. I find this table very useful. It provides so much information. See different results by clicking on "User type", "Rank", or "Total rides".
+
+```{r}
+#| code-fold: true
+#| column: body-outset-right
+# Render a bar chart with a label on the left
+bar_chart <- function(label, width = "100%", height = "0.875rem", fill = "#00bfc4", background = NULL) {
+  bar <- div(style = list(background = fill, width = width, height = height))
+  chart <- div(style = list(flexGrow = 1, marginLeft = "0.375rem", background = background), bar)
+  div(style = list(display = "flex", alignItems = "center"), label, chart)
+}
+
+reactable(
+  top_start_stations %>% select(user_type, rank, start_station_name, total_rides),
+  showPageSizeOptions = TRUE,
+  compact = TRUE,
+  columns = list(
+    user_type = colDef(
+      name = "User type",
+      width = 120
+    ),
+    rank = colDef(
+      name = "Rank",
+      width = 100
+    ),
+    start_station_name = colDef(
+      name = "Start station name",
+      minWidth = 320
+    ),
+    total_rides = colDef(
+      name = "Total rides",
+      defaultSortOrder = "desc",
+      format = colFormat(separators = TRUE),
+      cell = function(value, index) {
+        width <- paste0(value * 100 / max(top_start_stations$total_rides), "%")
+        # Add thousands separators
+        value <- format(value, big.mark = ",")
+        color_fill <- if(index <= (nrow(top_start_stations)/2)) {
+            "#355273"
+          } else {
+            "#FF3030"
+          }
+        bar_chart(value, width = width, fill = color_fill)    
+      },
+      minWidth = 250,
+      # And left-align the columns
+      align = "left"
+    )
+  ),
+  defaultSorted = c("total_rides", "user_type")
+)
+```
+
+#### 📊 Interactive leaflet map with the most popular stations
+
+```{r}
+#| code-fold: true
+# subsetting top stations for casuals and members
+casual <- top_start_stations %>% 
+  filter(user_type == "casual")
+
+member <- top_start_stations %>% 
+  filter(user_type == "member")
+
+# Creating a color palette
+mypalette <- colorFactor(my_colors, domain = top_start_stations$user_type)
+
+# Preparing the text for the tooltip
+mytext_cas <- paste(
+   "Station: ", casual$start_station_name, "<br/>", 
+   "User type: ", casual$user_type, "<br/>", 
+   "Total rides: ", scales::comma(casual$total_rides), "<br/>", 
+   "Rank: ", casual$rank, sep="") %>%
+  lapply(htmltools::HTML)
+
+mytext_mem <- paste(
+   "Station: ", member$start_station_name, "<br/>", 
+   "User type: ", member$user_type, "<br/>", 
+   "Total rides: ", scales::comma(member$total_rides),  "<br/>", 
+   "Rank: ", casual$rank, sep="") %>%
+  lapply(htmltools::HTML)
+
+# final map
+leaflet(top_start_stations) %>% 
+  addProviderTiles("CartoDB") %>%  
+  addCircleMarkers(data = casual,
+                   fillColor = ~mypalette(user_type), 
+                   fillOpacity = 0.7, 
+                   color = "white", 
+                   radius = ~total_rides/3000,
+                   stroke = FALSE,
+                   label = mytext_cas,
+                   labelOptions = labelOptions(style = list("font-weight"="normal", 
+                padding = "3px 8px"), textsize = "12px", direction = "auto"),
+                   group = "casual") %>%
+  addCircleMarkers(data = member,
+                   fillColor = ~mypalette(user_type), 
+                   fillOpacity = 0.7, 
+                   color = "white", 
+                   radius = ~total_rides/3000,
+                   stroke = FALSE,
+                   label = mytext_mem,
+                   labelOptions = labelOptions(style = list("font-weight"="normal", 
+                padding = "3px 8px"), textsize = "12px", direction = "auto"),
+                   group = "member") %>%
+  addLegend(pal = mypalette, 
+            values = ~user_type, 
+            opacity = 0.7, 
+            title = "User type", 
+            position = "bottomright" ) %>% 
+  addLayersControl(overlayGroups = c("casual", "member"),
+                   options = layersControlOptions(collapsed = FALSE)) %>% 
+  leaflet.extras::addResetMapButton()
+```
+
+<br/>
+
+The most popular stations for casual riders are Millennium Park and those located along DuSable Lake Shore Drive. These are all localities for entertainment and leisure activities, which is indicative of the main purpose of these rides.
+
+Most popular stations for members are located nearby or inside the business district, which is indicative of the main purpose of these rides (commuting to work or school, running errands, getting to appointments, and similar).
+
+## ✨ PART V: Act
+
+Casual riders can be locals or visitors (tourists). With our new marketing campaign, we should target only locals since there is little chance that visitors will buy an annual membership. Unfortunately, there is no way to distinguish locals from visitors in the group of casual riders. We'll have to settle for the data we currently have.
+
+<p style="border-width:3px; border-style:solid; border-color:#4779b9; padding: 1em;">My **top three recommendations** for the new marketing strategy aimed at converting casual riders into annual members are::<br><br>1. Conduct the marketing campaign during the summer months (June, July, August), mostly on weekends in the afternoon but also on weekdays around 5 p.m.<br><br>2. Use the fact that casual riders tend to ride 12+ minutes longer than annual members.<br><br>3. Act in the areas of stations that are most popular with casual riders.</p>
+
+<br/>
+
+You've reached the end of this project. Thank you for reading! Dream big. Bye! 🖐

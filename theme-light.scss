@@ -106,6 +106,9 @@ $h6-font-size:                $font-size-base !default;
 $blockquote-footer-color:     $gray-800 !default;
 $blockquote-footer-font-size: 14px !default;
 
+// table
+$table-cell-padding-y:        .30rem !default;
+$table-cell-padding-x:        .35rem !default;
 
 /*-- scss:rules --*/
 
@@ -188,7 +191,7 @@ nav.navbar.navbar-expand-lg.navbar-dark {
 .table {
   --bs-table-striped-bg: $white;
   width: 100%;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 
