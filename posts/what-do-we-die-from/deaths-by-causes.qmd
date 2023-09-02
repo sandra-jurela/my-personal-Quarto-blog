@@ -4,11 +4,11 @@ description: |
   An exploratory data analysis of the Our World in Data dataset.
 date: 2022-04-21
 categories:
-  - EDA
+  - eda
   - data cleaning
   - data manipulation
   - data visualization
-  - R
+  - r
 draft: true
 ---
 

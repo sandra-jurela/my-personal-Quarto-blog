@@ -4,10 +4,10 @@ description: |
   My SQL project for the "Intermediate SQL for Data Analysis" course at Dataquest.
 date: 2022-02-15
 categories:
-  - SQL
-  - SQLite
+  - sql
+  - sqlite
   - data visualization
-  - R
+  - r
 image: images/media_type.png
 message: true
 ---

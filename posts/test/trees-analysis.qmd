@@ -5,7 +5,7 @@ date: "2023-05-29"
 categories: 
   - python
   - altair
-  - EDA
+  - eda
 jupyter: python3
 format:
   html:

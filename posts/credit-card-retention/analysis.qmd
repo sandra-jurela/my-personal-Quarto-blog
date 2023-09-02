@@ -5,7 +5,7 @@ date: "2023-06-10"
 categories: 
   - python
   - altair
-  - EDA
+  - eda
 format:
   html:
     theme: theme-light.scss

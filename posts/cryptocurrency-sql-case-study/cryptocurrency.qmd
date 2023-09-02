@@ -3,9 +3,9 @@ title: "Cryptocurrency SQL Case Study"
 description: "Data with Danny - SQL masterclass - O’Reilly. With R solutions for Part 4: Window functions."
 date: 2022-11-25
 categories:
-  - SQL
-  - PostgreSQL
-  - EDA
+  - sql
+  - postgresql
+  - eda
 ---
 
 ## Foreword

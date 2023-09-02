@@ -3,9 +3,9 @@ title: "Shiny App - Mass Shootings in the USA"
 description: "EDA with Shiny app on mass shootings between August 20th, 1982 and July 3rd, 2023."
 date: "2023-03-01"
 categories: 
-  - R
+  - r
   - shiny
-  - EDA
+  - eda
   - data cleaning
 image: images/preview.png
 ---

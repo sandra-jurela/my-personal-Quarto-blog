@@ -3,7 +3,7 @@ title: "Titanic Survival Exercises"
 description: "Assessment of visualization skills acquired in the HarvardX's Data Science: Visualization course."
 date: "2022-06-09"
 categories: 
-  - R
+  - r
   - ggplot2
   - data visualization
 image: images/preview.png
@@ -205,8 +205,6 @@ titanic2 <- titanic %>%
     )
   )
 ```
-
-
 
 ```{r, fig.width=5, fig.height=4}
 titanic2 %>% 

@@ -6,24 +6,23 @@ date: 2022-05-20
 categories:
   - data wrangling
   - data visualization
-  - SQL
-  - PostgreSQL
-  - R
+  - sql
+  - postgresql
+  - r
 image: images/preview.png
 ---
-
 
 ## Part I - Getting & wrangling data from the database
 
 The **Bike Sales** Database represents a **bicycle manufacturer**, including tables for products (bikes), customers (bike shops), and transactions (orders).
 
-It consists of 3 tables: 
+It consists of 3 tables:
 
-- **`bikes`** table, which includes bicycle models, descriptions, and unit prices that are produced by the manufacturer.
+-   **`bikes`** table, which includes bicycle models, descriptions, and unit prices that are produced by the manufacturer.
 
-- **`bikeshops`** table, which includes customers that the bicycle manufacturer has sold to.
+-   **`bikeshops`** table, which includes customers that the bicycle manufacturer has sold to.
 
-- **`orderlines`** table, which includes transactional data such as order ID, order line, date, customer, product, and quantity sold.
+-   **`orderlines`** table, which includes transactional data such as order ID, order line, date, customer, product, and quantity sold.
 
 **`bike_sales`** database is the local Postgres database stored on my machine.
 
@@ -45,9 +44,7 @@ library(tidyverse)
 library(lubridate)
 ```
 
-
-The `sql` engine uses the `DBI` package to execute SQL queries, print their results, and optionally assign the results to a data frame. To use the `sql` engine, we first need to establish a DBI connection to a database. 
-
+The `sql` engine uses the `DBI` package to execute SQL queries, print their results, and optionally assign the results to a data frame. To use the `sql` engine, we first need to establish a DBI connection to a database.
 
 ### Creating a connection to the `bike_sales` database
 
@@ -59,7 +56,6 @@ mycon <- DBI::dbConnect(RPostgres::Postgres(),
                         user = rstudioapi::askForPassword("Database username"),
                         password = rstudioapi::askForPassword("Database password"))
 ```
-
 
 There are several options to [secure your credentials](https://solutions.posit.co/connections/db/best-practices/managing-credentials/index.html) in R. Here I use prompting for credentials via `rstudioapi`.
 
@@ -87,7 +83,6 @@ dbReadTable(mycon, "bikes") %>% head()
 dbReadTable(mycon, "orderlines") %>% head()
 ```
 
-
 ```{r}
 # a simple query example
 dbGetQuery(mycon, 
@@ -99,7 +94,6 @@ dbGetQuery(mycon,
 ### Joining the tables
 
 In all three tables there are dots in column names. This is not a good practice and I first had to figure out how to join the tables without an error! Here is the solution:
-
 
 ```{r}
 bike_orderlines_joined <- dbGetQuery(mycon, 
@@ -118,13 +112,11 @@ head(bike_orderlines_joined)
 glimpse(bike_orderlines_joined)
 ```
 
-
 Disconnecting from the database.
 
 ```{r}
 dbDisconnect(mycon)
 ```
-
 
 ### Data wrangling
 
@@ -156,12 +148,9 @@ bike_orderlines %>% head()
 bike_orderlines %>% glimpse()
 ```
 
-
-
 # Part II - Advanced plots with `ggplot2`
 
 I will continue to work with the `bike_orderlines` dataframe and create two useful plots.
-
 
 ## Lollipop Chart: Top N Customers
 
@@ -197,7 +186,6 @@ top_customers <- bike_orderlines %>%
 top_customers
 ```
 
-               
 ### Data visualization
 
 ```{r}
@@ -228,8 +216,6 @@ top_customers %>%
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank())
 ```
-
-
 
 ## Heatmap: Customers' Purchasing Habits
 
@@ -287,18 +273,16 @@ pct_sales_by_customer %>%
 
 Top 3 customers that prefer mountain bikes:
 
-- Ithaca Mountain Climbers
-- Pittsburgh Mountain Machines
-- Tampa 29ers
+-   Ithaca Mountain Climbers
+-   Pittsburgh Mountain Machines
+-   Tampa 29ers
 
 Top 3 customers that prefer road bikes:
 
-- Ann Arbor Speed
-- Austin Cruisers
-- Indianapolis Velocipedes
-
+-   Ann Arbor Speed
+-   Austin Cruisers
+-   Indianapolis Velocipedes
 
 <br/>
 
 That's it! I hope you like it. For those wondering where I learned to make plots like this... in a fabulous course [Data Science for Business Part 1](https://university.business-science.io/p/ds4b-101-r-business-analysis-r) by [Matt Dancho](https://www.linkedin.com/in/mattdancho/). This is probably the best course on R and I highly recommend it.
-

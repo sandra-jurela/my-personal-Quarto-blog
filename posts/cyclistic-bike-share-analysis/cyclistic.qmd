@@ -4,11 +4,11 @@ description: |
   The latest version of my capstone project for the Google Data Analytics Professional Certificate.
 date: 2023-08-25
 categories:
-  - EDA
+  - eda
   - data cleaning
   - data wrangling
   - data visualization
-  - R
+  - r
 image: images/preview.png
 code-summary: "Show code"
 ---
@@ -37,7 +37,11 @@ Lily Moreno, the director of marketing and my manager has assigned me the first 
 
 In the first step of the data analysis process, we identify the business task and consider key stakeholders.
 
-<p style="border-width:3px; border-style:solid; border-color:#4779b9; padding: 1em;">**Business task**<br>How do annual members and casual riders use Cyclistic bikes differently?</p>
+<p style="border-width:3px; border-style:solid; border-color:#4779b9; padding: 1em;">
+
+**Business task**<br>How do annual members and casual riders use Cyclistic bikes differently?
+
+</p>
 
 **Primary Stakeholders**
 
@@ -965,7 +969,11 @@ Most popular stations for members are located nearby or inside the business dist
 
 Casual riders can be locals or visitors (tourists). With our new marketing campaign, we should target only locals since there is little chance that visitors will buy an annual membership. Unfortunately, there is no way to distinguish locals from visitors in the group of casual riders. We'll have to settle for the data we currently have.
 
-<p style="border-width:3px; border-style:solid; border-color:#4779b9; padding: 1em;">My **top three recommendations** for the new marketing strategy aimed at converting casual riders into annual members are::<br><br>1. Conduct the marketing campaign during the summer months (June, July, August), mostly on weekends in the afternoon but also on weekdays around 5 p.m.<br><br>2. Use the fact that casual riders tend to ride 12+ minutes longer than annual members.<br><br>3. Act in the areas of stations that are most popular with casual riders.</p>
+<p style="border-width:3px; border-style:solid; border-color:#4779b9; padding: 1em;">
+
+My **top three recommendations** for the new marketing strategy aimed at converting casual riders into annual members are::<br><br>1. Conduct the marketing campaign during the summer months (June, July, August), mostly on weekends in the afternoon but also on weekdays around 5 p.m.<br><br>2. Use the fact that casual riders tend to ride 12+ minutes longer than annual members.<br><br>3. Act in the areas of stations that are most popular with casual riders.
+
+</p>
 
 <br/>
 

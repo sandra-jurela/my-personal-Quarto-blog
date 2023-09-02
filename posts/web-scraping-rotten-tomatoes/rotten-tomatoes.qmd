@@ -6,8 +6,8 @@ categories:
 - web scraping
 - data wrangling
 - rvest
-- R 
-- Tableau
+- r 
+- tableau
 image: images/dashboard.jpg
 ---
 

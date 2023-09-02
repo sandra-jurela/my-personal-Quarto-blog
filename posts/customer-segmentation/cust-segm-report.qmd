@@ -4,9 +4,9 @@ description: |
   A report for the non-technical marketing team.
 date: 2022-12-15
 categories:
-  - R
+  - r
   - k-means
-  - UMAP
+  - umap
 image: images/clusters.png
 execute: 
   echo: false
