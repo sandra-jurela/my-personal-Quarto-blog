@@ -1,19 +1,20 @@
 ---
 title: "Shiny App - Mass Shootings in the USA"
-description: "EDA with Shiny app on mass shootings between August 20th, 1982 and July 3rd, 2023."
+description: "EDA with Shiny app on mass shootings between August 20th, 1982 and August 26th, 2023."
 date: "2023-03-01"
 categories: 
   - r
   - shiny
   - eda
   - data cleaning
+  - data wrangling
 image: images/preview.png
 ---
 
 ::: {.callout-note appearance="simple"}
 This post will be regularly updated with each new case.
 
-Last update on July 17, 2023.
+Last update on September 7, 2023.
 :::
 
 <br/>
@@ -39,7 +40,7 @@ mass_shootings <- read_csv("data/mass_shootings_usa_1982-2023.csv")
 mass_shootings %>% glimpse()
 ```
 
-We have 145 cases, described with 24 variables. At first glance, this dataset clearly needs extensive cleaning.
+We have 147 cases, described with 24 variables. At first glance, this dataset clearly needs extensive cleaning.
 
 ## Data cleaning
 
@@ -79,7 +80,7 @@ mass_shootings_cln %>%
   pivot_longer(cols = everything(), names_to = "column", values_to = "n_missing")
 ```
 
-19 of the most recent cases don't have location coordinates at all. We'll address this in the final cleanup step.
+21 of the most recent cases don't have location coordinates at all. We'll address this in the final cleanup step.
 
 ### 🧹 Step 2. Fixing unique values of categorical variables
 
@@ -220,7 +221,7 @@ count_unique(mass_shootings_cln, weapons_obtained_legally)
 count_unique(mass_shootings_cln, type)
 ```
 
-Note: Spree shootings here have three or more victims in a short time in multiple locations.
+Note: Spree shootings have three or more victims in a short time in multiple locations.
 
 ### 📊 Age of shooter distribution
 
@@ -274,14 +275,13 @@ mass_shootings_cln %>%
 
 -   The vast majority of shooters were between 15 and 50 years old.
 -   The age distribution is bimodal, with one mode around 23 years of age and a second mode around 41 years of age.
--   Most shooters were in the 20-24 age group (18.2 %), followed by 40-44 (16.8 %) and 25-29 (16.1 %).
+-   Most shooters were in the 20-24 age group (18.6 %), followed by 40-44 (16.6 %) and 25-29 (15.9 %).
 
 🔎 Who was the youngest shooter?
 
 ```{r}
-index <- which.min(mass_shootings_cln$age_of_shooter)
-
-mass_shootings_cln[index, ] %>% 
+mass_shootings_cln %>% 
+  slice_min(age_of_shooter, n = 1) %>% 
   select(case, date, summary, fatalities) %>% 
   knitr::kable()
 ```
@@ -304,7 +304,7 @@ ggplotly(p2)
 
 -   We can see an increase in mass shootings in the last 12 years.
 -   2020 has a smaller number of cases probably due to Covid restrictions.
--   The data for 2023 is incomplete, with eight cases in the first seven months.
+-   The data for 2023 is incomplete, with ten cases in the first eight months.
 
 ### 📊 Fatalities-Injured relationship
 
@@ -398,9 +398,9 @@ mass_shootings_shiny <- mass_shootings_cln %>%
 
 ## Shiny app
 
-The app you can see below is embedded in this `quarto` document since my website is static. It was originally published on [shinyapps.io](https://www.shinyapps.io/) and you can also interact with it [here](https://sandra-jurela.shinyapps.io/shiny-mass-shootings-usa/).
+The app you can see below is embedded in this `quarto` document since my website is static. It was originally published on [shinyapps.io](https://sandra-jurela.shinyapps.io/shiny-mass-shootings-usa/), where you can also interact with it.
 
-**A quick note:** With a free account I have 25 active hours (when my applications are not idle). If these 25 active hours are exceeded, my app will not be available again until the following month cycle. Hope you get lucky! 😊
+**Note:** If you don't see the application, I've run out of my 25 active hours (when my applications are not idle). Sorry, this is a free account, and my app will not be available again until the following month cycle. Hope you get lucky! 😊
 
 📢 By clicking on each circle, you can read a summary of the mass shooting case.
 
