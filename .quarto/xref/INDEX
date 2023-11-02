@@ -85,5 +85,8 @@
   },
   "posts/credit-card-retention/analysis.qmd": {
     "analysis.html": "c223fddd"
+  },
+  "posts/sentiment-analysis/we_yevgeny_zamyatin.qmd": {
+    "we_yevgeny_zamyatin.html": "05dbd07f"
   }
 }
