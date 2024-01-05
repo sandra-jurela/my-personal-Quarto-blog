@@ -1,6 +1,6 @@
 ---
 title: "Shiny App - Mass Shootings in the USA"
-description: "EDA with Shiny app on mass shootings between August 20th, 1982 and October 25th, 2023."
+description: "EDA with Shiny app on mass shootings between August 20th, 1982 and December 6th, 2023."
 date: "2023-03-01"
 categories: 
   - r
@@ -14,7 +14,7 @@ image: images/preview.png
 ::: {.callout-note appearance="simple"}
 This post will be regularly updated with each new case.
 
-Last update on November 2, 2023.
+Last update on January 5, 2024.
 :::
 
 <br/>
@@ -40,7 +40,7 @@ mass_shootings <- read_csv("data/mass_shootings_usa_1982-2023.csv")
 mass_shootings %>% glimpse()
 ```
 
-We have 148 cases, described with 24 variables. At first glance, this dataset clearly needs extensive cleaning.
+We have 149 cases, described with 24 variables. At first glance, this dataset clearly needs extensive cleaning.
 
 ## Data cleaning
 
@@ -80,7 +80,7 @@ mass_shootings_cln %>%
   pivot_longer(cols = everything(), names_to = "column", values_to = "n_missing")
 ```
 
-22 of the most recent cases don't have location coordinates at all. We'll address this in the final cleanup step.
+23 of the most recent cases don't have location coordinates at all. We'll address this in the final cleanup step.
 
 ### 🧹 Step 2. Fixing unique values of categorical variables
 
@@ -127,7 +127,7 @@ mass_shootings_cln <- mass_shootings_cln %>%
 
 ### 🧹 Step 3. Geocoding locations with missing coordinates
 
-There are 22 cases with missing location coordinates. In this step we'll convert locations to coordinates with geocoding. and use them later to create a `leaflet` map for a `shiny app`.
+There are 23 cases with missing location coordinates. In this step we'll convert locations to coordinates with geocoding. and use them later to create a `leaflet` map for a `shiny app`.
 
 The `tidygeocoder` package provides geocoding services. It's designed to work easily with the `tidyverse.` It also provides access to several different geocoding services, including [LocationIQ](https://locationiq.com/) which I'm going to use here. LocationIQ is a freemium service that provides a free tier, which doesn't require you to give them your billing details. When you sign up to LocationIQ, they'll take you to the Manage Your API Access Tokens page, which is where we obtain our API token. Next, you need to provide the `tidygeocoder` package with your API key.
 
@@ -275,7 +275,7 @@ mass_shootings_cln %>%
 
 -   The vast majority of shooters were between 15 and 50 years old.
 -   The age distribution is bimodal, with one mode around 23 years of age and a second mode around 41 years of age.
--   Most shooters were in the 20-24 age group (18.5 %), followed by 40-44 (17.1 %) and 25-29 (15.8 %).
+-   Most shooters were in the 20-24 age group (18.4 %), followed by 40-44 (17 %) and 25-29 (15.6 %).
 
 🔎 Who was the youngest shooter?
 
@@ -304,7 +304,6 @@ ggplotly(p2)
 
 -   We can see an increase in mass shootings in the last 12 years.
 -   2020 has a smaller number of cases probably due to Covid restrictions.
--   The data for 2023 is incomplete, with 11 cases in the first ten months.
 
 ### 📊 Fatalities-Injured relationship
 
